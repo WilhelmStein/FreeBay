@@ -2,7 +2,7 @@
 
 ## Back - End
 
-- [ ] Setup Express
+- [x] Setup Express
 - [ ] Design Database
 - [ ] Setup MySQL
 - [ ] Create CRUD
@@ -12,8 +12,8 @@
 
 ## Front - End
 
-- [ ] Create React app
-- [ ] Setup Router
+- [x] Create React app
+- [x] Setup Router
 - [ ] Setup Sass
 - [ ] Design UI - Adobe XD
 
@@ -21,3 +21,4 @@
 
 * [Pagination](https://www.npmjs.com/package/react-paginate)
 * [Map](https://react-leaflet.js.org/)
+* [Router](https://blog.pshrmn.com/simple-react-router-v4-tutorial/)
