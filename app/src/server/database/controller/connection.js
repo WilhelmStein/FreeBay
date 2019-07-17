@@ -5,7 +5,7 @@ function initConnection() {
         host: 'localhost',
         user: 'root',
         password: 'password',
-        database: 'sdi1500084'
+        database: 'freebay'
     }) );
 }
 
