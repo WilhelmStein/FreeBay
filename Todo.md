@@ -7,11 +7,13 @@
 
 - [x] Setup Express
 - [x] Setup MySQL
-- [ ] Design Database
+- [x] Design Database
+- [x] DB Create Script
+- [ ] DB Fill Script
 
 ### Features
 
-- [ ] Create CRUD
+- [ ] Create Database Controller
 - [ ] Setup SSL encryption
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
