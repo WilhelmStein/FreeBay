@@ -7,6 +7,7 @@
 
 - [x] Setup Express
 - [x] Setup MySQL
+- [ ] Add Visited Auction Table MxN User - Auction (bonus)
 - [x] Design Database
 - [x] DB Create Script
 - [ ] DB Fill Script
