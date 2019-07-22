@@ -1,5 +1,5 @@
 const express = require('express');
-const sql = require('./connection').initConnection();
+const sql = require('./database/controller/connection').initConnection();
 const bodyParser = require('body-parser');
 
 const app = express();
