@@ -1,0 +1,35 @@
+$blue: rgb(72, 109, 209);
+$orange: orange;
+$red: rgb(248, 97, 97);
+$almost-white: rgb(241, 241, 241);
+
+$font: Ubuntu, Helvetica, Arial, sans-serif;
+
+$small-font-size: 15px;
+$normal-font-size: 18px;
+$header-font-size: 25px;
+
+body, #root, .App
+{
+    height: 100vh;
+    width: 100vw;
+}
+
+.link
+{
+    text: {
+        decoration: none;
+    }
+
+    font: {
+        family: $font;
+        size: 18px;
+    }
+
+    border: none;
+    outline: none;
+
+    cursor: pointer;
+
+    background: none;
+}

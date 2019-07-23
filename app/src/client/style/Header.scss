@@ -1,0 +1,26 @@
+@import "global";
+
+.Header
+{
+    color:white;
+    
+    background-color: $blue;
+    height: 10%;
+
+    #Logo
+    {
+        color: white;
+    }
+
+    #Signup
+    {
+        color: white;
+    }
+
+    .AccountSnapshot
+    {
+        float: right;
+    }
+}
+
+

@@ -1,0 +1,107 @@
+@import 'global';
+
+#Login
+{
+    color: white;
+}
+
+.LoginPopup-content
+{
+    width: 400px !important;
+
+    border-radius: 5px;
+
+    box-shadow: 1px 1px 10px !important grey;
+
+    padding:
+    {
+        bottom: 20px !important;
+    }
+
+    text-align: center !important;
+}
+
+.LoginForm
+{
+    header
+    {
+        font-size: $header-font-size;
+        margin: 10px;
+        color: $blue;
+    }
+
+    label
+    {
+        margin: 0 auto;
+        width: 80%;
+        height: 100%;
+
+        p
+        {
+            margin: 10px auto;
+            font-size: $normal-font-size;
+            color: $blue;
+            text-align: left;
+        }
+
+        input
+        {
+            border-radius: 5px;
+            border: none;
+            width : 80%;
+
+            float: left;
+
+            padding: 15px;
+
+            background-color: $almost-white;
+        }
+
+        input.form-wrong
+        {
+            border: 1px solid $red;
+        }
+
+        input.form-right
+        {
+            border: none;
+        }
+    }
+
+    button
+    {
+        box-shadow: 1px 1px 10px gray;
+    
+        border: none;
+        border-radius: 5px;
+
+        cursor: pointer;
+
+        color: white;
+        
+        font-size: 20px;
+
+        padding: 10px 20px;
+        margin: 20px auto;
+        margin-bottom: 10px;
+        width: 150px;
+
+        text-align: center;
+
+        background-color: $blue;
+    }
+
+    span
+    {
+        font-size: $small-font-size;
+        color: gray;
+
+        .link
+        {
+            color: $blue;
+            font-size: $small-font-size;
+        }
+    }
+
+    display: grid;
+}
