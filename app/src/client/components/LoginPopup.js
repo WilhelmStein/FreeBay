@@ -70,6 +70,9 @@ export class LoginForm extends Component
             password: this.state.password
         })
         .then(res => {
+            
+            console.log(res.data);
+
             if (res.data.error)
             {
                 this.setState({
@@ -82,12 +85,11 @@ export class LoginForm extends Component
             {
                 this.props.Close();
 
-                const user = JSON.stringify(res.data.data);
-                sessionStorage.setItem('LoggedUser', user);
+                sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
 
                 if (this.props.loginHandler)
                 {
-                    this.props.loginHandler(user)
+                    this.props.loginHandler(res.data.data)
                 }
             }
             
@@ -127,7 +129,7 @@ export class LoginForm extends Component
                     />
                 </label>
 
-                <button id="LoginButton" type="submit">Login</button>
+                <button id="LoginButton" type="submit">Log in</button>
 
                 <span>
                     New User? &nbsp;

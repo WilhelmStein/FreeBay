@@ -15,8 +15,11 @@ class App extends React.Component {
     {
         super(props);
 
+        const user_s = sessionStorage.getItem('LoggedUser');
+        const user = user_s ? JSON.parse(user_s) : null;
+
         this.state = {
-            user: null
+            user: user
         }
 
         autoBind(this);

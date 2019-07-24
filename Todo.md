@@ -33,7 +33,8 @@
 - [ ] Header
     - [x] Logo
     - [ ] Search
-    - [ ] Login
+    - [x] Login
+    - [ ] Styling
 - [ ] Signup
 
 ### Packages

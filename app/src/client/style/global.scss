@@ -1,13 +1,28 @@
 $blue: rgb(72, 109, 209);
 $orange: orange;
 $red: rgb(248, 97, 97);
+
 $almost-white: rgb(241, 241, 241);
+$less-white: rgb(230, 230, 230);
+$graphite: rgb(73, 73, 73);
 
 $font: Ubuntu, Helvetica, Arial, sans-serif;
 
 $small-font-size: 15px;
 $normal-font-size: 18px;
 $header-font-size: 25px;
+
+$main-color: $blue;
+$secondary-color: $orange;
+
+@mixin vertical_center
+{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY((-50%));
+    transform: translateY(-50%);
+}
 
 body, #root, .App
 {
@@ -32,4 +47,6 @@ body, #root, .App
     cursor: pointer;
 
     background: none;
+
+    color: $blue;
 }

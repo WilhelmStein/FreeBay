@@ -1,15 +1,29 @@
 @import "global";
 
+$Header-height: 100px;
+$Search-height: calc(#{$Header-height} / 2.2);
+
 .Header
 {
-    color:white;
+    display: grid;
+    grid-template-columns: 250px 5fr 250px;
     
-    background-color: $blue;
-    height: 10%;
+    background-color: $main-color;
+    height: $Header-height;
 
+    color: white;
+    
     #Logo
     {
+        height: $Header-height;
+
         color: white;
+
+        line-height: $header-font-size;
+        font-size: $header-font-size;
+
+        box-sizing: border-box;
+        padding: calc((#{$Header-height} - #{$header-font-size}) / 2) 50px;
     }
 
     #Signup
@@ -17,9 +31,96 @@
         color: white;
     }
 
+    .SearchBar
+    {
+        font-size: $normal-font-size;
+
+        border-radius: 5px;
+        border: none;
+
+        box-sizing: border-box;
+
+        display: grid;
+        grid-template-columns: 1fr 7fr $Search-height;
+
+        width: 80%;
+        height: $Header-height;
+
+        margin: 0 auto;
+        padding: calc((#{$Header-height} - #{$Search-height}) / 2) 50px;
+
+        select
+        {
+            font-size: inherit;
+
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            
+            border:
+            {
+                right: 0.3px solid grey;
+                left: 0;
+                top: 0;
+                bottom: 0;
+            }
+
+            height: $Search-height;
+
+            padding: 10px;
+
+            background-color: $less-white;
+
+            color: $graphite;
+        }
+
+        input
+        {
+            font-size: inherit;
+
+            border: none;
+            outline: none;
+
+            height: $Search-height;
+
+            padding: 0 25px;
+
+            background-color: $almost-white;
+
+            color: $graphite;
+        }
+
+        button
+        {
+            background-color: $secondary-color;
+
+            border:none;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            outline:none;
+
+            cursor: pointer;
+
+            height: $Search-height;
+            width: $Search-height;
+
+            padding: 13px;
+
+            img
+            {
+                width: 100%;
+            }
+        }
+    }
+
     .AccountSnapshot
     {
-        float: right;
+        line-height: $normal-font-size;
+        font-size: $normal-font-size;
+
+        height: $Header-height;
+
+        box-sizing: border-box;
+        padding: calc((#{$Header-height} - #{$normal-font-size} - 1px) / 2) 50px;
     }
 }
 

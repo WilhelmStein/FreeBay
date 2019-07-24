@@ -6,7 +6,7 @@ export default class Home extends Component
     {
         super(props);
 
-        this.state = props;
+        this.state = {};
     }
 
     render()
