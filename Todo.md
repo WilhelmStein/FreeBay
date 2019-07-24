@@ -30,11 +30,12 @@
 
 ### Components
 
-- [ ] Header
+- [x] Header
     - [x] Logo
-    - [ ] Search
+    - [x] Search
+      - [ ] Implement Functionality
     - [x] Login
-    - [ ] Styling
+    - [x] Styling
 - [ ] Signup
 
 ### Packages

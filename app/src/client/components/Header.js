@@ -4,6 +4,7 @@ import autoBind from 'auto-bind';
 import axios from "axios"
 
 import LoginPopup from './LoginPopup';
+import Popup from 'reactjs-popup';
 import Logo from '../images/Logo2.png';
 
 import "../style/Header.scss"
@@ -147,10 +148,30 @@ function AccountSnapshot(props)
     {
         return (
             <div className="AccountSnapshot AccountSnapshotFull">
-                Welcome, {props.user.Username}!
-                <button onClick={() => { sessionStorage.removeItem("LoggedUser"); props.loginHandler(null); }}>
-                    Log out
-                </button>
+                <Popup
+                    className='AccountPopup'
+                    trigger = {open => (
+                        <div className="AccountPopupText">
+                            Welcome, {props.user.Username} !
+                            {
+                                open ?
+                                <span className="account_button"/>
+                                :
+                                <span className="account_button_downward"/>
+                            }
+                        </div>
+                    )}
+                    position="bottom right"
+                >
+                    <div className = "AccountMenu">
+                        <button onClick={() => {}}>
+                            Settings
+                        </button>
+                        <button onClick={() => { sessionStorage.removeItem("LoggedUser"); props.loginHandler(null); }}>
+                            Log out
+                        </button>
+                    </div>
+                </Popup>
             </div>
         )
     }

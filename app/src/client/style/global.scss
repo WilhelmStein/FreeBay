@@ -1,10 +1,17 @@
 $blue: rgb(72, 109, 209);
+$grey-blue: #557a95;
+
 $orange: orange;
-$red: rgb(250, 77, 77);
+$somon: #379683;
+
+$red: rgb(196, 37, 37);
+$dark-red: rgb(119, 24, 24);
+
 $green: #138d27;
 
 $almost-white: rgb(241, 241, 241);
 $less-white: rgb(230, 230, 230);
+$lesser-white: rgb(216, 216, 216);
 $graphite: rgb(73, 73, 73);
 
 $font: Ubuntu, Helvetica, Arial, sans-serif;
@@ -13,8 +20,8 @@ $small-font-size: 15px;
 $normal-font-size: 18px;
 $header-font-size: 25px;
 
-$main-color: $blue;
-$secondary-color: $orange;
+$main-color: $red;
+$secondary-color: $dark-red;
 
 @mixin vertical_center
 {
