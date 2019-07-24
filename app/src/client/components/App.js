@@ -33,6 +33,7 @@ class App extends React.Component {
     {
         return (
             <div className="App">
+                {/* Header is here because it will always render in the website. It also gives login status to every other page */}
                 <Header user={this.state.user} loginHandler={this.loginHandler}/>
                 <Switch>
                     <Route exact path='/' component={Home} />
