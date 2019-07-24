@@ -12,9 +12,14 @@ $Search-height: calc(#{$Header-height} / 2.2);
     height: $Header-height;
 
     color: white;
+
+    box-shadow: 1px 1px 20px $graphite;
+    // filter: drop-shadow(0 5px 20px grey);
     
     #Logo
     {
+        filter: drop-shadow(1px 1px 2px $graphite);
+
         height: $Header-height;
 
         color: white;
@@ -23,16 +28,38 @@ $Search-height: calc(#{$Header-height} / 2.2);
         font-size: $header-font-size;
 
         box-sizing: border-box;
-        padding: calc((#{$Header-height} - #{$header-font-size}) / 2) 50px;
+        margin-left: 25px;
+
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+
+
+
+        img
+        {
+            width: 100%;
+            padding: calc((#{$Header-height} - 80px) / 2) 0;
+        }
+
+        p
+        {
+            margin: 0;
+            padding: calc((#{$Header-height} - #{$header-font-size}) / 2) 10px;
+
+        }
     }
 
-    #Signup
+    #Signup, #Login
     {
+        text-shadow: 1px 2px 2px $graphite;
+
         color: white;
     }
 
     .SearchBar
     {
+        filter: drop-shadow(1px 1px 2px $graphite);
+
         font-size: $normal-font-size;
 
         border-radius: 5px;
@@ -114,6 +141,8 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
     .AccountSnapshot
     {
+        text-shadow: 1px 1px 1px $graphite;
+
         line-height: $normal-font-size;
         font-size: $normal-font-size;
 

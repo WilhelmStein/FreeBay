@@ -14,15 +14,14 @@
     box-shadow: 1px 1px 10px !important grey;
 
     padding: 20px !important;
-    // {
-    //     bottom: 20px !important;
-    // }
 
     text-align: center !important;
 }
 
 .LoginForm
 {
+    text-shadow: none !important;
+
     header
     {
         font-size: $header-font-size;
@@ -70,7 +69,7 @@
 
     button
     {
-        box-shadow: 1px 1px 10px gray;
+        box-shadow: 1px 1px 5px $graphite;
     
         border: none;
         border-radius: 5px;

@@ -4,7 +4,7 @@ import autoBind from 'auto-bind';
 import axios from "axios"
 
 import LoginPopup from './LoginPopup';
-// import logo from '../images/Logo.png';
+import Logo from '../images/Logo2.png';
 
 import "../style/Header.scss"
 import SearchImg from "../images/Search.png"
@@ -28,7 +28,8 @@ export default class Header extends Component
         return (
             <div className="Header">
                 <Link to='/' id="Logo" className="link">
-                    FreeBay
+                    <img alt="" src={Logo}/>
+                    <p>FreeBay</p>
                 </Link>
                 <SearchBar/>
                 <AccountSnapshot user={this.props.user} loginHandler={this.props.loginHandler}/>
