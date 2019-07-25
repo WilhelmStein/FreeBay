@@ -36,7 +36,10 @@
       - [ ] Implement Functionality
     - [x] Login
     - [x] Styling
-- [ ] Signup
+- [x] Signup
+  - [x] [Countries](https://restcountries.eu/rest/v2/all)
+  - [x] Styling
+  - [x] Implementation
 
 ### Packages
 

@@ -2,10 +2,14 @@ $blue: rgb(72, 109, 209);
 $grey-blue: #557a95;
 
 $orange: orange;
-$somon: #379683;
 
 $red: rgb(196, 37, 37);
+$red-hover: rgb(177, 33, 33);
+$red-active: rgb(158, 29, 29);
+
 $dark-red: rgb(119, 24, 24);
+$dark-red-hover: rgb(104, 20, 20);
+$dark-red-active: rgb(87, 17, 17);
 
 $green: #138d27;
 
@@ -21,7 +25,11 @@ $normal-font-size: 18px;
 $header-font-size: 25px;
 
 $main-color: $red;
+$main-hover: $red-hover;
+$main-active: $red-active;
 $secondary-color: $dark-red;
+$secondary-hover: $dark-red-hover;
+$secondary-active: $dark-red-active;
 
 @mixin vertical_center
 {

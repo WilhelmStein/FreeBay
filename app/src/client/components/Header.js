@@ -134,13 +134,11 @@ function AccountSnapshot(props)
     {
         return (
             <div className="AccountSnapshot AccountSnapshotEmpty">
-                <LoginPopup loginHandler={props.loginHandler}/>
+                <LoginPopup loginHandler={props.loginHandler} text="Log In"/>
                 &nbsp;
                 |
                 &nbsp;
-                <Link to="/signup" className="link" id="Signup">
-                    Sign Up
-                </Link>
+                <LoginPopup loginHandler={props.loginHandler} text="Sign Up"/>
             </div>
         )
     }

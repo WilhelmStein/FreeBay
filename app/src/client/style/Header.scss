@@ -48,13 +48,6 @@ $Search-height: calc(#{$Header-height} / 2.2);
         }
     }
 
-    #Signup, #Login
-    {
-        text-shadow: 1px 2px 2px $graphite;
-
-        color: white;
-    }
-
     .SearchBar
     {
         filter: drop-shadow(1px 1px 2px $graphite);
@@ -149,8 +142,6 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
         box-sizing: border-box;
         padding: calc((#{$Header-height} - #{$normal-font-size} - 1px) / 2) 50px;
-
-        cursor: pointer;
 
         .AccountPopup-content
         {

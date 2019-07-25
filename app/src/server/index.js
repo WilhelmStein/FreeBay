@@ -13,18 +13,15 @@ let controller = require('./database/controller/controller').DBController
 controller = new controller(sql)
 
 
-app.post('/api/login', function(req, res)
-{
-    const username = req.body.username;
-    const password = req.body.password;
+app.post('/api/login', function(req, res) { controller.login(req.body.username, req.body.password, res); });
 
-    controller.login(username, password, res);
-});
+app.get('/api/categories', function(req, res) { controller.categories(res); });
 
-app.get('/api/categories', function(req, res)
-{
-    controller.categories(res);
-});
+app.post('/api/username', function(req, res) { controller.username(req.body.username, res); });
+
+app.post('/api/email', function(req, res) { controller.email(req.body.email, res) });
+
+app.post('/api/signup', function(req, res) { controller.signup(req.body, res ) });
 
 
 app.listen(8080, () => console.log('Listening on port 8080!'));
