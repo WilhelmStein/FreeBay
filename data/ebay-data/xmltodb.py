@@ -5,7 +5,8 @@ from os import path
 
 from parser import Parser
 
-from database import Database
+from manager import Manager
+
 
 # Process every .XML file in the given directory and store its contents
 # in a shared-between-files dictionary of auctions hashed by their unique 'ItemID's
@@ -27,11 +28,11 @@ if example_id in auctions:
         sep='\n'
     )
 
-db = Database()
+manager = Manager()
 
 for auction in auctions:
 
     entry, table = None, None
 
-    db.insert(entry, table)
+    manager.register(entry, table)
 
