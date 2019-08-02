@@ -1,53 +1,37 @@
 
-import os
-
-import xml.etree.ElementTree as ET
-
 import json
 
-from parser import parse
+from os import path
 
-# Parameters
+from parser import Parser
 
-debug = False
-
-directory = os.path.curdir
+from database import Database
 
 # Process every .XML file in the given directory and store its contents
 # in a shared-between-files dictionary of auctions hashed by their unique 'ItemID's
 
-for filename in sorted(os.listdir(directory), key=lambda filename: (len(filename), filename)):
+parser = Parser(directory=path.curdir, verbose=False)
 
-    if filename.endswith(".xml"):
+auctions = parser.parse()
 
-        if debug:
+example_id = 1043749860
 
-            print("Processing file '%s'" % os.path.join(directory, filename))
+if example_id in auctions:
 
-        for element in ET.parse(filename).getroot():
+    print(json.dumps(
+        auctions[example_id],
+        sort_keys=True,
+        indent=4,
+        separators=(",", ": "),
+        default=lambda d: d.strftime("%Y-%m-%d %H:%M:%S")),
+        sep='\n'
+    )
 
-            id = int(element.attrib["ItemID"])
+db = Database()
 
-            if debug:
+for auction in auctions:
 
-                print("\tProcessing auction '%s'" % id)
+    entry, table = None, None
 
-            auction = parse(id, element)
-
-            if id == 1043495702:
-
-                print("\n\nExample:", json.dumps(
-                    auction,
-                    sort_keys=True,
-                    indent=4,
-                    separators=(",", ": "),
-                    default=lambda d: d.strftime("%Y-%m-%d %H:%M:%S")),
-                    sep='\n'
-                )
-
-    else:
-
-        if debug:
-
-            print("Ignoring file '%s'" % os.path.join(directory, filename))
+    db.insert(entry, table)
 

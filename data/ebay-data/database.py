@@ -57,9 +57,9 @@ class Database:
 
     def __init__(self):
 
-        self.cnx = sql.connect(**config)
+        self.cnx = sql.connect(**Database.config)
 
-        self.cur = cnx.cursor()
+        self.cur = self.cnx.cursor()
 
 
     def __del__(self):
