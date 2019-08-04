@@ -89,15 +89,21 @@ class Manager:
 
 
     @staticmethod
-    def __random_decimal__(lower=0.0, upper=999.9, round_digits=2):
+    def __random_decimal__(lower=0.0, upper=100.0, round_digits=2):
 
         return round(random.uniform(lower, upper), round_digits)
 
 
     @staticmethod
-    def __random_amount__(mean=500, sigma=165):
+    def __normalize_decimal__(decimal, src_lower=0.0, src_upper=58823.0, dst_lower=0.0, dst_upper=100.0, round_digits=2):
 
-        return random.gauss(mean, sigma)
+        return (decimal - src_lower) * ((dst_upper - dst_lower) / (src_upper - src_lower)) + dst_lower
+
+
+    @staticmethod
+    def __random_amount__(mean=200, sigma=65):
+
+        return abs(random.gauss(mean, sigma))
 
 
     def __random_datetime__(self):
