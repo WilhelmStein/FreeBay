@@ -128,6 +128,57 @@ class SearchBar extends Component
     }
 }
 
+export class Menu extends Component
+{
+    constructor(props)
+    {
+        super(props);
+        autoBind(this);
+
+        console.log(this.props.active)
+    }
+
+    render()
+    {
+        const paths = [
+            {
+                name: "Home",
+                path: "/"
+            },
+            {
+                name: "Account",
+                path: "/account"
+            },
+            {
+                name: "My Auctions",
+                path: "/myauctions"
+            },
+            {
+                name: "Messages",
+                path: "/messages"
+            },
+            {
+                name: "About Us",
+                path: "/about"
+            },
+            {
+                name: "Help",
+                path: "/help"
+            }
+        ]
+
+        const buttons = paths.map( (item, index) => {
+            return <Link className={`link ${this.props.active === item.path ? "active" : ""}`} key={item.name} to={item.path}>{item.name}</Link>
+        })
+
+        return (
+            <div className="Menu">
+                {buttons}
+            </div>
+        ) 
+    }
+}
+
 function AccountSnapshot(props)
 {
     if (props.user === null)

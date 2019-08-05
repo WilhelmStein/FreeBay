@@ -4,6 +4,7 @@ $grey-blue: #557a95;
 $orange: orange;
 
 $red: rgb(196, 37, 37);
+$red-dim: rgb(207, 71, 71);
 $red-hover: rgb(177, 33, 33);
 $red-active: rgb(158, 29, 29);
 
@@ -25,8 +26,10 @@ $normal-font-size: 18px;
 $header-font-size: 25px;
 
 $main-color: $red;
+$main-dim: $red-dim;
 $main-hover: $red-hover;
 $main-active: $red-active;
+
 $secondary-color: $dark-red;
 $secondary-hover: $dark-red-hover;
 $secondary-active: $dark-red-active;

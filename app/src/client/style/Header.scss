@@ -215,4 +215,35 @@ $Search-height: calc(#{$Header-height} / 2.2);
     }
 }
 
+.Menu
+{
+    background-color: $secondary-color;
+    color: white;
+    padding: 15px 0;
 
+    .link
+    {
+        font-size: $normal-font-size;
+        color: white;
+
+        padding:
+        {
+            top: 15px;
+            bottom: 15px;
+            right: 50px;
+            left: 50px;
+        }
+
+        &:hover
+        {
+            background-color: $secondary-hover;
+        }
+
+        &:active, &.active
+        {
+            background-color: $secondary-active;
+        }
+
+        transition: 200ms;
+    }
+}
