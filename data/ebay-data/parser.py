@@ -22,33 +22,8 @@ class Parser:
         return modifier(sub("[" + delete + "]", "", text))
 
 
-    def __init__(self, target=os.path.curdir, verbose=False):
-
-        if not os.path.exists(target):
-
-            raise ValueError("'" + target + "' does not name an existing file or directory")
-
-        if os.path.isfile(target):
-
-            self.filenames = []
-
-            if target.endswith(".xml"):
-
-                self.filenames.append(target)
-
-        elif os.path.isdir(target):
-
-            self.filenames = [filename for filename in os.listdir(target) if filename.endswith(".xml")]
-            self.filenames = sorted(self.filenames, key=lambda filename: (len(filename), filename))
-
-        else:
-
-            raise ValueError("'%s' is neither a directory nor a file")
-
-        self.verbose = verbose
-
-
-    def seller(self, field):
+    @staticmethod
+    def seller(field):
 
         seller = {}
 
@@ -59,7 +34,8 @@ class Parser:
         return seller
 
 
-    def location(self, field):
+    @staticmethod
+    def location(field):
 
         location = { "Place": field.text }
 
@@ -70,7 +46,8 @@ class Parser:
         return location
 
 
-    def bids(self, field):
+    @staticmethod
+    def bids(field):
 
         bids = []
 
@@ -109,7 +86,8 @@ class Parser:
         return bids
 
 
-    def auction(self, field):
+    @staticmethod
+    def auction(field):
 
         auction = {
             "Category": []
@@ -123,15 +101,15 @@ class Parser:
 
             elif detail.tag == "Seller":
 
-                auction[detail.tag] = self.seller(detail)
+                auction[detail.tag] = Parser.seller(detail)
 
             elif detail.tag == "Location":
 
-                auction[detail.tag] = self.location(detail)
+                auction[detail.tag] = Parser.location(detail)
 
             elif detail.tag == "Bids":
 
-                auction[detail.tag] = self.bids(detail)
+                auction[detail.tag] = Parser.bids(detail)
 
             elif detail.tag == "Currently" or detail.tag == "First_Bid":
 
@@ -152,6 +130,32 @@ class Parser:
         return auction
 
 
+    def __init__(self, target=os.path.curdir, verbose=False):
+
+        if not os.path.exists(target):
+
+            raise ValueError("'" + target + "' does not name an existing file or directory")
+
+        if os.path.isfile(target):
+
+            self.filenames = []
+
+            if target.endswith(".xml"):
+
+                self.filenames.append(target)
+
+        elif os.path.isdir(target):
+
+            self.filenames = [filename for filename in os.listdir(target) if filename.endswith(".xml")]
+            self.filenames = sorted(self.filenames, key=lambda filename: (len(filename), filename))
+
+        else:
+
+            raise ValueError("'%s' is neither a directory nor a file")
+
+        self.verbose = verbose
+
+
     def parse(self):
 
         auctions = {}
@@ -170,7 +174,7 @@ class Parser:
 
                         print("\tProcessing auction '%s'" % id)
 
-                    auctions[id] = { "ItemID": id, **self.auction(element) }
+                    auctions[id] = { "ItemID": id, **Parser.auction(element) }
 
         return auctions
 

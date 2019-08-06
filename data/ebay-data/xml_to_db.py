@@ -5,7 +5,7 @@ from os import path
 
 from parser import Parser
 
-from manager import Manager
+from generator import Generator
 
 
 # Process every .XML file in the given directory and store its contents
@@ -30,15 +30,15 @@ try:
             sep='\n'
         )
 
-    manager = Manager()
+    generator = Generator()
 
     for auction in auctions:
 
         entry, table = None, None
 
-        manager.register(entry, table)
+        generator.register(entry, table)
 
-except ValueError as error:
+except Exception as exception:
 
-    print(error)
+    print("\n[ERROR]:", exception)
 

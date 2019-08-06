@@ -10,7 +10,7 @@ import random
 import math
 
 
-class Manager:
+class Generator:
 
     config = {
         "user": "root",
@@ -59,12 +59,12 @@ class Manager:
     }
 
     amount_mean, amount_sigma = 20, 5
-    
+
     time_delta_min, time_delta_max = 30, 1440
 
     def __init__(self, seed=123456789):
 
-        self.cnx = connector.connect(**Manager.config)
+        self.cnx = connector.connect(**Generator.config)
 
         self.cur = self.cnx.cursor()
 
@@ -207,15 +207,15 @@ class Manager:
 
         if table is None or not isinstance(table, str):
 
-            raise TypeError("'table' is not a string")
+            raise TypeError("'" + str(table) + "' is not a string")
 
         if table not in queries:
 
-            raise ValueError("'" + table + "' is not a valid table name")
+            raise ValueError("'" + str(table) + "' is not a valid table name")
 
         if entry is None or not isinstance(entry, dict):
 
-            raise TypeError("'entry' is not a dictionary")
+            raise TypeError("'" + str(entry) + "' is not a dictionary")
 
         self.cur.execute(queries[table], entry)
 
