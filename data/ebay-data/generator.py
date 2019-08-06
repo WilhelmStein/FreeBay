@@ -89,13 +89,13 @@ class Generator:
 
 
     @staticmethod
-    def __random_rating__(lower=0.0, upper=100.0, round_digits=2):
+    def __random_decimal__(lower=0.0, upper=100.0, round_digits=2):
 
         return round(random.uniform(lower, upper), round_digits)
 
 
     @staticmethod
-    def __normalize_rating__(decimal, src_lower=0.0, src_upper=58823.0, dst_lower=0.0, dst_upper=100.0, round_digits=2):
+    def __normalize_decimal__(decimal, src_lower=0.0, src_upper=58823.0, dst_lower=0.0, dst_upper=100.0, round_digits=2):
 
         return (decimal - src_lower) * ((dst_upper - dst_lower) / (src_upper - src_lower)) + dst_lower
 
