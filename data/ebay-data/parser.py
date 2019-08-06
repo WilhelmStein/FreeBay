@@ -1,11 +1,11 @@
 
-from os import path, listdir
-
 from datetime import datetime
 
 from re import sub
 
 from xml.etree import ElementTree as ET
+
+import os
 
 
 class Parser:
@@ -130,9 +130,28 @@ class Parser:
         return auction
 
 
-    def __init__(self, directory, verbose):
+    def __init__(self, target=os.path.curdir, verbose=False):
 
-        self.directory = directory
+        if not os.path.exists(target):
+
+            raise ValueError("'" + target + "' does not name an existing file or directory")
+
+        if os.path.isfile(target):
+
+            self.filenames = []
+
+            if target.endswith(".xml"):
+
+                self.filenames.append(target)
+
+        elif os.path.isdir(target):
+
+            self.filenames = [filename for filename in os.listdir(target) if filename.endswith(".xml")]
+            self.filenames = sorted(self.filenames, key=lambda filename: (len(filename), filename))
+
+        else:
+
+            raise ValueError("'%s' is neither a directory nor a file")
 
         self.verbose = verbose
 
@@ -141,13 +160,11 @@ class Parser:
 
         auctions = {}
 
-        for filename in sorted(listdir(self.directory), key=lambda filename: (len(filename), filename)):
-
-            if filename.endswith(".xml"):
+        for filename in self.filenames:
 
                 if self.verbose:
 
-                    print("Processing file '%s'" % path.join(self.directory, filename))
+                    print("Processing file '%s'" % os.path.join(self.directory, filename))
 
                 for element in ET.parse(filename).getroot():
 
@@ -158,12 +175,6 @@ class Parser:
                         print("\tProcessing auction '%s'" % id)
 
                     auctions[id] = { "ItemID": id, **Parser.auction(element) }
-
-            else:
-
-                if self.verbose:
-
-                    print("Ignoring file '%s'" % path.join(directory, filename))
 
         return auctions
 

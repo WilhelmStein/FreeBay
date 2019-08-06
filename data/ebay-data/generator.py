@@ -7,8 +7,10 @@ from datetime import datetime
 
 import random
 
+import math
 
-class Manager:
+
+class Generator:
 
     config = {
         "user": "root",
@@ -56,29 +58,27 @@ class Manager:
         )
     }
 
-    def __init__(self, seed=123456789, starting_user_id=0, starting_address_id=0, starting_category_id=0, starting_auction_id=0, starting_bid_id=0):
+    amount_mean, amount_sigma = 20, 5
 
-        self.cnx = connector.connect(**Manager.config)
+    time_delta_min, time_delta_max = 30, 1440
+
+    def __init__(self, seed=123456789):
+
+        self.cnx = connector.connect(**Generator.config)
 
         self.cur = self.cnx.cursor()
 
 
-        self.random.seed(seed)
+        random.seed(seed)
 
         self.generator = Faker()
 
         self.generator.seed(seed)
 
 
-        self.user_id = starting_user_id
+        self.amount_delta = lambda: abs(random.gauss(amount_mean, amount_sigma))
 
-        self.address_id = starting_address_id
-
-        self.category_id = starting_category_id
-
-        self.auction_id = starting_auction_id
-
-        self.bid_id = starting_bid_id
+        self.time_delta = lambda: math.floor(abs(random.random() - random.random()) * (1.0 + time_delta_max - time_delta_min) + time_delta_min)
 
 
     def __del__(self):
@@ -168,9 +168,9 @@ class Manager:
         }
 
 
-    def __generate_auction__(self, auction_id, seller_id, name, currently=None, first_bid=None, buy_price=None, location=None, latitude=None, longitude=None, started=None, ends=None, description=None):
+    def __generate_auction__(self, auction_id, seller_id, name, currently=None, first_bid=None, buy_price=None, location=(None, None, None), started=None, ends=None, description=None):
 
-        if location is None:
+        if location == (None, None, None):
 
             latitude, longitude, region, country_code, country_city = self.generator.location_on_land()
 
@@ -207,15 +207,15 @@ class Manager:
 
         if table is None or not isinstance(table, str):
 
-            raise TypeError("'table' is not a string")
+            raise TypeError("'" + str(table) + "' is not a string")
 
         if table not in queries:
 
-            raise ValueError("'" + table + "' is not a valid table name")
+            raise ValueError("'" + str(table) + "' is not a valid table name")
 
         if entry is None or not isinstance(entry, dict):
 
-            raise TypeError("'entry' is not a dictionary")
+            raise TypeError("'" + str(entry) + "' is not a dictionary")
 
         self.cur.execute(queries[table], entry)
 
