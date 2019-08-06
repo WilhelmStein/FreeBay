@@ -7,6 +7,8 @@ from datetime import datetime
 
 import random
 
+import math
+
 
 class Manager:
 
@@ -56,29 +58,27 @@ class Manager:
         )
     }
 
-    def __init__(self, seed=123456789, starting_user_id=0, starting_address_id=0, starting_category_id=0, starting_auction_id=0, starting_bid_id=0):
+    amount_mean, amount_sigma = 20, 5
+    
+    time_delta_min, time_delta_max = 30, 1440
+
+    def __init__(self, seed=123456789):
 
         self.cnx = connector.connect(**Manager.config)
 
         self.cur = self.cnx.cursor()
 
 
-        self.random.seed(seed)
+        random.seed(seed)
 
         self.generator = Faker()
 
         self.generator.seed(seed)
 
 
-        self.user_id = starting_user_id
+        self.amount_delta = lambda: abs(random.gauss(amount_mean, amount_sigma))
 
-        self.address_id = starting_address_id
-
-        self.category_id = starting_category_id
-
-        self.auction_id = starting_auction_id
-
-        self.bid_id = starting_bid_id
+        self.time_delta = lambda: math.floor(abs(random.random() - random.random()) * (1.0 + time_delta_max - time_delta_min) + time_delta_min)
 
 
     def __del__(self):
@@ -89,15 +89,21 @@ class Manager:
 
 
     @staticmethod
-    def __random_decimal__(lower=0.0, upper=999.9, round_digits=2):
+    def __random_rating__(lower=0.0, upper=100.0, round_digits=2):
 
         return round(random.uniform(lower, upper), round_digits)
 
 
     @staticmethod
-    def __random_amount__(mean=500, sigma=165):
+    def __normalize_rating__(decimal, src_lower=0.0, src_upper=58823.0, dst_lower=0.0, dst_upper=100.0, round_digits=2):
 
-        return random.gauss(mean, sigma)
+        return (decimal - src_lower) * ((dst_upper - dst_lower) / (src_upper - src_lower)) + dst_lower
+
+
+    @staticmethod
+    def __random_amount__(mean=200, sigma=65):
+
+        return abs(random.gauss(mean, sigma))
 
 
     def __random_datetime__(self):
@@ -162,9 +168,9 @@ class Manager:
         }
 
 
-    def __generate_auction__(self, auction_id, seller_id, name, currently=None, first_bid=None, buy_price=None, location=None, latitude=None, longitude=None, started=None, ends=None, description=None):
+    def __generate_auction__(self, auction_id, seller_id, name, currently=None, first_bid=None, buy_price=None, location=(None, None, None), started=None, ends=None, description=None):
 
-        if location is None:
+        if location == (None, None, None):
 
             latitude, longitude, region, country_code, country_city = self.generator.location_on_land()
 

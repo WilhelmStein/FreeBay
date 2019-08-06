@@ -1,11 +1,11 @@
 
-from os import path, listdir
-
 from datetime import datetime
 
 from re import sub
 
 from xml.etree import ElementTree as ET
+
+import os
 
 
 class Parser:
@@ -22,8 +22,33 @@ class Parser:
         return modifier(sub("[" + delete + "]", "", text))
 
 
-    @staticmethod
-    def seller(field):
+    def __init__(self, target=os.path.curdir, verbose=False):
+
+        if not os.path.exists(target):
+
+            raise ValueError("'" + target + "' does not name an existing file or directory")
+
+        if os.path.isfile(target):
+
+            self.filenames = []
+
+            if target.endswith(".xml"):
+
+                self.filenames.append(target)
+
+        elif os.path.isdir(target):
+
+            self.filenames = [filename for filename in os.listdir(target) if filename.endswith(".xml")]
+            self.filenames = sorted(self.filenames, key=lambda filename: (len(filename), filename))
+
+        else:
+
+            raise ValueError("'%s' is neither a directory nor a file")
+
+        self.verbose = verbose
+
+
+    def seller(self, field):
 
         seller = {}
 
@@ -34,8 +59,7 @@ class Parser:
         return seller
 
 
-    @staticmethod
-    def location(field):
+    def location(self, field):
 
         location = { "Place": field.text }
 
@@ -46,8 +70,7 @@ class Parser:
         return location
 
 
-    @staticmethod
-    def bids(field):
+    def bids(self, field):
 
         bids = []
 
@@ -86,8 +109,7 @@ class Parser:
         return bids
 
 
-    @staticmethod
-    def auction(field):
+    def auction(self, field):
 
         auction = {
             "Category": []
@@ -101,15 +123,15 @@ class Parser:
 
             elif detail.tag == "Seller":
 
-                auction[detail.tag] = Parser.seller(detail)
+                auction[detail.tag] = self.seller(detail)
 
             elif detail.tag == "Location":
 
-                auction[detail.tag] = Parser.location(detail)
+                auction[detail.tag] = self.location(detail)
 
             elif detail.tag == "Bids":
 
-                auction[detail.tag] = Parser.bids(detail)
+                auction[detail.tag] = self.bids(detail)
 
             elif detail.tag == "Currently" or detail.tag == "First_Bid":
 
@@ -130,24 +152,15 @@ class Parser:
         return auction
 
 
-    def __init__(self, directory, verbose):
-
-        self.directory = directory
-
-        self.verbose = verbose
-
-
     def parse(self):
 
         auctions = {}
 
-        for filename in sorted(listdir(self.directory), key=lambda filename: (len(filename), filename)):
-
-            if filename.endswith(".xml"):
+        for filename in self.filenames:
 
                 if self.verbose:
 
-                    print("Processing file '%s'" % path.join(self.directory, filename))
+                    print("Processing file '%s'" % os.path.join(self.directory, filename))
 
                 for element in ET.parse(filename).getroot():
 
@@ -157,13 +170,7 @@ class Parser:
 
                         print("\tProcessing auction '%s'" % id)
 
-                    auctions[id] = { "ItemID": id, **Parser.auction(element) }
-
-            else:
-
-                if self.verbose:
-
-                    print("Ignoring file '%s'" % path.join(directory, filename))
+                    auctions[id] = { "ItemID": id, **self.auction(element) }
 
         return auctions
 
