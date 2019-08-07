@@ -1,0 +1,181 @@
+@import 'global';
+
+.Login
+{
+    color: white !important;
+    text-shadow: 1px 2px 2px $graphite;
+    padding: 0;
+    margin: 0;
+}
+
+.LoginPopup-content
+{
+    min-width: 400px !important;
+    width: 450px !important;
+
+    border-radius: 5px;
+
+    box-shadow: 1px 1px 10px grey !important;
+
+    padding: 20px !important;
+
+    text-align: center !important;
+
+    transition: 200ms;
+}
+
+.LoginPopupWrapper
+{
+    display: grid;
+    grid-template-rows: 70px 5fr;
+
+    .Buttons
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+
+        button
+        {
+            border:none;
+            border-bottom: 1px solid grey;
+
+            outline: none;
+            background: none;
+            font-size: $small-font-size;
+            color: grey;
+            cursor: pointer;
+
+            margin:
+            {
+                bottom: 30px;
+                left: 40px;
+                right: 40px;
+            }
+
+            padding-bottom: 15px;
+
+            &:hover
+            {
+                color: $main-hover;
+                border-bottom: 1px solid $main-hover;
+            }
+
+            transition: 200ms;
+        }
+
+        .active
+        {
+            color: $main-color !important;
+            border-bottom: 1px solid $main-color !important;
+        }
+    }
+}
+
+.LoginForm, .SignupForm
+{
+    text-shadow: none !important;
+    padding: 20px;
+
+    header
+    {
+        font-size: $header-font-size;
+        color: $main-color;
+    }
+
+    .label
+    {
+        width: 100%;
+
+        p
+        {
+            padding: 0 20px;
+            font-size: $small-font-size;
+            margin: 5px;
+
+            color: $main-color;
+            text-align: left;
+        }
+
+        input, select
+        {
+            border-radius: 5px;
+            border: none;
+            width : 80%;
+
+            padding: 15px;
+
+            background-color: $almost-white;
+        }
+
+        select
+        {
+            width: 95%;
+        }
+
+        input.form-wrong
+        {
+            border: 1px solid $red;
+        }
+
+        input.form-right
+        {
+            border: none;
+        }
+    }
+
+    button
+    {
+        box-shadow: 1px 1px 5px $graphite;
+    
+        border: none;
+        border-radius: 5px;
+
+        cursor: pointer;
+
+        color: white;
+        
+        font-size: 20px;
+
+        padding: 10px 20px;
+        margin: 40px auto;
+        margin-bottom: 10px;
+        width: 150px;
+
+        text-align: center;
+
+        background-color: $secondary-color;
+
+        &:hover
+        {
+            background-color: $secondary-hover;
+        }
+
+        &:active
+        {
+            background-color: $secondary-active;
+        }
+    }
+
+    .Labels
+    {
+        display: grid;
+        grid-template-columns: 1fr 1fr ;
+
+        div
+        {
+            margin: 10px;
+        }
+    }
+}
+
+.SignupForm
+{
+    text-shadow: none !important;
+
+    p
+    {
+        padding: 0 10px !important;
+    }
+}
+

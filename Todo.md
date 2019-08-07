@@ -2,12 +2,11 @@
 
 ## Back - End
 
-
 ### Setup
 
 - [x] Setup Express
 - [x] Setup MySQL
-- [ ] Add Visited Auction Table MxN User - Auction (bonus)
+- [x] Add Visited Auction Table MxN User - Auction (bonus)
 - [x] Design Database
 - [x] DB Create Script
 - [ ] DB Fill Script
@@ -25,9 +24,22 @@
 
 - [x] Create React app
 - [x] Setup Router
-- [ ] Setup Sass
+- [x] Setup Sass
 - [ ] Test Bootstrap
 - [ ] Design UI - Adobe XD
+
+### Components
+
+- [x] Header
+    - [x] Logo
+    - [x] Search
+      - [ ] Implement Functionality
+    - [x] Login
+    - [x] Styling
+- [x] Signup
+  - [x] [Countries](https://restcountries.eu/rest/v2/all)
+  - [x] Styling
+  - [x] Implementation
 
 ### Packages
 
