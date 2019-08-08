@@ -23,18 +23,18 @@ class Generator:
     queries = {
         "User": (
             "INSERT INTO User "
-            "(id, Username, Password, Email) "
-            "(%(id)s, %(Username)s, %(Password)s, %(Email)s)"
+            "(Id, Username, Password, Email) "
+            "VALUES (%(Id)s, %(Username)s, %(Password)s, %(Email)s)"
         ),
         "General_User": (
             "INSERT INTO General_User "
             "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated) "
-            "(%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
+            "VALUES (%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
         ),
         "Address": (
-            "INSERT INTO General_User "
-            "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated) "
-            "(%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
+            "INSERT INTO Address "
+            "(Id, Street, Number, ZipCode, Country, City) "
+            "VALUES (%(Id)s, %(Street)s, %(Number)s, %(ZipCode)s, %(Country)s, %(City)s)"
         ),
         "Category": (
             "INSERT INTO Category "
@@ -48,13 +48,13 @@ class Generator:
         ),
         "Auction": (
             "INSERT INTO Auction "
-            "(id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description) "
-            "VALUES (%(id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s)"
+            "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description) "
+            "VALUES (%(Id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s)"
         ),
         "Bid": (
             "INSERT INTO Bid"
             "(Id, User_id, Auction_Id, Amount, Time)"
-            "(%(Id)s, %(User_id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
+            "VALUES (%(Id)s, %(User_id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
         )
     }
 
@@ -62,12 +62,17 @@ class Generator:
 
     time_delta_min, time_delta_max = 30, 1440
 
-    def __init__(self, seed=123456789):
+    def __init__(self, seed=123456789, reset=None):
 
         self.cnx = connector.connect(**Generator.config)
 
         self.cur = self.cnx.cursor()
 
+        if reset:
+
+            for table in reset:
+
+                self.cur.execute("DELETE FROM {}".format(table))
 
         random.seed(seed)
 
@@ -86,7 +91,7 @@ class Generator:
 
         self.address_id = 0
 
-        self.bid_id =    0
+        self.bid_id = 0
 
 
     def __del__(self):
@@ -97,26 +102,21 @@ class Generator:
 
 
     @staticmethod
-    def __random_decimal__(lower=0.0, upper=100.0, round_digits=2):
+    def __normalize_decimal__(decimal, src_lower=0.0, src_upper=58823.0, dst_lower=0.0, dst_upper=100.0, round_digits=1):
 
-        return round(random.uniform(lower, upper), round_digits)
+        return round((decimal - src_lower) * ((dst_upper - dst_lower) / (src_upper - src_lower)) + dst_lower, round_digits)
 
 
     @staticmethod
-    def __normalize_decimal__(decimal, src_lower=0.0, src_upper=58823.0, dst_lower=0.0, dst_upper=100.0, round_digits=2):
+    def __random_decimal__(lower=0.0, upper=100.0, round_digits=1):
 
-        return (decimal - src_lower) * ((dst_upper - dst_lower) / (src_upper - src_lower)) + dst_lower
+        return round(random.uniform(lower, upper), round_digits)
 
 
     @staticmethod
     def __random_amount__(mean=200, sigma=65):
 
         return abs(random.gauss(mean, sigma))
-
-
-    def __random_datetime__(self):
-
-        return datetime.combine(self.generator.date_object(), self.generator.time_object())
 
 
     def __random_auction_description__(self, lower=100, upper=300):
@@ -136,12 +136,12 @@ class Generator:
         }
 
 
-    def __generate_general_user__(self, seller_rating=None, bidder_rating=None, name=None, surname=None, phone=None):
+    def __generate_general_user__(self, user_id, seller_rating=None, bidder_rating=None, name=None, surname=None, phone=None):
 
         return {
-            "User_Id": self.users[username],
-            "Seller_Rating": seller_rating if seller_rating else __random_decimal__(),
-            "Bidder_Rating": bidder_rating if bidder_rating else __random_decimal__(),
+            "User_Id": user_id,
+            "Seller_Rating": self.__normalize_decimal__(seller_rating) if seller_rating else self.__random_decimal__(),
+            "Bidder_Rating": self.__normalize_decimal__(bidder_rating) if bidder_rating else self.__random_decimal__(),
             "Name": name if name else self.generator.first_name(),
             "Surname": surname if surname else self.generator.last_name(),
             "Phone": phone if phone else self.generator.phone_number(),
@@ -158,7 +158,7 @@ class Generator:
             "Id": self.address_id,
             "Street": street if street else self.generator.street_name(),
             "Number": number if number else random.randint(1, 100),
-            "ZipCode": zip_code if zip_code else self.generator.zip_code(),
+            "ZipCode": zip_code if zip_code else self.generator.zipcode(),
             "Country": country if country else self.generator.country(),
             "City": city if city else self.generator.city()
         }
@@ -182,7 +182,7 @@ class Generator:
         }
 
 
-    def __generate_auction__(self, auction_id, seller_id, name, currently=None, first_bid=None, buy_price=None, location=(None, None, None), started=None, ends=None, description=None):
+    def __generate_auction__(self, auction_id, seller_id, name, currently, first_bid, started, ends, description, buy_price=None, location=(None, None, None)):
 
         if location == (None, None, None):
 
@@ -190,23 +190,27 @@ class Generator:
 
             location = " ".join(region, country_code, country_city)
 
+        else:
+
+            latitude, longitude, location = location
+
         return {
             "Id": auction_id,
             "Seller_id": seller_id,
             "Name": name,
-            "Currently": currently if currently else __random_amount__(),
-            "First_Bid": first_bid if first_bid else __random_amount__(),
-            "Buy_Price": buy_price if buy_price else __random_amount__(),
+            "Currently": currently,
+            "First_Bid": first_bid,
+            "Buy_Price": buy_price,
             "Location":  location,
             "Latitude": latitude,
             "Longitude": longitude,
-            "Started": __random_datetime__(),
-            "Ends": __random_datetime__(),
-            "Description": __random_auction_description__()
+            "Started": started,
+            "Ends": ends,
+            "Description": description
         }
 
 
-    def __generate_bid__(self, user_id, auction_id, amount=None, time=None):
+    def __generate_bid__(self, user_id, auction_id, amount, time):
 
         self.bid_id += 1
 
@@ -214,8 +218,8 @@ class Generator:
             "Id": bid_id,
             "User_id": user_id,
             "Auction_Id": auction_id,
-            "Amount": amount if amount else __random_amount__(),
-            "Time": time if time else __random_datetime__()
+            "Amount": amount,
+            "Time": time
         }
 
 
@@ -240,6 +244,31 @@ class Generator:
 
     def register(self, auction):
 
+        seller = auction["Seller"]
+
+        if seller["UserID"] not in self.users:
+
+            self.__register__("Address", self.__generate_address__())
+
+            self.__register__("User", self.__generate_user__(username=seller["UserID"]))
+
+            self.__register__("General_User", self.__generate_general_user__(user_id=self.users[seller["UserID"]], seller_rating=seller["Rating"]))
+
+        self.__register__("Auction",
+            self.__generate_auction__(
+                auction_id=auction["ItemID"],
+                seller_id=self.users[seller["UserID"]],
+                name=auction["Name"],
+                currently=auction["Currently"],
+                first_bid=auction["First_Bid"],
+                buy_price=auction.get("Buy_Price"),
+                location=auction["Location"],
+                started=auction["Started"],
+                ends=auction["Ends"],
+                description=auction["Description"]
+            )
+        )
+
         for bid in auction["Bids"]:
 
             bidder = bid["Bidder"]
@@ -254,7 +283,6 @@ class Generator:
 
                 self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=auction["ItemID"], amount=bid["Amount"], time=bid["Time"]))
 
-
         for category in auction["Category"]:
 
             if category not in self.categories:
@@ -262,31 +290,4 @@ class Generator:
                 self.__register__("Category", self.__generate_category__(category))
 
                 self.__register__("Auction_has_Category", self.__generate_auction_has_category__(auction["ItemID"], self.categories[category]))
-
-
-        seller = auction["Seller"]
-
-        if seller["UserID"] not in self.users:
-
-            self.__register__("Address", self.__generate_address__())
-
-            self.__register__("User", self.__generate_user__(username=seller["UserID"]))
-
-            self.__register__("General_User", self.__generate_general_user__(seller_rating=seller["Rating"]))
-
-
-        self.__register__("Auction",
-            self.__generate_auction__(
-                auction_id=auction["ItemID"],
-                seller_id=self.users[seller["UserID"]],
-                name=auction["Name"],
-                currently=auction["Currently"],
-                first_bid=auction["First_Bid"],
-                buy_price=auction["Buy_Price"],
-                location=auction["Location"],
-                started=auction["Started"],
-                ends=auction["Ends"],
-                description=auction["Description"]
-            )
-        )
 
