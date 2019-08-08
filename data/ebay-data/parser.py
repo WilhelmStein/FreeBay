@@ -5,6 +5,8 @@ from re import sub
 
 from xml.etree import ElementTree as ET
 
+import json
+
 import os
 
 
@@ -153,28 +155,32 @@ class Parser:
 
             raise ValueError("'%s' is neither a directory nor a file")
 
-        self.verbose = verbose
 
-
-    def parse(self):
-
-        auctions = {}
+        self.auctions = {}
 
         for filename in self.filenames:
 
-                if self.verbose:
+            if verbose:
 
-                    print("Processing file '%s'" % os.path.join(self.directory, filename))
+                print("Processing file '%s'" % os.path.join(self.directory, filename))
 
-                for element in ET.parse(filename).getroot():
+            for element in ET.parse(filename).getroot():
 
-                    id = int(element.attrib["ItemID"])
+                id = int(element.attrib["ItemID"])
 
-                    if self.verbose:
+                if verbose:
 
-                        print("\tProcessing auction '%s'" % id)
+                    print("\tProcessing auction '%s'" % id)
 
-                    auctions[id] = { "ItemID": id, **Parser.auction(element) }
+                self.auctions[id] = { "ItemID": id, **Parser.auction(element) }
 
-        return auctions
+
+    def dumps(self, id):
+
+        return json.dumps(
+            self.auctions[id],
+            sort_keys=True,
+            indent=4,
+            separators=(",", ": "),
+            default=lambda d: d.strftime("%Y-%m-%d %H:%M:%S"))
 
