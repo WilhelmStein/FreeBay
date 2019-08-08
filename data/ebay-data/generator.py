@@ -219,13 +219,13 @@ class Generator:
         }
 
 
-    def __register__(self, entry, table):
+    def __register__(self, table, entry):
 
         if table is None or not isinstance(table, str):
 
             raise TypeError("'" + str(table) + "' is not a string")
 
-        if table not in queries:
+        if table not in self.queries:
 
             raise ValueError("'" + str(table) + "' is not a valid table name")
 
@@ -233,7 +233,7 @@ class Generator:
 
             raise TypeError("'" + str(entry) + "' is not a dictionary")
 
-        self.cur.execute(queries[table], entry)
+        self.cur.execute(self.queries[table], entry)
 
         self.cnx.commit()
 
@@ -246,44 +246,47 @@ class Generator:
 
             if bidder["UserID"] not in self.users:
 
-                __register__("Address", __generate_address__())
+                self.__register__("Address", self.__generate_address__())
 
-                __register__("User", __generate_user__(username=bidder["UserID"]))
+                self.__register__("User", self.__generate_user__(username=bidder["UserID"]))
 
-                __register__("General_User", __generate_general_user__(bidder_rating=bidder["Rating"]))
+                self.__register__("General_User", self.__generate_general_user__(bidder_rating=bidder["Rating"]))
 
-                __register__("Bid", __generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=auction["ItemID"], amount=bid["Amount"], time=bid["Time"]))
+                self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=auction["ItemID"], amount=bid["Amount"], time=bid["Time"]))
 
 
         for category in auction["Category"]:
 
             if category not in self.categories:
 
-                __register__("Category", __generate_category__(category))
+                self.__register__("Category", self.__generate_category__(category))
 
-                __register__("Auction_has_Category", __generate_auction_has_category__(auction["ItemID"], self.categories[category]))
+                self.__register__("Auction_has_Category", self.__generate_auction_has_category__(auction["ItemID"], self.categories[category]))
 
 
         seller = auction["Seller"]
 
         if seller["UserID"] not in self.users:
 
-            __register__("Address", __generate_address__())
+            self.__register__("Address", self.__generate_address__())
 
-            __register__("User", __generate_user__(username=seller["UserID"]))
+            self.__register__("User", self.__generate_user__(username=seller["UserID"]))
 
-            __register__("General_User", __generate_general_user__(seller_rating=seller["Rating"]))
+            self.__register__("General_User", self.__generate_general_user__(seller_rating=seller["Rating"]))
 
 
-        __register__("Auction",
-            __generate_auction__(auction_id=auction["ItemID"],
-            seller_id=self.users[seller["UserID"]],
-            name=auction["Name"],
-            currently=auction["Currently"],
-            first_bid=auction["First_Bid"],
-            buy_price=auction["Buy_Price"],
-            location=auction["Location"],
-            started=auction["Started"],
-            ends=auction["Ends"],
-            description=auction["Description"]))
+        self.__register__("Auction",
+            self.__generate_auction__(
+                auction_id=auction["ItemID"],
+                seller_id=self.users[seller["UserID"]],
+                name=auction["Name"],
+                currently=auction["Currently"],
+                first_bid=auction["First_Bid"],
+                buy_price=auction["Buy_Price"],
+                location=auction["Location"],
+                started=auction["Started"],
+                ends=auction["Ends"],
+                description=auction["Description"]
+            )
+        )
 

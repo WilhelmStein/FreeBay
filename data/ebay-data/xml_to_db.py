@@ -13,17 +13,15 @@ from generator import Generator
 
 parser = Parser(target='./items-0.xml')
 
-example_id = 1043749860
+# example_id = 1043749860
 
-if example_id in parser.auctions:
+# if example_id in parser.auctions:
 
-    print(parser.dumps(example_id), sep='\n')
+#     print(parser.dumps(example_id), sep='\n')
 
 generator = Generator()
 
-for auction in parser.auctions:
+for auction in parser.auctions.values():
 
-    entry, table = None, None
-
-    generator.register(entry, table)
+    generator.register(auction)
 
