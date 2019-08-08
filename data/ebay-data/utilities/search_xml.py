@@ -10,9 +10,13 @@ metrics = {
     "Matches": len
 }
 
+
 directory = os.pardir
 
-target = re.compile(r"Rating=\"([0-9]+)\"")
+# target = re.compile(r"Rating=\"([0-9]+)\"")
+# modifier = int
+target = re.compile(r"<Description>(.*)</Description>")
+modifier = len
 
 results = []
 
@@ -32,7 +36,7 @@ for filename in filenames:
 
                 if match:
 
-                    results.append(int(match.group(1)))
+                    results.append(modifier(match.group(1)))
 
 
 for metric, method in metrics.items():

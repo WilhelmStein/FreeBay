@@ -19,7 +19,7 @@ parser = Parser(target='./items-0.xml')
 
 #     print(parser.dumps(example_id), sep='\n')
 
-generator = Generator()
+generator = Generator(reset=["Auction_has_Category", "Auction", "General_User", "User", "Address", "Category", "Bid"])
 
 for auction in parser.auctions.values():
 

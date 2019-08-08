@@ -39,13 +39,11 @@ class Parser:
     @staticmethod
     def location(field):
 
-        location = { "Place": field.text }
-
-        for attribute, value in field.attrib.items():
-
-            location[attribute] = float(value)
-
-        return location
+        return {
+            "Place": field.text,
+            "Latitude": field.attrib.get("Latitude"),
+            "Longitude": field.attrib.get("Longitude")
+        }
 
 
     @staticmethod
