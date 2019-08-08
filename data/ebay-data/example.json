@@ -1,0 +1,149 @@
+{
+    "Bids": [
+        {
+            "Amount": 17.37,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "USA",
+                "Rating": 496,
+                "UserID": "bbb1218"
+            },
+            "Time": "2001-12-05 06:36:30"
+        },
+        {
+            "Amount": 33.74,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "East Coast!",
+                "Rating": 598,
+                "UserID": "littlelou"
+            },
+            "Time": "2001-12-05 22:36:30"
+        },
+        {
+            "Amount": 50.12,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "San Francisco",
+                "Rating": 52,
+                "UserID": "earthdeev"
+            },
+            "Time": "2001-12-06 14:36:30"
+        },
+        {
+            "Amount": 66.49,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "ONLY TOWN, PA",
+                "Rating": 16,
+                "UserID": "clovers-woodsedge"
+            },
+            "Time": "2001-12-07 06:36:30"
+        },
+        {
+            "Amount": 82.87,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "SOUTH BEACH",
+                "Rating": 38,
+                "UserID": "sabsmart"
+            },
+            "Time": "2001-12-07 22:36:30"
+        },
+        {
+            "Amount": 99.24,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "Orlando, FL",
+                "Rating": 686,
+                "UserID": "clothingbroker"
+            },
+            "Time": "2001-12-08 14:36:30"
+        },
+        {
+            "Amount": 115.62,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "North Carolina",
+                "Rating": 134,
+                "UserID": "surfingmarie"
+            },
+            "Time": "2001-12-09 06:36:30"
+        },
+        {
+            "Amount": 132.0,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "VERY SEXY SKIRT",
+                "Rating": 66,
+                "UserID": "parker983"
+            },
+            "Time": "2001-12-09 22:36:30"
+        },
+        {
+            "Amount": 148.37,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "Cleveland, OH",
+                "Rating": 21,
+                "UserID": "tiff1519"
+            },
+            "Time": "2001-12-10 14:36:30"
+        },
+        {
+            "Amount": 164.75,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "AtomicPlanet.net",
+                "Rating": 1563,
+                "UserID": "atomicplanet.net"
+            },
+            "Time": "2001-12-11 06:36:30"
+        },
+        {
+            "Amount": 181.12,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "California",
+                "Rating": 758,
+                "UserID": "mikekomm"
+            },
+            "Time": "2001-12-11 22:36:30"
+        },
+        {
+            "Amount": 197.5,
+            "Bidder": {
+                "Country": "USA",
+                "Location": "Makawao - Maui",
+                "Rating": 771,
+                "UserID": "kaelo"
+            },
+            "Time": "2001-12-12 14:36:30"
+        }
+    ],
+    "Category": [
+        "Collectibles",
+        "Pop Culture",
+        "Comics",
+        "Silver Age (1956-69)",
+        "Horror, Sci-Fi"
+    ],
+    "Country": "USA",
+    "Currently": 197.5,
+    "Description": "According to the CGC census their are only 3 higher graded copies of this book in the world. KILLER BOOK! One owner (CAPTWHIZ)! COMBINE SHIPPING! This comic book is graded VFN/NM 9.0 by CGC! Any waves, bends or flashes in the photos is just BAD photography. This is the BLUE LABEL which means NO RESTORATION!! NUFF SAID! The NM price is $450.00. SUPERFAST shipping only $3.95, international extra! PayPal accepted.",
+    "Ends": "2001-12-14 14:36:30",
+    "First_Bid": 0.99,
+    "ItemID": 1043749860,
+    "Location": {
+        "Latitude": 40.578996,
+        "Longitude": -74.27987,
+        "Place": "NJ,USA"
+    },
+    "Name": "CGC 9.0 80 PAGE GIANT #8 SECRET ORIGINS VF/NM",
+    "Number_of_Bids": 12,
+    "Seller": {
+        "Rating": 1054,
+        "UserID": "captwhiz"
+    },
+    "Started": "2001-12-04 14:36:30"
+}

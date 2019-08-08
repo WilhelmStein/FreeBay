@@ -80,6 +80,14 @@ class Generator:
 
         self.time_delta = lambda: math.floor(abs(random.random() - random.random()) * (1.0 + time_delta_max - time_delta_min) + time_delta_min)
 
+        self.users = {}
+
+        self.categories = {}
+
+        self.address_id = 0
+
+        self.bid_id =    0
+
 
     def __del__(self):
 
@@ -116,34 +124,38 @@ class Generator:
         return self.generator.text(random.randint(lower, upper))
 
 
-    def __generate_user__(self, user_id, username=None, password=None, email=None):
+    def __generate_user__(self, username=None, password=None, email=None):
+
+        self.users[username] = len(self.users) + 1
 
         return {
-            "Id" : user_id,
+            "Id" : self.users[username],
             "Username" : username if username else self.generator.user_name(),
             "Password" : password if password else self.generator.password(),
             "Email" : email if email else self.generator.email()
         }
 
 
-    def __generate_general_user__(self, user_id, address_id, seller_rating=None, bidder_rating=None, name=None, surname=None, phone=None):
+    def __generate_general_user__(self, seller_rating=None, bidder_rating=None, name=None, surname=None, phone=None):
 
         return {
-            "User_Id": user_id,
+            "User_Id": self.users[username],
             "Seller_Rating": seller_rating if seller_rating else __random_decimal__(),
             "Bidder_Rating": bidder_rating if bidder_rating else __random_decimal__(),
             "Name": name if name else self.generator.first_name(),
             "Surname": surname if surname else self.generator.last_name(),
             "Phone": phone if phone else self.generator.phone_number(),
-            "Address_Id": address_id,
+            "Address_Id": self.address_id,
             "Validated": True
         }
 
 
-    def __generate_address__(self, address_id, street=None, number=None, zip_code=None, country=None, city=None):
+    def __generate_address__(self, street=None, number=None, zip_code=None, country=None, city=None):
+
+        self.address_id += 1
 
         return {
-            "Id": address_id,
+            "Id": self.address_id,
             "Street": street if street else self.generator.street_name(),
             "Number": number if number else random.randint(1, 100),
             "ZipCode": zip_code if zip_code else self.generator.zip_code(),
@@ -152,10 +164,12 @@ class Generator:
         }
 
 
-    def __generate_category__(self, category_id, name):
+    def __generate_category__(self, name):
+
+        self.categories[name] = len(self.categories) + 1
 
         return {
-            "Id": category_id,
+            "Id": len(self.categories),
             "Name": name
         }
 
@@ -192,7 +206,9 @@ class Generator:
         }
 
 
-    def __generate_bid__(self, bid_id, user_id, auction_id, amount=None, time=None):
+    def __generate_bid__(self, user_id, auction_id, amount=None, time=None):
+
+        self.bid_id += 1
 
         return {
             "Id": bid_id,
@@ -203,13 +219,13 @@ class Generator:
         }
 
 
-    def register(self, entry, table):
+    def __register__(self, table, entry):
 
         if table is None or not isinstance(table, str):
 
             raise TypeError("'" + str(table) + "' is not a string")
 
-        if table not in queries:
+        if table not in self.queries:
 
             raise ValueError("'" + str(table) + "' is not a valid table name")
 
@@ -217,7 +233,60 @@ class Generator:
 
             raise TypeError("'" + str(entry) + "' is not a dictionary")
 
-        self.cur.execute(queries[table], entry)
+        self.cur.execute(self.queries[table], entry)
 
         self.cnx.commit()
+
+
+    def register(self, auction):
+
+        for bid in auction["Bids"]:
+
+            bidder = bid["Bidder"]
+
+            if bidder["UserID"] not in self.users:
+
+                self.__register__("Address", self.__generate_address__())
+
+                self.__register__("User", self.__generate_user__(username=bidder["UserID"]))
+
+                self.__register__("General_User", self.__generate_general_user__(bidder_rating=bidder["Rating"]))
+
+                self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=auction["ItemID"], amount=bid["Amount"], time=bid["Time"]))
+
+
+        for category in auction["Category"]:
+
+            if category not in self.categories:
+
+                self.__register__("Category", self.__generate_category__(category))
+
+                self.__register__("Auction_has_Category", self.__generate_auction_has_category__(auction["ItemID"], self.categories[category]))
+
+
+        seller = auction["Seller"]
+
+        if seller["UserID"] not in self.users:
+
+            self.__register__("Address", self.__generate_address__())
+
+            self.__register__("User", self.__generate_user__(username=seller["UserID"]))
+
+            self.__register__("General_User", self.__generate_general_user__(seller_rating=seller["Rating"]))
+
+
+        self.__register__("Auction",
+            self.__generate_auction__(
+                auction_id=auction["ItemID"],
+                seller_id=self.users[seller["UserID"]],
+                name=auction["Name"],
+                currently=auction["Currently"],
+                first_bid=auction["First_Bid"],
+                buy_price=auction["Buy_Price"],
+                location=auction["Location"],
+                started=auction["Started"],
+                ends=auction["Ends"],
+                description=auction["Description"]
+            )
+        )
 
