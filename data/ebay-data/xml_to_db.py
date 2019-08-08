@@ -5,13 +5,13 @@ from os import path
 
 from parser import Parser
 
-from manager import Manager
+from generator import Generator
 
 
 # Process every .XML file in the given directory and store its contents
 # in a shared-between-files dictionary of auctions hashed by their unique 'ItemID's
 
-parser = Parser(directory=path.curdir, verbose=False)
+parser = Parser()
 
 auctions = parser.parse()
 
@@ -28,11 +28,11 @@ if example_id in auctions:
         sep='\n'
     )
 
-manager = Manager()
+generator = Generator()
 
 for auction in auctions:
 
     entry, table = None, None
 
-    manager.register(entry, table)
+    generator.register(entry, table)
 

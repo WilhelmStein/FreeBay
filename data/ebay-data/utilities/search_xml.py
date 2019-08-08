@@ -3,13 +3,24 @@ import os
 
 import re
 
-directory = os.path.curdir
 
-rating_regex = re.compile(r"Rating=\"([0-9]+)\"")
+metrics = {
+    "Minimum": min,
+    "Maximum": max,
+    "Matches": len
+}
 
-ratings = []
+directory = os.pardir
 
-for filename in sorted(os.listdir(directory), key=lambda filename: (len(filename), filename)):
+target = re.compile(r"Rating=\"([0-9]+)\"")
+
+results = []
+
+filenames = os.listdir(directory)
+filenames = sorted(filenames, key=lambda filename: (len(filename), filename))
+filenames = map(lambda filename: os.path.join(directory, filename), filenames)
+
+for filename in filenames:
 
     if filename.endswith(".xml"):
 
@@ -17,15 +28,14 @@ for filename in sorted(os.listdir(directory), key=lambda filename: (len(filename
 
             for line in file.readlines():
 
-                match = rating_regex.search(line, re.IGNORECASE)
+                match = target.search(line, re.IGNORECASE)
 
                 if match:
 
-                    ratings.append(int(match.group(1)))
+                    results.append(int(match.group(1)))
 
 
-print("Directory '" + directory + "' reporting:")
-print("Matches:", len(ratings))
-print("Minimum:", min(ratings))
-print("Maximum:", max(ratings))
+for metric, method in metrics.items():
+
+    print(metric, ":", method(results))
 
