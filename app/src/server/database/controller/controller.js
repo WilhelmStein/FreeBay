@@ -104,6 +104,18 @@ class DBController
         this.query(query, res);
     }
 
+    search(category, text, res)
+    {
+        // TODO
+        
+        const query = {
+            string: "Select Auction.* From Auction, Auction_has_Category, Category Where Category.Id = ?",
+            escape: [category]
+        }
+
+        this.query(query, res);
+    }
+
     query(query, res, callback = null, check = null)
     {
         this.sql.query(query.string, query.escape, function(err, rows)
@@ -133,7 +145,6 @@ class DBController
             if (callback)
             {
                 return callback(rows);
-                
             }
             
             res.send({

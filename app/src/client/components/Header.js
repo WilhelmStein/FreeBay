@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import autoBind from 'auto-bind';
 import axios from "axios"
 
@@ -10,7 +10,7 @@ import Logo from '../images/Logo2.png';
 import "../style/Header.scss"
 import SearchImg from "../images/Search.png"
 
-export default class Header extends Component
+class Header extends Component
 {
     constructor(props)
     {
@@ -32,7 +32,7 @@ export default class Header extends Component
                     <img alt="" src={Logo}/>
                     <p>FreeBay</p>
                 </Link>
-                <SearchBar/>
+                <SearchBar history={this.props.history}/>
                 <AccountSnapshot user={this.props.user} loginHandler={this.props.loginHandler}/>
             </div>
         );
@@ -94,16 +94,7 @@ class SearchBar extends Component
 
     submit(event)
     {
-        axios.post("/api/search", {
-            category: this.state.categories[this.state.category].Id,
-            text: this.state.text
-        })
-        .then(res => {
-            // Get results and load them
-        })
-        .catch(err => console.log(err));
-
-        console.log(`Category: ${this.state.categories[this.state.category].Name}, Text: ${this.state.text}`);
+        this.props.history.push(`/search?category={${this.state.categories[this.state.category].Id}}&text={${this.state.text}}`);
 
         event.preventDefault();
     }
@@ -134,8 +125,6 @@ export class Menu extends Component
     {
         super(props);
         autoBind(this);
-
-        console.log(this.props.active)
     }
 
     render()
@@ -225,3 +214,5 @@ function AccountSnapshot(props)
         )
     }
 }
+
+export default withRouter(Header);

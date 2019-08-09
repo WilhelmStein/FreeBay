@@ -23,5 +23,7 @@ app.post('/api/email', function(req, res) { controller.email(req.body.email, res
 
 app.post('/api/signup', function(req, res) { controller.signup(req.body, res ) });
 
+app.post('/api/search', function(req, res) {});
+
 
 app.listen(8080, () => console.log('Listening on port 8080!'));
