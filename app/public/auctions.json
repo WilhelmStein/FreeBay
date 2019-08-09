@@ -1,0 +1,263 @@
+[
+    {
+        "Id": "1",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "2",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "3",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "4",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "5",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "6",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "7",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "8",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    },
+    {
+        "Id": "9",
+        "User": {
+            "Id": "1",
+            "Username": "your_father",
+            "Seller_Rating": "98.0"
+        },
+        "Name": "Your Childhood",
+        "Bids": [
+            {
+                "Id": "1",
+                "User": {
+                    "Id": "2",
+                    "Username": "Your Mother",
+                    "Bidder_Rating": "98.0"
+                },
+                "Amount": "100.0",
+                "Time": "2001-12-05 06:36:30"
+            }
+        ],
+        "First_bid": "20.00",
+        "Currently": "100.00",
+        "Buy_Price": "200.00",
+        "Location": "USA",
+        "Started": "2001-12-4 06:35:12",
+        "Ends": "2001-12-10 23:59:59",
+        "Description": "100% PURE AWESOME CHILDHOOD. 100% ORGANIC CHILDREN'S TEARS, HOPES AND DREAMS. BUY NOW",
+        "Category": "Health & Fitness"
+    }
+]

@@ -21,6 +21,7 @@ $graphite: rgb(73, 73, 73);
 
 $font: Ubuntu, Helvetica, Arial, sans-serif;
 
+$smaller-font-size: 12px;
 $small-font-size: 15px;
 $normal-font-size: 18px;
 $header-font-size: 25px;
@@ -52,7 +53,7 @@ body, #root, .App
 .link
 {
     text: {
-        decoration: none;
+        decoration: none !important;
     }
 
     font: {

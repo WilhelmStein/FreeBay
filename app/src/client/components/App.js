@@ -6,6 +6,7 @@ import autoBind from "auto-bind"
 import Header, { Menu } from './Header';
 import Home from './Home';
 import SearchResults from './SearchResults';
+import AuctionPage from './Auction';
 import NotFound from './NotFound';
 
 import '../style/App.scss';
@@ -43,6 +44,7 @@ class App extends React.Component {
                 <Switch>
                     <Route exact path='/' component={Home} />
                     <Route path='/search' component={SearchResults} />
+                    <Route path='/auction' component={AuctionPage} />
                     <Route path='*' component={NotFound} />
                 </Switch>
             </div>

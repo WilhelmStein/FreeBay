@@ -1,4 +1,9 @@
-.App img
+.App
 {
-  filter:brightness(150%);
+    // overflow: hidden;
+
+    img
+    {
+        filter: brightness(150%);
+    }
 }

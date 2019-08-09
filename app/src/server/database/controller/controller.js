@@ -107,10 +107,25 @@ class DBController
     search(category, text, res)
     {
         // TODO
+        res.send({
+            error: false,
+            message: "OK",
+            data: require("../../../../public/auctions.json")
+        })
         
+        // const query = {
+        //     string: "Select Auction.* From Auction, Auction_has_Category, Category Where Category.Id = ?",
+        //     escape: [category]
+        // }
+
+        // this.query(query, res);
+    }
+
+    auction(auctionId, res)
+    {
         const query = {
-            string: "Select Auction.* From Auction, Auction_has_Category, Category Where Category.Id = ?",
-            escape: [category]
+            string: "Select * From Auction Where Id = ?",
+            escape: [auctionId]
         }
 
         this.query(query, res);

@@ -1,0 +1,130 @@
+@import 'global';
+
+.SearchResultsPage
+{
+    color: $graphite;
+
+    h2
+    {
+        font-size: $header-font-size;
+        margin-left: 15px;
+
+        span
+        {
+            margin-left: 50px;
+            font-size: $smaller-font-size;
+            font-weight: 400;
+
+            select
+            {
+                filter: drop-shadow(1px 1px 1px $graphite);
+
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                
+                border:
+                {
+                    right: 0.3px solid grey;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                }
+
+                font-size: $small-font-size;
+
+                padding: 10px;
+
+                background-color: $less-white;
+            }
+        }
+    }
+}
+
+.SearchResults
+{
+    &.Detailed
+    {
+        .Item
+        {
+            display: grid;
+            grid-template-columns: 300px auto;
+        }
+    }
+    
+    &.Collapsed
+    {
+        .Item
+        {
+            display: grid;
+            grid-template-columns: 100px 200px 100px;
+    
+            .ItemBody
+            {
+                .Prices
+                {
+                    margin-top: 30px;
+                }
+            }
+        }
+    }
+
+    .ListItem
+    {
+        transition: 200ms;
+
+        &:hover
+        {
+            cursor: pointer;
+            background-color: $less-white;
+        }
+
+        &:active
+        {
+            background-color: $lesser-white;
+        }
+    }
+
+    .ItemBody
+    {
+        margin-left: 50px;
+    }
+
+    .Seller
+    {
+        font-size: $smaller-font-size;
+        span
+        {
+            font-size: $normal-font-size;
+            color: $blue;
+        }
+    }
+    
+    .Prices
+    {
+        div
+        {
+            display: grid;
+            grid-template-columns: 110px auto;
+
+            .Price
+            {
+                font-size: $normal-font-size;
+
+                &.Starting
+                {
+                    color: $green;
+                }
+
+                &.Current
+                {
+                    color: $red;
+                }
+
+                &.Buyout
+                {
+                    color: $blue;
+                }
+            }
+        }
+    }
+}
