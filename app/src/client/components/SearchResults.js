@@ -4,6 +4,18 @@ import { withRouter } from 'react-router-dom';
 import axios from "axios";
 import { ListGroup, ListGroupItem, Media } from 'react-bootstrap';
 
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+
+import Button from '@material-ui/core/Button';
+
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
+
+import Rating from '@material-ui/lab/Rating';
+
 import "../style/SearchResults.scss"
 
 
@@ -17,7 +29,7 @@ class SearchResults extends Component
             items: [],
             category: -1,
             text: "",
-            view: "Collapsed"
+            view: "Detailed"
         }
 
         autoBind(this);
@@ -58,7 +70,7 @@ class SearchResults extends Component
 
     pressItem(item)
     {
-        this.props.history.push(`/auction?id={${item.Id}}`);
+        // this.props.history.push(`/auction?id={${item.Id}}`);
     }
 
     render()
@@ -67,9 +79,9 @@ class SearchResults extends Component
 
         if (this.state.view === "Detailed")
         {
-            items = this.state.items.map( (item) => {
+            items = this.state.items.map( (item, index) => {
                 return (
-                    <ListGroupItem key={item.Id} className="ListItem" onClick={() => this.pressItem(item)}>
+                    <ListGroupItem key={item.Id} className={`ListItem ${index % 2 === 0 ? "even" : "odd"}`} onClick={() => this.pressItem(item)}>
                         <DetailedAuctionItem  item={item}/>
                     </ListGroupItem>
                 );
@@ -77,9 +89,9 @@ class SearchResults extends Component
         }
         else if (this.state.view === "Collapsed")
         {
-            items = this.state.items.map( (item) => {
+            items = this.state.items.map( (item, index) => {
                 return (
-                    <ListGroupItem key={item.Id} className="ListItem" onClick={() => this.pressItem(item)}>
+                    <ListGroupItem key={item.Id} className={`ListItem ${index % 2 === 0 ? "even" : "odd"}`} onClick={() => this.pressItem(item)}>
                         <CollapsedAuctionItem item={item}/>
                     </ListGroupItem>
                 );
@@ -93,7 +105,7 @@ class SearchResults extends Component
                     {items.length} results for " {this.state.text} ":
                     <span>
                         View: &nbsp;
-                        <select onChange={this.changeView}>
+                        <select value={this.state.view} onChange={this.changeView}>
                             <option value="Detailed">Detailed</option>
                             <option value="Collapsed">Collapsed</option>
                         </select>
@@ -108,44 +120,86 @@ class SearchResults extends Component
     }
 }
 
+
 function DetailedAuctionItem(props)
 {
+    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+
     return (
-        <Media className="Item">
-            <img
-                width={300}
-                height={300}
+        <Card className="Item">
+            <CardMedia
                 className="align-self-start mr-3"
-                src="https://picsum.photos/300/300"
-                alt="Generic placeholder"
+                image="https://picsum.photos/300/300"
+                title="Generic placeholder"
             />
-            <Media.Body className="ItemBody">
-                <h3>{props.item.Name}</h3>
-                <p className="Seller"> Sold By: &nbsp;&nbsp; <span>{props.item.User.Username}</span> </p>
-                <h5>Description: </h5>
-                <p className="Description">{props.item.Description}</p>
-                <br/>
-                <div className="Prices">
-                    <div> 
-                        <p>Starting Price:</p>
-                        <p className="Starting Price">$ {props.item.First_bid}</p> 
-                    </div>
+            <CardContent className="ItemBody">
 
-                    <div> 
-                        <p>Current Price:</p>
-                        <p className="Current Price">$ {props.item.Currently}</p> 
-                    </div>
+                <Typography variant="h2">
+                    {props.item.Name}
+                </Typography>
 
-                    <div> 
-                        <p>Buyout Price:</p>
-                        <p className="Buyout Price">$ {props.item.Buy_Price}</p> 
-                    </div>
-                </div>
-            </Media.Body>
-            <Media.Body className="ItemBody">
+                <Box mb={3}>
+                    <Typography display="inline"> Sold By:</Typography>
+
+                    <Typography className="Seller" display="inline" variant="h5">
+                        &nbsp; &nbsp;{props.item.User.Username}
+                    </Typography>
+                        
+                    <Rating display="inline" value={rating} precision={0.5} readOnly />
+                </Box>
                 
-            </Media.Body>
-        </Media>
+                <Typography paragraph className="Description">
+                    {props.item.Description}
+                </Typography>
+                
+            </CardContent>
+
+            <CardContent className="Pricing">
+                <Grid container className="Prices" spacing={1}>
+                    <Grid item xs={6}>
+                        <Typography variant="h5" className="Title">Starting Price:</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Typography className="Starting Price" variant="h4">EUR {props.item.First_bid}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                        <Typography variant="h5" className="Title">Current Price:</Typography>
+                    </Grid>
+                    <Grid item xs={6} zeroMinWidth>
+                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price}</Typography>
+                    </Grid>
+                </Grid>
+
+                <Box className="Buttons" mt={3}>
+                    <Button className="Bid Button" variant="contained">
+                        Bid
+                    </Button>
+                    <Button className="Buyout Button" variant="contained">
+                        Buyout
+                    </Button>
+                </Box>
+
+                <Box className="Dates" mt={2}>
+                    <Typography>
+                        Started in: <span className="Started Date">{props.item.Started}</span>
+                    </Typography>
+                    <Typography>
+                        Ends in: <span className="Ends Date">{props.item.Ends}</span>
+                    </Typography>
+                </Box>
+                
+            </CardContent>
+            
+
+        </Card>
     )
 }
 
@@ -169,12 +223,12 @@ function CollapsedAuctionItem(props)
                 <div className="Prices">
                     <div> 
                         <p>Current Price:</p>
-                        <p className="Current Price">$ {props.item.Currently}</p> 
+                        <p className="Current Price">EUR {props.item.Currently}</p> 
                     </div>
 
                     <div> 
                         <p>Buyout Price:</p>
-                        <p className="Buyout Price">$ {props.item.Buy_Price}</p> 
+                        <p className="Buyout Price">EUR {props.item.Buy_Price}</p> 
                     </div>
                 </div>
             </Media.Body>
