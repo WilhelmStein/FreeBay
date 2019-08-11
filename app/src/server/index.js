@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
 
@@ -24,4 +26,11 @@ app.post('/api/email', function(req, res) { controller.email(req.body.email, res
 app.post('/api/signup', function(req, res) { controller.signup(req.body, res ) });
 
 
-app.listen(8080, () => console.log('Listening on port 8080!'));
+const options = {
+    key: fs.readFileSync(path.join(__dirname, 'encryption/server.key'), 'utf8'),
+    cert: fs.readFileSync(path.join(__dirname, 'encryption/server.cert'), 'utf8')
+  };
+
+https.createServer(options, app).listen(8080, () => {
+    console.log("server starting on port 8080")
+});
