@@ -60,7 +60,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
         box-sizing: border-box;
 
         display: grid;
-        grid-template-columns: 1fr 7fr $Search-height;
+        grid-template-columns: 1fr 7fr 1fr;
 
         width: 80%;
         height: $Header-height;
@@ -119,15 +119,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
             cursor: pointer;
 
-            height: $Search-height;
             width: $Search-height;
-
-            padding: 13px;
-
-            img
-            {
-                width: 100%;
-            }
         }
     }
 
@@ -219,11 +211,14 @@ $Search-height: calc(#{$Header-height} / 2.2);
 {
     background-color: $secondary-color;
     color: white;
-    padding: 15px 0;
+    
 
-    .link
+    .Button
     {
-        font-size: $normal-font-size;
+        outline: none;
+
+        text-decoration: none;
+        font-size: $small-font-size;
         color: white;
 
         padding:
@@ -234,6 +229,11 @@ $Search-height: calc(#{$Header-height} / 2.2);
             left: 50px;
         }
 
+        &.inactive
+        {
+            background-color: inherit;
+        }
+
         &:hover
         {
             background-color: $secondary-hover;
@@ -242,6 +242,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
         &:active, &.active
         {
             background-color: $secondary-active;
+
         }
 
         transition: 200ms;

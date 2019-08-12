@@ -29,39 +29,11 @@
     display: grid;
     grid-template-rows: 70px 5fr;
 
-    .Buttons
+    .Tabs
     {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-
-
-        button
+        .Tab
         {
-            border:none;
-            border-bottom: 1px solid grey;
-
-            outline: none;
-            background: none;
             font-size: $small-font-size;
-            color: grey;
-            cursor: pointer;
-
-            margin:
-            {
-                bottom: 30px;
-                left: 40px;
-                right: 40px;
-            }
-
-            padding-bottom: 15px;
-
-            &:hover
-            {
-                color: $main-hover;
-                border-bottom: 1px solid $main-hover;
-            }
-
-            transition: 200ms;
         }
 
         .active
@@ -69,6 +41,14 @@
             color: $main-color !important;
             border-bottom: 1px solid $main-color !important;
         }
+    }
+}
+
+.LoginForm
+{
+    .TextField
+    {
+        width: 80% !important;
     }
 }
 
@@ -80,47 +60,27 @@
     header
     {
         font-size: $header-font-size;
-        color: $main-color;
+        color: $mui-primary;
     }
 
-    .label
+    .TextField
     {
+        margin-top: 10px;
         width: 100%;
 
-        p
+        label
         {
-            padding: 0 20px;
             font-size: $small-font-size;
-            margin: 5px;
-
-            color: $main-color;
-            text-align: left;
         }
 
-        input, select
+        input
         {
-            border-radius: 5px;
-            border: none;
-            width : 80%;
-
-            padding: 15px;
-
-            background-color: $almost-white;
+            font-size: $normal-font-size;
         }
 
-        select
+        &.Select
         {
-            width: 95%;
-        }
-
-        input.form-wrong
-        {
-            border: 1px solid $red;
-        }
-
-        input.form-right
-        {
-            border: none;
+            font-size: $normal-font-size;
         }
     }
 
@@ -144,27 +104,16 @@
 
         text-align: center;
 
-        background-color: $secondary-color;
+        background-color: $mui-primary;
 
         &:hover
         {
-            background-color: $secondary-hover;
+            background-color: $main-hover;
         }
 
         &:active
         {
-            background-color: $secondary-active;
-        }
-    }
-
-    .Labels
-    {
-        display: grid;
-        grid-template-columns: 1fr 1fr ;
-
-        div
-        {
-            margin: 10px;
+            background-color: $main-active;
         }
     }
 }

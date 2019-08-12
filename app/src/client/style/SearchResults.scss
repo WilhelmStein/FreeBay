@@ -49,6 +49,13 @@
         margin: 0;
     }
 
+    .Item
+    {
+        width: 97%;
+        margin-left: 10px;
+        overflow: auto;
+    }
+
     
     &.Detailed
     {
@@ -59,10 +66,23 @@
             display: grid;
             grid-template-columns: 300px 500px 270px;
 
+            &.Grid
+            {
+                grid-template-columns: 250px 300px 270px;
+                height: 250px;
+
+                .Description
+                {
+                    font-size: $smaller-font-size;
+                    color: $graphite;
+                }
+            }
+
             .Description
             {
                 font-size: $small-font-size;
                 color: $graphite;
+
             }
         }
     }
@@ -72,13 +92,25 @@
         .Item
         {
             display: grid;
-            grid-template-columns: 100px 200px 100px;
+
+            grid-template-columns: 100px 300px 270px 200px;
     
             .ItemBody
             {
-                .Prices
+                height: 100px;
+                margin-left: 30px;
+            }
+
+            .Buttons
+            {
+                height: 100px;
+
+                .Button
                 {
-                    margin-top: 30px;
+                    margin-bottom: 2px;
+                    width: 90px;
+                    padding: 5px;
+                    font-size: $small-font-size;
                 }
             }
         }
@@ -92,7 +124,7 @@
 
     .ItemBody
     {
-        margin-left: 50px;
+        margin-left: 30px;
     }
 
     .Seller
@@ -105,30 +137,6 @@
     {
         margin-top: 10px;
 
-        .Button
-        {
-            text-transform: capitalize;
-            margin-right: 5px;
-            width: 100px;
-            border-radius: 5px;
-            color: white;
-
-            padding: 5px 15px;
-
-            font-size: $normal-font-size;
-            
-            &.Bid
-            {
-                
-                background-color: $green;
-            }
-
-            &.Buyout
-            {
-                background-color: $red;
-            }
-        }
-        
         .Prices
         {
             color: $graphite;
@@ -173,6 +181,30 @@
                     color: $red;
                 }
             }
+        }
+    }
+
+    .Button
+    {
+        text-transform: capitalize;
+        margin-right: 5px;
+        width: 100px;
+        border-radius: 5px;
+        color: white;
+
+        padding: 5px 15px;
+
+        font-size: $normal-font-size;
+        
+        &.Bid
+        {
+            
+            background-color: $green;
+        }
+
+        &.Buyout
+        {
+            background-color: $red;
         }
     }
 }

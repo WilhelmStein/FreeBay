@@ -7,8 +7,10 @@ import LoginPopup from './LoginPopup';
 import Popup from 'reactjs-popup';
 import Logo from '../images/Logo2.png';
 
+import SearchIcon from '@material-ui/icons/Search'
+import Button from '@material-ui/core/Button'
+
 import "../style/Header.scss"
-import SearchImg from "../images/Search.png"
 
 class Header extends Component
 {
@@ -111,9 +113,9 @@ class SearchBar extends Component
                     {categories}
                 </select>
                 <input placeholder="Search..." value={this.state.text} onChange={this.inputChange}/>
-                <button type="submit" onClick={this.submit}>
-                    <img alt="" src={SearchImg}/>
-                </button>
+                <Button color="secondary"  variant="contained" type="submit" aria-label="search" onClick={this.submit}>
+                    <SearchIcon fontSize="large"/>
+                </Button>
             </div>
         )
     }
@@ -157,7 +159,7 @@ export class Menu extends Component
         ]
 
         const buttons = paths.map( (item, index) => {
-            return <Link className={`link ${this.props.active === item.path ? "active" : ""}`} key={item.name} to={item.path}>{item.name}</Link>
+            return <Button component={Link} variant="contained" className={`Button ${this.props.active === item.path ? "active" : "inactive"}`} key={item.name} to={item.path}>{item.name}</Button>
         })
 
         return (
