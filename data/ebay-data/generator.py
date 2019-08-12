@@ -10,6 +10,20 @@ import random
 import math
 
 
+# TODO
+def constraint(string, max_length=45):
+
+    if len(string) > max_length:
+
+        return string[:45]
+
+
+# TODO
+def no_decimals(number):
+
+    return round(number)
+
+
 class Generator:
 
     config = {
@@ -62,15 +76,17 @@ class Generator:
 
     time_delta_min, time_delta_max = 30, 1440
 
-    def __init__(self, seed=123456789, reset=None):
+    def __init__(self, seed=123456789, drop_all=False, verbose=False):
+
+        self.verbose = verbose
 
         self.cnx = connector.connect(**Generator.config)
 
         self.cur = self.cnx.cursor()
 
-        if reset:
+        if drop_all:
 
-            for table in reset:
+            for table in ["Auction_has_Category", "Bid", "Auction", "General_User", "User", "Address", "Category"]:
 
                 self.cur.execute("DELETE FROM {}".format(table))
 
@@ -159,7 +175,7 @@ class Generator:
             "Street": street if street else self.generator.street_name(),
             "Number": number if number else random.randint(1, 100),
             "ZipCode": zip_code if zip_code else self.generator.zipcode(),
-            "Country": country if country else self.generator.country(),
+            "Country": constraint(country if country else self.generator.country()),
             "City": city if city else self.generator.city()
         }
 
@@ -198,9 +214,9 @@ class Generator:
             "Id": auction_id,
             "Seller_id": seller_id,
             "Name": name,
-            "Currently": currently,
-            "First_Bid": first_bid,
-            "Buy_Price": buy_price,
+            "Currently": no_decimals(currently),
+            "First_Bid": no_decimals(first_bid),
+            "Buy_Price": no_decimals(buy_price) if buy_price else None,
             "Location":  location,
             "Latitude": latitude,
             "Longitude": longitude,
@@ -215,10 +231,10 @@ class Generator:
         self.bid_id += 1
 
         return {
-            "Id": bid_id,
+            "Id": self.bid_id,
             "User_id": user_id,
             "Auction_Id": auction_id,
-            "Amount": amount,
+            "Amount": no_decimals(amount),
             "Time": time
         }
 
@@ -243,6 +259,10 @@ class Generator:
 
 
     def register(self, auction):
+
+        if self.verbose:
+
+            print("Processing auction '%s'" % auction["ItemID"])
 
         seller = auction["Seller"]
 
@@ -279,7 +299,7 @@ class Generator:
 
                 self.__register__("User", self.__generate_user__(username=bidder["UserID"]))
 
-                self.__register__("General_User", self.__generate_general_user__(bidder_rating=bidder["Rating"]))
+                self.__register__("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]], bidder_rating=bidder["Rating"]))
 
                 self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=auction["ItemID"], amount=bid["Amount"], time=bid["Time"]))
 

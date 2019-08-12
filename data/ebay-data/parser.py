@@ -79,7 +79,7 @@ class Parser:
 
                 else:
 
-                    bid[subelement.tag] = subelement.text
+                    bid[subelement.tag] = subelement.text if subelement.text else ""
 
             bids.append(bid)
 
@@ -111,7 +111,7 @@ class Parser:
 
                 auction[detail.tag] = Parser.bids(detail)
 
-            elif detail.tag == "Currently" or detail.tag == "First_Bid":
+            elif detail.tag == "Currently" or detail.tag == "First_Bid" or detail.tag == "Buy_Price":
 
                 auction[detail.tag] = Parser.to_number(detail.text, float)
 
@@ -125,7 +125,7 @@ class Parser:
 
             else:
 
-                auction[detail.tag] = detail.text
+                auction[detail.tag] = detail.text if detail.text else ""
 
         return auction
 
