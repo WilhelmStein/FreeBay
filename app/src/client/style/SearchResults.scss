@@ -13,32 +13,13 @@
         {
             margin-left: 50px;
             font-size: $smaller-font-size;
-            font-weight: 400;
-
-            select
-            {
-                outline: none;
-
-                filter: drop-shadow(1px 1px 1px $graphite);
-
-                border-top-left-radius: 5px;
-                border-bottom-left-radius: 5px;
-                
-                border:
-                {
-                    right: 0.3px solid grey;
-                    left: 0;
-                    top: 0;
-                    bottom: 0;
-                }
-
-                font-size: $small-font-size;
-
-                padding: 10px;
-
-                background-color: $less-white;
-            }
         }
+    }
+
+    .Select
+    {
+        font-weight: 400;
+        font-size: $small-font-size;
     }
 }
 
@@ -186,7 +167,7 @@
 
     .Button
     {
-        text-transform: capitalize;
+        // text-transform: capitalize;
         margin-right: 5px;
         width: 100px;
         border-radius: 5px;

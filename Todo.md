@@ -13,10 +13,11 @@
 
 ### Features
 
-- [ ] Create Database Controller
-- [ ] Setup SSL encryption
+- [x] Create Database Controller
+- [x] Setup SSL encryption
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
+- [ ] Setup Image requesting
 
 ## Front - End
 
@@ -25,7 +26,7 @@
 - [x] Create React app
 - [x] Setup Router
 - [x] Setup Sass
-- [ ] Test Bootstrap
+- [x] Test Bootstrap
 - [ ] Design UI - Adobe XD
 
 ### Components

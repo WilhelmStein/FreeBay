@@ -8,6 +8,8 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 
 import Button from '@material-ui/core/Button';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -36,9 +38,19 @@ class SearchResults extends Component
 
     componentDidMount()
     {
+        this.initFromURL(this.props);
+    }
+
+    componentWillReceiveProps(nextProps)
+    {
+        this.initFromURL(nextProps);
+    }
+
+    initFromURL(props)
+    {
         const regex =  /{(.*?)}/g;
 
-        var params = this.props.location.search.match(regex);
+        var params = props.location.search.match(regex);
 
         var category = params[0].replace(/{|}/g, '');
         var text = params[1].replace(/{|}/g, '');
@@ -106,11 +118,11 @@ class SearchResults extends Component
                     {items.length} results for " {this.state.text} ":
                     <span>
                         View: &nbsp;
-                        <select value={this.state.view} onChange={this.changeView}>
-                            <option value="Detailed">Detailed</option>
-                            <option value="Collapsed">Collapsed</option>
-                            <option value="Detailed Grid">Detailed Grid</option>
-                        </select>
+                        <Select className="Select" value={this.state.view} onChange={this.changeView}>
+                            <MenuItem value="Detailed">Detailed</MenuItem>
+                            <MenuItem value="Collapsed">Collapsed</MenuItem>
+                            <MenuItem value="Detailed Grid">Detailed Grid</MenuItem>
+                        </Select>
                     </span>
                 </h2>
 
