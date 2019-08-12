@@ -42,7 +42,7 @@
     {
         .Item
         {
-            height: 300px;
+            height: 250px;
 
             display: grid;
             grid-template-columns: 300px 500px 270px;
@@ -97,6 +97,25 @@
         }
     }
 
+    &.Square
+    {
+        .Item
+        {
+            height: 250px;
+
+            display: grid;
+            grid-template-columns: 250px 300px;
+
+            .Buttons
+            {
+                .Button
+                {
+                    margin-right: 15px;
+                }
+            }
+        }
+    }
+
     .ListItem
     {
         outline: none;
@@ -117,57 +136,57 @@
     .Pricing
     {
         margin-top: 10px;
+    }
 
-        .Prices
+
+    .Prices
+    {
+        color: $graphite;
+
+        .Title
         {
-            color: $graphite;
-
-            .Title
-            {
-                font-weight: 300;
-            }
-
-            .Price
-            {
-                &.Starting
-                {
-                    color: $blue;
-                }
-
-                &.Current
-                {
-                    color: $green;
-                }
-
-                &.Buyout
-                {
-                    color: $red;
-                }
-            }
+            font-weight: 300;
         }
 
-        .Dates
+        .Price
         {
-            font-size: $normal-font-size;
-
-            .Date
+            &.Starting
             {
-                &.Started
-                {
-                    color: $green;
-                }
+                color: $blue;
+            }
 
-                &.Ends
-                {
-                    color: $red;
-                }
+            &.Current
+            {
+                color: $green;
+            }
+
+            &.Buyout
+            {
+                color: $red;
+            }
+        }
+    }
+
+    .Dates
+    {
+        font-size: $normal-font-size;
+
+        .Date
+        {
+            &.Started
+            {
+                color: $green;
+            }
+
+            &.Ends
+            {
+                color: $red;
             }
         }
     }
 
     .Button
     {
-        // text-transform: capitalize;
         margin-right: 5px;
         width: 100px;
         border-radius: 5px;
@@ -179,7 +198,6 @@
         
         &.Bid
         {
-            
             background-color: $green;
         }
 

@@ -30,7 +30,7 @@ class SearchResults extends Component
             items: [],
             category: -1,
             text: "",
-            view: "Detailed Grid"
+            view: "Square Grid"
         }
 
         autoBind(this);
@@ -88,6 +88,12 @@ class SearchResults extends Component
     {
         let items;
 
+        let gridDivision = 12;
+        if (this.state.view.includes("Grid"))
+        {
+            gridDivision = this.state.view === "Square Grid" ? 4 : 6
+        }
+
         const type = (item) => {
             if (this.state.view === "Detailed")
             {
@@ -97,15 +103,23 @@ class SearchResults extends Component
             {
                 return <CollapsedAuctionItem item={item}/>;
             }
+            else if (this.state.view === "Square Grid")
+            {
+                return <SquareAuctionItem grid item={item}/>
+            }
             else if (this.state.view === "Detailed Grid")
             {
                 return <DetailedAuctionItem grid item={item}/>;
+            }
+            else if (this.state.view === "Collapsed Grid")
+            {
+                return <CollapsedAuctionItem grid item={item}/>;
             }
         }
 
         items = this.state.items.map( (item) => {
             return (
-                <Grid item xs={this.state.view === "Detailed Grid" ? 6 : 12} key={item.Id} >
+                <Grid item xs={gridDivision} key={item.Id} >
                     {type(item)}
                 </Grid>
             );
@@ -122,6 +136,8 @@ class SearchResults extends Component
                             <MenuItem value="Detailed">Detailed</MenuItem>
                             <MenuItem value="Collapsed">Collapsed</MenuItem>
                             <MenuItem value="Detailed Grid">Detailed Grid</MenuItem>
+                            <MenuItem value="Collapsed Grid">Collapsed Grid</MenuItem>
+                            <MenuItem value="Square Grid">Square Grid</MenuItem>
                         </Select>
                     </span>
                 </h2>
@@ -144,7 +160,7 @@ function DetailedAuctionItem(props)
     return (
         <Card className={`Item ${props.grid ? "Grid" : ""}`}>
             <CardMedia
-                image={`https://picsum.photos/${props.grid ? 250 : 300}/${props.grid ? 250 : 300}`}
+                image={`https://picsum.photos/${props.grid ? 250 : 250}/${props.grid ? 250 : 250}`}
                 title="Generic placeholder"
             />
             <CardContent className="ItemBody">
@@ -153,7 +169,7 @@ function DetailedAuctionItem(props)
                     {props.item.Name}
                 </Typography>
 
-                <Box mb={3}>
+                <Box mb={2}>
                     <Typography display="inline"> Sold By:</Typography>
 
                     <Typography className="Seller" display="inline" variant="h5">
@@ -164,7 +180,7 @@ function DetailedAuctionItem(props)
                 </Box>
                 
                 <Typography paragraph className="Description">
-                    {props.item.Description}
+                    {props.item.Description === null ? "No Description." : props.item.Description}
                 </Typography>
                 
             </CardContent>
@@ -261,6 +277,58 @@ function CollapsedAuctionItem(props)
 
             <CardContent className="Buttons">
                 <Box>
+                    <Button className="Bid Button" variant="contained">
+                        Bid
+                    </Button>
+                    <Button className="Buyout Button" variant="contained">
+                        Buyout
+                    </Button>
+                </Box>
+            </CardContent>
+        </Card>
+    )
+}
+
+function SquareAuctionItem(props)
+{
+    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+
+    return (
+        <Card className="Item">
+            <CardMedia
+                image="https://picsum.photos/250/250"
+                title="Generic placeholder"
+            />
+            <CardContent className="ItemBody">
+                <Typography variant="h2">
+                    {props.item.Name}
+                </Typography>
+
+                <Box mb={3}>
+                    <Typography display="inline"> Sold By:</Typography>
+
+                    <Typography className="Seller" display="inline" variant="h5">
+                        &nbsp; &nbsp;{props.item.User.Username}
+                    </Typography>
+                        
+                    <Rating display="inline" value={rating} precision={0.5} readOnly />
+                </Box>
+                <Grid container className="Prices" spacing={1}>
+                    <Grid item xs={6}>
+                        <Typography variant="h5" className="Title">Current Price:</Typography>
+                    </Grid>
+                    <Grid item xs={6} zeroMinWidth>
+                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price}</Typography>
+                    </Grid>
+                </Grid>
+                <Box mt={3} className="Buttons">
                     <Button className="Bid Button" variant="contained">
                         Bid
                     </Button>
