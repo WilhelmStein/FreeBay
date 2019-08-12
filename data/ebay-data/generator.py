@@ -10,20 +10,6 @@ import random
 import math
 
 
-# TODO
-def constraint(string, max_length=45):
-
-    if len(string) > max_length:
-
-        return string[:45]
-
-
-# TODO
-def no_decimals(number):
-
-    return round(number)
-
-
 class Generator:
 
     config = {
@@ -80,6 +66,7 @@ class Generator:
 
         self.verbose = verbose
 
+
         self.cnx = connector.connect(**Generator.config)
 
         self.cur = self.cnx.cursor()
@@ -90,16 +77,13 @@ class Generator:
 
                 self.cur.execute("DELETE FROM {}".format(table))
 
+
         random.seed(seed)
 
         self.generator = Faker()
 
         self.generator.seed(seed)
 
-
-        self.amount_delta = lambda: abs(random.gauss(amount_mean, amount_sigma))
-
-        self.time_delta = lambda: math.floor(abs(random.random() - random.random()) * (1.0 + time_delta_max - time_delta_min) + time_delta_min)
 
         self.users = {}
 
@@ -127,12 +111,6 @@ class Generator:
     def __random_decimal__(lower=0.0, upper=100.0, round_digits=1):
 
         return round(random.uniform(lower, upper), round_digits)
-
-
-    @staticmethod
-    def __random_amount__(mean=200, sigma=65):
-
-        return abs(random.gauss(mean, sigma))
 
 
     def __random_auction_description__(self, lower=100, upper=300):
@@ -175,7 +153,7 @@ class Generator:
             "Street": street if street else self.generator.street_name(),
             "Number": number if number else random.randint(1, 100),
             "ZipCode": zip_code if zip_code else self.generator.zipcode(),
-            "Country": constraint(country if country else self.generator.country()),
+            "Country": country if country else self.generator.country(),
             "City": city if city else self.generator.city()
         }
 
@@ -214,9 +192,9 @@ class Generator:
             "Id": auction_id,
             "Seller_id": seller_id,
             "Name": name,
-            "Currently": no_decimals(currently),
-            "First_Bid": no_decimals(first_bid),
-            "Buy_Price": no_decimals(buy_price) if buy_price else None,
+            "Currently": round(currently, 2),
+            "First_Bid": round(first_bid, 2),
+            "Buy_Price": round(buy_price, 2) if buy_price else None,
             "Location":  location,
             "Latitude": latitude,
             "Longitude": longitude,
@@ -234,7 +212,7 @@ class Generator:
             "Id": self.bid_id,
             "User_id": user_id,
             "Auction_Id": auction_id,
-            "Amount": no_decimals(amount),
+            "Amount": round(amount, 2),
             "Time": time
         }
 
@@ -276,16 +254,16 @@ class Generator:
 
         self.__register__("Auction",
             self.__generate_auction__(
-                auction_id=auction["ItemID"],
+                auction_id=auction.get("ItemID"),
                 seller_id=self.users[seller["UserID"]],
-                name=auction["Name"],
-                currently=auction["Currently"],
-                first_bid=auction["First_Bid"],
+                name=auction.get("Name"),
+                currently=auction.get("Currently"),
+                first_bid=auction.get("First_Bid"),
                 buy_price=auction.get("Buy_Price"),
-                location=auction["Location"],
-                started=auction["Started"],
-                ends=auction["Ends"],
-                description=auction["Description"]
+                location=auction.get("Location"),
+                started=auction.get("Started"),
+                ends=auction.get("Ends"),
+                description=auction.get("Description")
             )
         )
 

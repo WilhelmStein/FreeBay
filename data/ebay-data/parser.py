@@ -79,7 +79,7 @@ class Parser:
 
                 else:
 
-                    bid[subelement.tag] = subelement.text if subelement.text else ""
+                    bid[subelement.tag] = subelement.text
 
             bids.append(bid)
 
@@ -125,7 +125,7 @@ class Parser:
 
             else:
 
-                auction[detail.tag] = detail.text if detail.text else ""
+                auction[detail.tag] = detail.text
 
         return auction
 
