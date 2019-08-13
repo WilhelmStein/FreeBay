@@ -39,10 +39,12 @@ class Parser:
     @staticmethod
     def location(field):
 
+        latitude, longitude = field.attrib.get("Latitude"), field.attrib.get("Longitude")
+
         return {
             "Place": field.text,
-            "Latitude": field.attrib.get("Latitude"),
-            "Longitude": field.attrib.get("Longitude")
+            "Latitude": Parser.to_number(latitude, float) if latitude else None,
+            "Longitude": Parser.to_number(longitude, float) if longitude else None
         }
 
 
@@ -132,45 +134,53 @@ class Parser:
 
     def __init__(self, target=os.path.curdir, verbose=False):
 
-        if not os.path.exists(target):
+        if isinstance(target, list):
 
-            raise ValueError("'" + target + "' does not name an existing file or directory")
-
-        if os.path.isfile(target):
-
-            self.filenames = []
-
-            if target.endswith(".xml"):
-
-                self.filenames.append(target)
-
-        elif os.path.isdir(target):
-
-            self.filenames = [filename for filename in os.listdir(target) if filename.endswith(".xml")]
-            self.filenames = sorted(self.filenames, key=lambda filename: (len(filename), filename))
+            self.filenames = [filename for filename in target if os.path.isfile(filename)]
 
         else:
 
-            raise ValueError("'%s' is neither a directory nor a file")
+            if os.path.isfile(target):
+
+                self.filenames = [target]
+
+            elif os.path.isdir(target):
+
+                self.filenames = [filename for filename in os.listdir(target)]
+                self.filenames = sorted(self.filenames, key=lambda filename: (len(filename), filename))
+
+            else:
+
+                raise ValueError("'{}' does not name an existing file or directory".format(target))
 
 
         self.auctions = {}
 
         for filename in self.filenames:
 
-            if verbose:
-
-                print("Processing file '%s'" % os.path.join(self.directory, filename))
-
-            for element in ET.parse(filename).getroot():
-
-                id = int(element.attrib["ItemID"])
+            if filename.endswith(".xml"):
 
                 if verbose:
 
-                    print("\tProcessing auction '%s'" % id)
+                    print("Parsing target '%s'" % filename)
 
-                self.auctions[id] = { "ItemID": id, **Parser.auction(element) }
+                for element in ET.parse(filename).getroot():
+
+                    id = int(element.attrib["ItemID"])
+
+                    if verbose:
+
+                        print("\tProcessing auction '%s'" % id)
+
+                    self.auctions[id] = { "ItemID": id, **Parser.auction(element) }
+
+            else:
+
+                if verbose:
+
+                    print("Skipping target '%s'" % filename)
+
+        print('\nParser reporting %d auctions' % len(self.auctions))
 
 
     def dumps(self, id):
