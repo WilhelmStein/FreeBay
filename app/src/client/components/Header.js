@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import autoBind from 'auto-bind';
 import axios from "axios"
 
@@ -7,10 +7,12 @@ import LoginPopup from './LoginPopup';
 import Popup from 'reactjs-popup';
 import Logo from '../images/Logo2.png';
 
-import "../style/Header.scss"
-import SearchImg from "../images/Search.png"
+import SearchIcon from '@material-ui/icons/Search'
+import Button from '@material-ui/core/Button'
 
-export default class Header extends Component
+import "../style/Header.scss"
+
+class Header extends Component
 {
     constructor(props)
     {
@@ -32,7 +34,7 @@ export default class Header extends Component
                     <img alt="" src={Logo}/>
                     <p>FreeBay</p>
                 </Link>
-                <SearchBar/>
+                <SearchBar history={this.props.history}/>
                 <AccountSnapshot user={this.props.user} loginHandler={this.props.loginHandler}/>
             </div>
         );
@@ -94,16 +96,7 @@ class SearchBar extends Component
 
     submit(event)
     {
-        axios.post("/api/search", {
-            category: this.state.categories[this.state.category].Id,
-            text: this.state.text
-        })
-        .then(res => {
-            // Get results and load them
-        })
-        .catch(err => console.log(err));
-
-        console.log(`Category: ${this.state.categories[this.state.category].Name}, Text: ${this.state.text}`);
+        this.props.history.push(`/search?category={${this.state.categories[this.state.category].Id}}&text={${this.state.text}}`);
 
         event.preventDefault();
     }
@@ -120,9 +113,9 @@ class SearchBar extends Component
                     {categories}
                 </select>
                 <input placeholder="Search..." value={this.state.text} onChange={this.inputChange}/>
-                <button type="submit" onClick={this.submit}>
-                    <img alt="" src={SearchImg}/>
-                </button>
+                <Button color="secondary"  variant="contained" type="submit" aria-label="search" onClick={this.submit}>
+                    <SearchIcon fontSize="large"/>
+                </Button>
             </div>
         )
     }
@@ -134,8 +127,6 @@ export class Menu extends Component
     {
         super(props);
         autoBind(this);
-
-        console.log(this.props.active)
     }
 
     render()
@@ -168,7 +159,7 @@ export class Menu extends Component
         ]
 
         const buttons = paths.map( (item, index) => {
-            return <Link className={`link ${this.props.active === item.path ? "active" : ""}`} key={item.name} to={item.path}>{item.name}</Link>
+            return <Button component={Link} variant="contained" className={`Button ${this.props.active === item.path ? "active" : "inactive"}`} key={item.name} to={item.path}>{item.name}</Button>
         })
 
         return (
@@ -225,3 +216,5 @@ function AccountSnapshot(props)
         )
     }
 }
+
+export default withRouter(Header);

@@ -1,9 +1,19 @@
 import React, { Component } from 'react';
 import Popup from 'reactjs-popup';
-import axios from "axios"
+import axios from "axios";
 import autoBind from 'auto-bind';
 
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+
+import TextField from '@material-ui/core/TextField'
+import MenuItem from '@material-ui/core/MenuItem'
+import Button from '@material-ui/core/Button'
+import Grid from '@material-ui/core/Grid';
+
 import "../style/LoginPopup.scss"
+
+
 
 export default class LoginPopup extends Component
 {
@@ -12,24 +22,22 @@ export default class LoginPopup extends Component
         super(props);
 
         this.state = {
-            login: props.text === "Log In" ? true : false
+            tab: props.text === "Log In" ? 0 : 1
         };
+
+        this.tabs = {
+            "Log In" : 0,
+            "Sign Up" : 1
+        }
 
         autoBind(this);
     }
 
-    loginPress()
+    tabChange(event, newValue)
     {
         this.setState({
-            login: true
-        })
-    }
-
-    signupPress()
-    {
-        this.setState({
-            login: false
-        })
+            tab: newValue
+        });
     }
 
     render()
@@ -45,16 +53,20 @@ export default class LoginPopup extends Component
                 {
                     close => (
                         <div className="LoginPopupWrapper">
-                            <div className="Buttons">
-                                <button onClick={this.loginPress} className={this.state.login ? "active" : ""}>
-                                    Log in
-                                </button>
-                                <button onClick={this.signupPress} className={!this.state.login ? "active" : ""}>
-                                    Sign up
-                                </button>
+                            <div className="Tabs">
+                                <Tabs
+                                    value={this.state.tab}
+                                    onChange={this.tabChange}
+                                    indicatorColor="primary"
+                                    textColor="primary"
+                                    centered
+                                >
+                                    <Tab className="Tab" label="Log In"/>
+                                    <Tab className="Tab" label="Sign Up"/>
+                                </Tabs>
                             </div>
                             {
-                                this.state.login ? 
+                                this.state.tab === this.tabs["Log In"] ? 
                                     <LoginForm Close={close} loginHandler={this.props.loginHandler}/>
                                     :
                                     <SignupForm Close={close} loginHandler={this.props.loginHandler}/>
@@ -137,31 +149,31 @@ export class LoginForm extends Component
         return (
             <form className='LoginForm' onSubmit={this.submit}>
                 <header>Log in</header>
-                    <div className="label">
-                        <p>Username</p>
-                        <input 
-                            title={this.state.wrong ? 'Wrong Username' : ''}
-                            className={this.state.wrong ? 'form-wrong' : 'form-right'}
-                            type="text"
-                            placeholder="example69"
-                            value={this.state.username}
-                            onChange={this.usernameChange}
-                        />
-                    </div>
+                    <TextField
+                        className="TextField"
+                        required
+                        error={this.state.wrong}
+                        label="Username"
+                        value={this.state.username}
+                        placeholder="example69"
+                        onChange={this.usernameChange}
+                        marign="normal"
+                        // variant="outlined"
+                    />
+                    <TextField
+                        className="TextField"
+                        required
+                        error={this.state.wrong}
+                        type="password"
+                        label="Password"
+                        value={this.state.password}
+                        placeholder="********"
+                        onChange={this.passwordChange}
+                        marign="normal"
+                        // variant="outlined"
+                    />
 
-                    <div className="label">
-                        <p>Password</p>
-                        <input 
-                            title={this.state.wrong ? 'Wrong Password' : ''}
-                            className={this.state.wrong ? 'form-wrong' : 'form-right'}
-                            type="password"
-                            placeholder="********"
-                            value={this.state.password}
-                            onChange={this.passwordChange}
-                        />
-                    </div>
-
-                <button id="LoginButton" type="submit">Log in</button>
+                <Button variant="contained" id="LoginButton" type="submit">Log in</Button>
             </form>
         )
     }
@@ -385,61 +397,74 @@ export class SignupForm extends Component
 
     render()
     {
-        const options = this.data.map( (menu, index) => {
-            
-            const suboptions = menu.map( (item, index2) => {
-                if (item.name === "country")
-                {
-                    const countries = this.state.countries.map( (country) => {
-                        return <option key={country} value={country}>
-                            {country}
-                        </option>
-                    })
-
-                    return (
-                        <div className="label" key={`${item.name}_label`}>
-                            <p>{item.label}</p>
-                            <select 
-                                key={item.name}
-                                onChange={ (e) => {this.change(e, item.name); } }
-                            >
-                                {countries}
-                            </select>
-                        </div>
-                    )
-                }
-
+        const inputField = item => {
+            if (item.name !== "country")
+            {
                 return (
-                    <div className="label" key={`${item.name}_label`}>
-                        <p>{item.label}</p>
-                        <input 
-                            key={item.name}
+                    <Grid item xs={6} key={`${item.name}TextField`}>
+                        <TextField
+                            className="TextField"
+                            required
+                            error={this.state[`${item.name}Error`]}
                             title={this.state[`${item.name}Error`]}
-                            className={this.state[`${item.name}Error`] ? 'form-wrong' : 'form-right'}
+                            label={item.label}
                             value={this.state[item.name]}
                             placeholder={item.placeholder}
                             type={item.type}
-                            onBlur={(e) => this.blur(e, item.name)}
                             onChange={ (e) => {this.change(e, item.name); } }
+                            onBlur={(e) => this.blur(e, item.name)}
+                            marign="normal"
+                            // variant="outlined"
                         />
-                    </div>
+                    </Grid>
                 )
-            })
+            }
+            else
+            {
+                const countries = this.state.countries.map( (country) => {
+                    return (
+                        <MenuItem value={country} key={country}>
+                            {country}
+                        </MenuItem>
+                    )
+                })
+                return (
+                    <Grid item xs={6} key={`${item.name}TextField`}>
+                        <TextField
+                            select
+                            className="TextField Select"
+                            required
+                            error={this.state[`${item.name}Error`]}
+                            title={this.state[`${item.name}Error`]}
+                            label={item.label}
+                            value={this.state[item.name]}
+                            placeholder={item.placeholder}
+                            type={item.type}
+                            onChange={ (e) => {this.change(e, item.name); } }
+                            onBlur={(e) => this.blur(e, item.name)}
+                            marign="normal"
+                        >
+                            {countries}
+                        </TextField>
+                    </Grid>
+                )
+            }
+        }
 
-            return (
-                <div key={`menu${index}`}>
-                    {suboptions}
-                </div>
-            )
-        });
+        let options = [];
+        for (let i = 0; i < this.data[0].length; i++)
+        {
+            options.push(inputField(this.data[0][i]));
+            options.push(inputField(this.data[1][i]));
+        }
 
         return (
             <form className='SignupForm' onSubmit={this.submit}>
                 <header>Sign up</header>
-                <div className="Labels">
+                <Grid container spacing={3} className="Labels">
                     {options}
-                </div>
-                <button id="SignupButton" type="submit">Sign up</button>
+                </Grid>
+                <Button variant="contained" id="SignupButton" type="submit">Sign Up</Button>
             </form>
         )
     }

@@ -23,7 +23,11 @@ app.post('/api/username', function(req, res) { controller.username(req.body.user
 
 app.post('/api/email', function(req, res) { controller.email(req.body.email, res) });
 
-app.post('/api/signup', function(req, res) { controller.signup(req.body, res ) });
+app.post('/api/signup', function(req, res) { controller.signup(req.body, res); });
+
+app.post('/api/search', function(req, res) { controller.search(req.body.category, req.body.text, res); });
+
+app.post('/api/auction', function(req, res) { controller.auction(req.body.auctionId, res); });
 
 
 const options = {

@@ -1,0 +1,232 @@
+@import 'global';
+
+.SearchResultsPage
+{
+    color: $graphite;
+
+    h2
+    {
+        font-size: $big-header-font-size;
+        margin-left: 15px;
+
+        span
+        {
+            margin-left: 50px;
+            font-size: $smaller-font-size;
+        }
+    }
+
+    .Select
+    {
+        font-weight: 400;
+        font-size: $small-font-size;
+    }
+}
+
+.SearchResults
+{
+    ::-webkit-scrollbar 
+    {
+        width: 0.4em;
+        height: 0.4em;
+    }
+
+    ::-webkit-scrollbar-track
+    {
+        box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+    }
+
+    ::-webkit-scrollbar-thumb
+    {
+        background-color: rgba(0,0,0,.1);
+        outline: 1px solid slategrey
+    }
+
+    ::-webkit-scrollbar-thumb:hover
+    {
+        background: $lesser-white;
+    }
+
+    h2
+    {
+        margin: 0;
+    }
+
+    .Item
+    {
+        width: 97%;
+        margin-left: 10px;
+        overflow: auto;
+    }
+
+    
+    &.Detailed
+    {
+        .Item
+        {
+            height: 250px;
+
+            display: grid;
+            grid-template-columns: 300px 500px 270px;
+
+            &.Grid
+            {
+                grid-template-columns: 250px 300px 270px;
+                height: 250px;
+
+                .Description
+                {
+                    font-size: $smaller-font-size;
+                    color: $graphite;
+                }
+            }
+
+            .Description
+            {
+                font-size: $small-font-size;
+                color: $graphite;
+
+            }
+        }
+    }
+    
+    &.Collapsed
+    {
+        .Item
+        {
+            display: grid;
+
+            grid-template-columns: 100px 300px 270px 200px;
+    
+            .ItemBody
+            {
+                height: 100px;
+                margin-left: 30px;
+            }
+
+            .Buttons
+            {
+                height: 100px;
+
+                .Button
+                {
+                    margin-bottom: 2px;
+                    width: 90px;
+                    padding: 5px;
+                    font-size: $small-font-size;
+                }
+            }
+        }
+    }
+
+    &.Square
+    {
+        .Item
+        {
+            height: 250px;
+
+            display: grid;
+            grid-template-columns: 250px 300px;
+
+            .Buttons
+            {
+                .Button
+                {
+                    margin-right: 15px;
+                }
+            }
+        }
+    }
+
+    .ListItem
+    {
+        outline: none;
+        transition: 200ms;
+    }
+
+    .ItemBody
+    {
+        margin-left: 30px;
+    }
+
+    .Seller
+    {
+        color: $blue;
+        cursor: pointer;
+    }
+
+    .Pricing
+    {
+        margin-top: 10px;
+    }
+
+
+    .Prices
+    {
+        color: $graphite;
+
+        .Title
+        {
+            font-weight: 300;
+        }
+
+        .Price
+        {
+            &.Starting
+            {
+                color: $blue;
+            }
+
+            &.Current
+            {
+                color: $green;
+            }
+
+            &.Buyout
+            {
+                color: $red;
+            }
+        }
+    }
+
+    .Dates
+    {
+        font-size: $normal-font-size;
+
+        .Date
+        {
+            &.Started
+            {
+                color: $green;
+            }
+
+            &.Ends
+            {
+                color: $red;
+            }
+        }
+    }
+
+    .Button
+    {
+        margin-right: 5px;
+        width: 100px;
+        border-radius: 5px;
+        color: white;
+
+        padding: 5px 15px;
+
+        font-size: $normal-font-size;
+        
+        &.Bid
+        {
+            background-color: $green;
+        }
+
+        &.Buyout
+        {
+            background-color: $red;
+        }
+    }
+}

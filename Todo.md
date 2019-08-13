@@ -10,13 +10,19 @@
 - [x] Design Database
 - [x] DB Create Script
 - [ ] DB Fill Script
+- [ ] Setup Image requesting
 
 ### Features
 
-- [ ] Create Database Controller
-- [ ] Setup SSL encryption
+- [x] Create Database Controller
+- [x] Setup SSL encryption
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
+- [ ] XML -> DB generation
+- [ ] Search sql queries
+- [ ] Bonus algorithm
+- [ ] Auction retrieval sql query
+- [ ] Auction post sql query
 
 ## Front - End
 
@@ -25,7 +31,8 @@
 - [x] Create React app
 - [x] Setup Router
 - [x] Setup Sass
-- [ ] Test Bootstrap
+- [x] Test Bootstrap
+- [x] Integrate Material UI
 - [ ] Design UI - Adobe XD
 
 ### Components
@@ -33,13 +40,31 @@
 - [x] Header
     - [x] Logo
     - [x] Search
-      - [ ] Implement Functionality
+      - [x] Implement Functionality
     - [x] Login
     - [x] Styling
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
   - [x] Implementation
+- [ ] Search Results
+  - [ ] Collapsed
+  - [x] Detailed
+  - [x] Detailed Grid
+  - [ ] Collapsed Grid
+  - [x] Square Grid
+- [ ] Account Page
+  - [ ] Profile
+  - [ ] Posted Auctions
+  - [ ] Active Auctions
+  - [ ] Messages
+  - [ ] Settings
+- [ ] Auction Page
+  - [ ] Post Auction
+  - [ ] View - Bid Auction
+- [ ] Admin Page
+- [ ] About Page
+- [ ] Help Page
 
 ### Packages
 
