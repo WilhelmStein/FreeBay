@@ -132,7 +132,7 @@ class Parser:
         return auction
 
 
-    def __init__(self, target=os.path.curdir, verbose=False):
+    def __init__(self, target=os.path.curdir, verbose=True):
 
         if isinstance(target, list):
 
@@ -162,7 +162,7 @@ class Parser:
 
                 if verbose:
 
-                    print("Parsing target '%s'" % filename)
+                    print("[Parser] Processing file '%s'" % filename)
 
                 for element in ET.parse(filename).getroot():
 
@@ -170,7 +170,7 @@ class Parser:
 
                     if verbose:
 
-                        print("\tProcessing auction '%s'" % id)
+                        print("[Parser] Processing auction '%s'" % id)
 
                     self.auctions[id] = { "ItemID": id, **Parser.auction(element) }
 
@@ -178,9 +178,9 @@ class Parser:
 
                 if verbose:
 
-                    print("Skipping target '%s'" % filename)
+                    print("[Parser] Skipping file '%s'" % filename)
 
-        print('\nParser reporting %d auctions' % len(self.auctions))
+        print('[Parser] %d auctions were processed' % len(self.auctions))
 
 
     def dumps(self, id):

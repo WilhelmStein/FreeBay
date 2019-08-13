@@ -11,6 +11,8 @@ import math
 
 import json
 
+import os
+
 
 class Generator:
 
@@ -19,7 +21,7 @@ class Generator:
         "password": "password",
         "host": "127.0.0.1",
         "database": "freebay",
-        "raise_on_warnings": True
+        "raise_on_warnings": False
     }
 
     queries = {
@@ -60,50 +62,27 @@ class Generator:
         )
     }
 
-    def __init__(self, create_script_path='/home/massiva/Documents/Courses/Web Application Technologies/FreeBay/app/src/server/database/sql/create.sql', seed=123456789, verbose=False, drop_all=False, rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2):
+    def __init__(self, seed=123456789, verbose=True, tables_to_drop=["Auction_has_Category", "Bid", "Auction", "General_User", "User", "Address", "Category"], rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2, validated_percentage=0.7):
 
         self.verbose = verbose
 
-
         self.rating_lower, self.rating_upper, self.rating_digits = rating_lower, rating_upper, rating_digits
-
 
         self.dollar_digits = dollar_digits
 
+        self.validated_percentage = validated_percentage
 
         self.cnx = connector.connect(**Generator.config)
 
         self.cur = self.cnx.cursor()
 
-        if drop_all:
+        if isinstance(tables_to_drop, list) and tables_to_drop:
 
-            for table in ["Auction_has_Category", "Bid", "Auction", "General_User", "User", "Address", "Category"]:
+            print("[Generator] Tables", ",".join(["'{}'".format(table) for table in tables_to_drop]), "were dropped")
+
+            for table in tables_to_drop:
 
                 self.cur.execute("DELETE FROM {}".format(table))
-
-        else:
-
-            if create_script_path:
-
-                with open(create_script_path, 'r') as create_script:
-
-                    for query in create_script.read().split(';'):
-
-                        query = query.strip()
-
-                        if query != '' and not query.startswith('--'):
-
-                            try:
-
-                                self.cur.execute(query)
-
-                            except Exception as exception:
-
-                                code, message = str(exception).split(": ")
-
-                                print("[ERROR {}] {}".format(code, message))
-
-                                exit(1)
 
 
         self.random = random.Random(seed)
@@ -166,7 +145,7 @@ class Generator:
             "Surname": surname if surname else self.generator.last_name(),
             "Phone": phone if phone else self.generator.phone_number(),
             "Address_Id": self.address_id,
-            "Validated": True
+            "Validated": self.random.random() <= self.validated_percentage
         }
 
 
@@ -272,7 +251,7 @@ class Generator:
 
             code, message = str(error).split(": ")
 
-            print("[ERROR {}] {}".format(code, message), dump, sep='\n')
+            print("[Generator] [ERROR {}] {}".format(code, message), dump, sep='\n\n')
 
             exit(1)
 
@@ -283,7 +262,7 @@ class Generator:
 
         if self.verbose:
 
-            print("Processing auction '%s'" % auction["ItemID"])
+            print("[Generator] Processing auction '%s'" % auction["ItemID"])
 
         seller = auction["Seller"]
 
