@@ -1,7 +1,6 @@
 import React from 'react';
 import { Switch, Route, withRouter } from 'react-router-dom';
 import autoBind from "auto-bind"
-import axios from "axios";
 
 import Header, { Menu } from './Header';
 import Home from './Home';
@@ -39,6 +38,10 @@ class App extends React.Component {
                 {
                     this.props.history.push("/admin");
                 }
+            }
+            else
+            {
+                this.props.history.push("/");
             }
         });
     }

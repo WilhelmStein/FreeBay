@@ -41,14 +41,32 @@ class DBController
         )
     }
 
-    admin(id, res)
+    admin_users(username, password, res)
     {
         const query = {
-            string: "Select 1 From Admin Where User_Id = ?",
-            escape: [id]
+            string: "Select 1 From Admin, User Where User.Id = Admin.User_Id And User.Username = ? And User.Password = ?",
+            escape: [username, password]
         }
 
-        this.query(query, res);
+        this.query(query, res, (rows) => {
+            if (rows.length !== 1)
+            {
+                res.send({
+                    error: true,
+                    message: "Permission Denied",
+                })
+
+                return;
+            }
+
+
+            const query = {
+                string: "Select gu.Name, gu.Surname, gu.Phone, u.Username, u.Password, u.Email, gu.Validated From General_User as gu, User as u Where u.Id = gu.User_Id limit 25",
+                escape: []
+            }
+
+            this.query(query, res)
+        })
     }
 
     signup(data, res)

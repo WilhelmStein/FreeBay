@@ -1,0 +1,14 @@
+@import "global";
+
+.AdminPage
+{
+    .Table
+    {
+        margin-top: 50px;
+        .TableCell
+        {
+            font-size: $normal-font-size;
+        }
+        
+    }
+}

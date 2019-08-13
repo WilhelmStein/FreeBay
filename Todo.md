@@ -63,6 +63,10 @@
   - [ ] Post Auction
   - [ ] View - Bid Auction
 - [ ] Admin Page
+  - [x] Login Routing
+  - [ ] List of user dropdowns
+  - [ ] Sort by (Username, Status, Date of signup?)
+  - [ ] Search users by usermame
 - [ ] About Page
 - [ ] Help Page
 

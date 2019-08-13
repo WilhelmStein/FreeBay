@@ -17,7 +17,7 @@ controller = new controller(sql)
 
 app.post('/api/login', function(req, res) { controller.login(req.body.username, req.body.password, res); });
 
-app.post('/api/admin', function(req, res) { controller.admin(req.body.Id, res); });
+app.post('/api/admin/users', function(req, res) { controller.admin_users(req.body.username, req.body.password, res); });
 
 app.get('/api/categories', function(req, res) { controller.categories(res); });
 
