@@ -1,0 +1,78 @@
+$blue: rgb(72, 109, 209);
+$grey-blue: #557a95;
+
+$mui-primary: #3f51b5;
+$mui-secondary: #f50057;
+
+$orange: orange;
+
+$red: rgb(196, 37, 37);
+$red-dim: rgb(207, 71, 71);
+$red-hover: rgb(177, 33, 33);
+$red-active: rgb(158, 29, 29);
+
+$dark-red: rgb(119, 24, 24);
+$dark-red-hover: rgb(104, 20, 20);
+$dark-red-active: rgb(87, 17, 17);
+
+$green: #159c2b;
+
+$almost-white: rgb(241, 241, 241);
+$less-white: rgb(230, 230, 230);
+$lesser-white: rgb(216, 216, 216);
+$graphite: rgb(73, 73, 73);
+
+$font: Ubuntu, Helvetica, Arial, sans-serif;
+
+$smaller-font-size: 12px;
+$small-font-size: 15px;
+$normal-font-size: 18px;
+$bigger-font-size: 21px;
+$header-font-size: 25px;
+$big-header-font-size: 30px;
+
+$main-color: $red;
+$main-dim: $red-dim;
+$main-hover: $red-hover;
+$main-active: $red-active;
+
+$secondary-color: $dark-red;
+$secondary-hover: $dark-red-hover;
+$secondary-active: $dark-red-active;
+
+@mixin vertical_center
+{
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY((-50%));
+    transform: translateY(-50%);
+}
+
+body, #root, .App
+{
+    height: 100vh;
+    width: 100vw;
+}
+
+.link
+{
+    text: {
+        decoration: none !important;
+    }
+
+    font: {
+        size: 18px;
+    }
+
+    border: none;
+    outline: none;
+
+    cursor: pointer;
+
+    background: none;
+
+    color: $blue;
+}
+
+

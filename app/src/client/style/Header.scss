@@ -1,0 +1,250 @@
+@import "global";
+
+$Header-height: 100px;
+$Search-height: calc(#{$Header-height} / 2.2);
+
+.Header
+{
+    display: grid;
+    grid-template-columns: 250px 5fr 250px;
+    
+    background-color: $main-color;
+    height: $Header-height;
+
+    color: white;
+
+    box-shadow: 1px 1px 20px $graphite;
+    
+    #Logo
+    {
+        filter: drop-shadow(1px 1px 2px $graphite);
+
+        height: $Header-height;
+
+        color: white;
+
+        line-height: $header-font-size;
+        font-size: $header-font-size;
+
+        box-sizing: border-box;
+        margin-left: 25px;
+
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+
+
+
+        img
+        {
+            width: 100%;
+            padding: calc((#{$Header-height} - 80px) / 2) 0;
+        }
+
+        p
+        {
+            margin: 0;
+            padding: calc((#{$Header-height} - #{$header-font-size}) / 2) 10px;
+
+        }
+    }
+
+    .SearchBar
+    {
+        filter: drop-shadow(1px 1px 2px $graphite);
+
+        font-size: $normal-font-size;
+
+        border-radius: 5px;
+        border: none;
+
+        box-sizing: border-box;
+
+        display: grid;
+        grid-template-columns: 1fr 7fr 1fr;
+
+        width: 80%;
+        height: $Header-height;
+
+        margin: 0 auto;
+        padding: calc((#{$Header-height} - #{$Search-height}) / 2) 50px;
+
+        select
+        {
+            font-size: inherit;
+
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            
+            border:
+            {
+                right: 0.3px solid grey;
+                left: 0;
+                top: 0;
+                bottom: 0;
+            }
+
+            height: $Search-height;
+
+            padding: 10px;
+
+            background-color: $less-white;
+
+            color: $graphite;
+        }
+
+        input
+        {
+            font-size: inherit;
+
+            border: none;
+            outline: none;
+
+            height: $Search-height;
+
+            padding: 0 25px;
+
+            background-color: $almost-white;
+
+            color: $graphite;
+        }
+
+        button
+        {
+            background-color: $secondary-color;
+
+            border:none;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            outline:none;
+
+            cursor: pointer;
+
+            width: $Search-height;
+        }
+    }
+
+    .AccountSnapshot
+    {
+        text-shadow: 1px 1px 1px $graphite;
+
+        line-height: $normal-font-size;
+        font-size: $normal-font-size;
+
+        height: $Header-height;
+
+        box-sizing: border-box;
+        padding: calc((#{$Header-height} - #{$normal-font-size} - 1px) / 2) 50px;
+
+        .AccountPopup-content
+        {
+            box-shadow: 1px 1px 5px $graphite !important;
+            border: none !important;
+            border-radius: 5px !important;
+            padding: 0 !important;
+            background-color: $almost-white !important;
+
+            .AccountMenu
+            {
+                padding: 0;
+                margin: 0 auto;
+                width: 100%;
+                height: 100%;
+
+                button
+                {
+                    border-radius: 5px;
+
+                    height: 100%;
+                    width: 100%;
+                    
+                    font-size: $normal-font-size;
+                    color: $graphite;
+                    
+                    background-color: $almost-white;
+
+                    border: none;
+                    outline: none;
+
+                    cursor: pointer;
+
+                    padding: 10px;
+
+                    transition: 200ms;
+
+                    &:hover
+                    {
+                        background-color: $less-white;
+                    }
+
+                    &:active
+                    {
+                        background-color: $lesser-white;
+                    }
+                }
+            }
+        }
+
+        .account_button, .account_button_downward
+        {
+            margin-left: 8px;
+        
+            display: inline-block;
+        
+            width: 0;
+            height: 0;
+        
+            border-top: 0;
+            border-bottom: 10px solid $secondary-color;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+        }
+        
+        .account_button_downward
+        {
+            border-top: 10px solid $secondary-color;
+            border-bottom: 0;
+        }
+    }
+}
+
+.Menu
+{
+    background-color: $secondary-color;
+    color: white;
+    
+
+    .Button
+    {
+        outline: none;
+
+        text-decoration: none;
+        font-size: $small-font-size;
+        color: white;
+
+        padding:
+        {
+            top: 15px;
+            bottom: 15px;
+            right: 50px;
+            left: 50px;
+        }
+
+        &.inactive
+        {
+            background-color: inherit;
+        }
+
+        &:hover
+        {
+            background-color: $secondary-hover;
+        }
+
+        &:active, &.active
+        {
+            background-color: $secondary-active;
+
+        }
+
+        transition: 200ms;
+    }
+}

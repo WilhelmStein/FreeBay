@@ -1,0 +1,25 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/app/node_modules
+/app/.pnp
+/app.pnp.js
+
+# testing
+/app/coverage
+/app/src/server/database/sql/test.sql
+/data/ebay-data/__pycache__
+
+# production
+/app/build
+
+# misc
+/app.DS_Store
+/app.env.local
+/app.env.development.local
+/app.env.test.local
+/app.env.production.local
+
+/appnpm-debug.log*
+/appyarn-debug.log*
+/appyarn-error.log*
