@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
 
@@ -28,4 +30,11 @@ app.post('/api/search', function(req, res) { controller.search(req.body.category
 app.post('/api/auction', function(req, res) { controller.auction(req.body.auctionId, res); });
 
 
-app.listen(8080, () => console.log('Listening on port 8080!'));
+const options = {
+    key: fs.readFileSync(path.join(__dirname, 'encryption/server.key'), 'utf8'),
+    cert: fs.readFileSync(path.join(__dirname, 'encryption/server.cert'), 'utf8')
+  };
+
+https.createServer(options, app).listen(8080, () => {
+    console.log("server starting on port 8080")
+});
