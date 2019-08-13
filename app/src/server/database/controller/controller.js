@@ -13,18 +13,42 @@ class DBController
         }
 
         this.query(query, res, 
-            (rows) => {
-                res.send({
-                    error: false,
-                    message: "OK",
-                    // rows[0] because there should be ONLY 1 user with those credentials
-                    data: rows[0]
-                });
+            (users) => {
+                const query = {
+                    string: "Select 1 From Admin Where User_Id = ?",
+                    escape: [users[0].Id]
+                }
+
+                this.query(query, res,
+                    (admins) => {
+
+                        if (admins.length === 1)
+                        {
+                            users[0].admin = true
+                        }
+
+                        res.send({
+                            error: false,
+                            message: "OK",
+                            // users[0] because there should be ONLY 1 user with those credentials
+                            data: users[0]
+                        });
+                    })
             },
             (rows) => {
                 return !(rows.length === 0)
             }
         )
+    }
+
+    admin(id, res)
+    {
+        const query = {
+            string: "Select 1 From Admin Where User_Id = ?",
+            escape: [id]
+        }
+
+        this.query(query, res);
     }
 
     signup(data, res)
