@@ -61,7 +61,7 @@ class DBController
 
 
             const query = {
-                string: "Select gu.Name, gu.Surname, gu.Phone, u.Username, u.Password, u.Email, gu.Validated From General_User as gu, User as u Where u.Id = gu.User_Id limit 25",
+                string: "Select gu.Name, gu.Surname, gu.Phone, u.Username, u.Password, u.Email, gu.Validated From General_User as gu, User as u Where u.Id = gu.User_Id Order By gu.Validated",
                 escape: []
             }
 
@@ -112,6 +112,33 @@ class DBController
                 )
             }
         )
+    }
+
+    admin_validate(username, password, user_username, res)
+    {
+        const query = {
+            string: "Select 1 From Admin, User Where User.Id = Admin.User_Id And User.Username = ? And User.Password = ?",
+            escape: [username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            if (rows.length !== 1)
+            {
+                res.send({
+                    error: true,
+                    message: "Permission Denied",
+                })
+
+                return;
+            }
+
+            const query = {
+                string: "Update General_User gu JOIN User u ON (u.Id = gu.User_Id) Set gu.Validated = 1 Where u.Username = ?",
+                escape: [user_username]
+            }
+
+            this.query(query, res)
+        })
     }
 
     categories(res)

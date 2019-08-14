@@ -43,6 +43,10 @@
       - [x] Implement Functionality
     - [x] Login
     - [x] Styling
+- [ ] Home Page
+  - [ ] Carousel
+  - [ ] Featured Items Algorithm
+  - [ ] Popular Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
@@ -63,10 +67,14 @@
   - [ ] Post Auction
   - [ ] View - Bid Auction
 - [ ] Admin Page
+  - [x] Dashboard with options
   - [x] Login Routing
-  - [ ] List of user dropdowns
-  - [ ] Sort by (Username, Status, Date of signup?)
-  - [ ] Search users by usermame
+  - [ ] Full User Data Display
+  - [x] Sort by (Username, Status, Date of signup?)
+  - [x] Search users by usermame
+  - [x] Validate User
+  - [ ] Reject User
+  - [ ] Support?
 - [ ] About Page
 - [ ] Help Page
 
