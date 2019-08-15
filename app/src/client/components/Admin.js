@@ -125,6 +125,8 @@ class Users extends Component
 
     componentDidMount()
     {
+        if (!this.props.user) return;
+        
         axios.post('/api/admin/users', {username: this.props.user.Username, password: this.props.user.Password})
         .then( res => {
 
