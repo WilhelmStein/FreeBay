@@ -1,6 +1,9 @@
 $blue: rgb(72, 109, 209);
 $grey-blue: #557a95;
 
+$mui-primary: #3f51b5;
+$mui-secondary: #f50057;
+
 $orange: orange;
 
 $red: rgb(196, 37, 37);
@@ -12,7 +15,7 @@ $dark-red: rgb(119, 24, 24);
 $dark-red-hover: rgb(104, 20, 20);
 $dark-red-active: rgb(87, 17, 17);
 
-$green: #138d27;
+$green: #159c2b;
 
 $almost-white: rgb(241, 241, 241);
 $less-white: rgb(230, 230, 230);
@@ -21,9 +24,12 @@ $graphite: rgb(73, 73, 73);
 
 $font: Ubuntu, Helvetica, Arial, sans-serif;
 
+$smaller-font-size: 12px;
 $small-font-size: 15px;
 $normal-font-size: 18px;
+$bigger-font-size: 21px;
 $header-font-size: 25px;
+$big-header-font-size: 30px;
 
 $main-color: $red;
 $main-dim: $red-dim;
@@ -52,11 +58,10 @@ body, #root, .App
 .link
 {
     text: {
-        decoration: none;
+        decoration: none !important;
     }
 
     font: {
-        family: $font;
         size: 18px;
     }
 
@@ -69,3 +74,4 @@ body, #root, .App
 
     color: $blue;
 }
+
