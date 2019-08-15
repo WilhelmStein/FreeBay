@@ -42,7 +42,7 @@ class App extends React.Component {
                 <Header user={this.state.user} loginHandler={this.loginHandler}/>
                 <Menu active={this.props.location.pathname}/>
                 <Switch>
-                    <Route exact path='/' component={Home} />
+                    <Route exact path='/' render={(props) => <Home user={this.state.user} loginHandler={this.loginHandler} />} />
                     <Route path='/search' component={SearchResults} />
                     <Route path='/auction' component={AuctionPage} />
                     <Route path='*' component={NotFound} />
