@@ -296,8 +296,8 @@ function SquareAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
-                image="https://picsum.photos/250/250"
-                title="Generic placeholder"
+                image={`/api/image?path=${props.item.Path}`}
+                title={props.item.Name}
             />
             <CardContent className="ItemBody">
                 <Typography variant="h2">
@@ -342,3 +342,4 @@ function SquareAuctionItem(props)
 }
 
 export default withRouter(SearchResults);
+export {SquareAuctionItem};

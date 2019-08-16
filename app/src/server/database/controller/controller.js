@@ -142,21 +142,36 @@ class DBController
         }
         else
         {
+            // Remember to add bids to query and place it in a function
             const query = {
-                string: 'SELECT t.Id, t.Seller_Id, t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,\
+                string: 'SELECT t.Id, JSON_OBJECT(\'Id\', t.Seller_Id, \'Username\', u.Username, \'Seller_Rating\', gu.Seller_Rating) as User,\
+                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,\
                                 t.Description, Count(v.User_Id) AS Times_Viewed, t.Image_Id, t.Path as Path\
-                        FROM (SELECT a.Id, a.Seller_Id, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,\
-                                     a.Description, Min(i.Id) as Image_Id, Min(i.path) as Path\
-                              FROM (Auction a LEFT JOIN Image i ON a.Id = i.Auction_Id) GROUP BY a.Id ) as t,\
-                             Views v\
-                        WHERE t.Id = v.Auction_Id\
-                        GROUP BY t.Id ORDER BY times_viewed DESC LIMIT 5',
+                         FROM (SELECT a.Id, a.Seller_Id, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude,\
+                                      a.Longitude, a.Started, a.Ends,\
+                                      a.Description, Min(i.Id) as Image_Id, Min(i.path) as Path\
+                               FROM (Auction a LEFT JOIN Image i ON a.Id = i.Auction_Id) GROUP BY a.Id ) as t,\
+                            Views v,\
+                            User u,\
+                            General_User gu\
+                        WHERE t.Id = v.Auction_Id AND t.Seller_Id = gu.User_Id AND t.Seller_Id = u.Id\
+                        GROUP BY t.Id ORDER BY Times_Viewed DESC LIMIT 5',
                 escape: []
             }
 
-            this.query(query, res);
+            this.query(query, res, (rows) => {
 
-            
+                rows = rows.map( (item) => {
+                    item.User = JSON.parse(item.User);
+                    return item;
+                });
+
+                res.send({
+                    error: false,
+                    message: "OK",
+                    data: rows
+                });
+            });      
         }
     }
 
