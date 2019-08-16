@@ -278,8 +278,6 @@ class Users extends Component
                    return this.__compareString(a.Username, b.Username);
                 case "Name":
                     return this.__compareString(a.Username, b.Name);
-                case "Surname":
-                    return this.__compareString(a.Username, b.Surname);
                 case "Status":
                     if (!a.Validated) return -1;
                     if (!b.Validated) return 1;
@@ -358,7 +356,6 @@ class Users extends Component
                                 >
                                     <MenuItem value="Username">Username</MenuItem>
                                     <MenuItem value="Name">First Name</MenuItem>
-                                    <MenuItem value="Surname">Surname</MenuItem>
                                     <MenuItem value="Status" >Status</MenuItem>
                                 </Select>
                             </span>
