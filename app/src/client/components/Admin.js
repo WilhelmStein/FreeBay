@@ -57,11 +57,16 @@ class AdminPage extends Component
         })
     }
 
+    userClick(username)
+    {
+        this.props.history.push(`/user/${username}`);
+    }
+
     render()
     {
         let toDisplay = null;
         if (this.state.active === 0)
-            toDisplay = <Users user={this.props.user}/>;
+            toDisplay = <Users user={this.props.user} userClick={this.userClick}/>;
         
 
         return (
@@ -84,7 +89,7 @@ function Dashboard(props)
 
     const options = props.options.map( (item, index) => {
         return (
-            <ListItem button className={`ListItem ${props.active === index ? "active" : ""}`} onClick={() => {props.onClick(index);} }>
+            <ListItem button key={item} className={`ListItem ${props.active === index ? "active" : ""}`} onClick={() => {props.onClick(index);} }>
                 <ListItemText primary={item} className="ListItemText"/>
             </ListItem>
         )
@@ -95,7 +100,7 @@ function Dashboard(props)
             <AppBar position="sticky">
                 <Toolbar className="DashboardToolbar">
                     <Typography className="DashboardTitle" variant="h6" noWrap>
-                        Dashboard
+                        Admin Dashboard
                     </Typography>
                 </Toolbar>
             </AppBar>
@@ -125,9 +130,10 @@ class Users extends Component
 
     componentDidMount()
     {
+        if (!this.props.user) return;
+
         axios.post('/api/admin/users', {username: this.props.user.Username, password: this.props.user.Password})
         .then( res => {
-
             if (res.data.error)
             {
                 console.error(res.data.message)
@@ -141,7 +147,7 @@ class Users extends Component
 
             this.setState({
                 display: display,
-                users: res.data.data
+                users: display
             })
         })
         .catch( err => {console.error(err);})
@@ -175,7 +181,30 @@ class Users extends Component
 
     rejectUser(user, index)
     {
-        console.log(user)
+        axios.post('/api/admin/reject', {username: this.props.user.Username, password: this.props.user.Password, user: user.Username})
+        .then( res => {
+            
+            if (res.data.error)
+            {
+                alert(res.data.message);
+                console.error(res.data.message);
+                return;
+            }
+
+            const users = this.state.users;
+            users[this.state.display[index].index].Validated = false;
+            users[this.state.display[index].index].Rejected = true;
+
+            const display = this.state.display;
+            display[index].Validated = false;
+            display[index].Rejected = true;
+
+            this.setState({
+                users: users,
+                display: display
+            })
+        })
+        .catch( err => {console.error(err);})
     }
 
     searchChange(event)
@@ -215,71 +244,92 @@ class Users extends Component
         })
     }
 
+    __cell(content, align, className="")
+    {
+        return (
+            <TableCell className={`TableCell ${className}`} align={align}>
+                {content}
+            </TableCell>
+        )
+    }
+
+    __compareString(s1, s2)
+    {
+        const s1u = s1.toUpperCase();
+        const s2u = s2.toUpperCase();
+
+        if (s1u < s2u) {
+            return -1;
+        }
+        if (s1u > s2u) {
+            return 1;
+        }
+
+        return 0;
+}
+
     render()
     {
-        const cell = (content, align, className="") => {
-            return (
-                <TableCell className={`TableCell ${className}`} align={align}>
-                    {content}
-                </TableCell>
-            )
-        }
-
-        const compString = (s1, s2) => {
-            const s1u = s1.toUpperCase();
-            const s2u = s2.toUpperCase();
-
-            if (s1u < s2u) {
-                return -1;
-            }
-            if (s1u > s2u) {
-                return 1;
-            }
-
-            return 0;
-        }
-
         const cells = this.state.display
         .sort( (a, b) => {
             switch(this.state.sort)
             {
                 case "Username":
-                   return compString(a.Username, b.Username);
+                   return this.__compareString(a.Username, b.Username);
                 case "Name":
-                    return compString(a.Username, b.Name);
+                    return this.__compareString(a.Username, b.Name);
                 case "Surname":
-                    return compString(a.Username, b.Surname);
+                    return this.__compareString(a.Username, b.Surname);
                 case "Status":
-                    if (a.Validated) return -1;
-                    if (b.Validated) return 1;
+                    if (!a.Validated) return -1;
+                    if (!b.Validated) return 1;
                     return 0;
                 default: return 0;
             }
         })
         .slice(this.state.page * this.state.rowsPerPage, this.state.page * this.state.rowsPerPage + this.state.rowsPerPage)
         .map( (user, index) => {
-            const status = user.Validated === true ? "Validated \u2713" :
-            (   
-                <Box>
-                    <Button variant='contained' className="Validate Button" onClick={() => this.validateUser(user, index)}>
-                        Validate
-                    </Button>
-                    <Button variant='contained' className="Reject Button" onClick={() => this.rejectUser(user, index)}>
-                        Reject
-                    </Button>
-                </Box>
-            )
+            let status;
+            let statusClass = ""
+
+            if (user.Validated)
+            {
+                status = "Validated \u2713";
+                statusClass = "Validated"
+            } 
+            else
+            {
+                if (user.Rejected) 
+                {
+                    status = "Rejected \u2717";
+                    statusClass = "Rejected" 
+                }
+                else 
+                {
+                    status = (
+                        <Box>
+                            <Button variant='contained' size='small' className="Validate Button" onClick={() => this.validateUser(user, index)}>
+                                Validate
+                            </Button>
+                            <Button variant='contained' size='small' className="Reject Button" onClick={() => this.rejectUser(user, index)}>
+                                Reject
+                            </Button>
+                        </Box>
+                    ) 
+                }
+            }
 
             const oddity = index % 2 === 1 ? "odd" : "even";
 
             return (
-                <TableRow className={`TableRow ${oddity}`} key={user.Username}>
-                    {cell(user.Username, 'left')}
-                    {cell(user.Email, 'left')}
-                    {cell(user.Name, 'left')}
-                    {cell(user.Surname, 'left')}
-                    {cell(user.Phone, 'left')}
-                    {cell(status, 'left')}
+                <TableRow onClick={() => {this.props.userClick(user.Username)}} className={`TableRow ${oddity}`} key={user.Username}>
+                    {this.__cell(user.Username, 'left')}
+                    {this.__cell(user.Email, 'left')}
+                    {this.__cell(user.Name, 'left')}
+                    {this.__cell(user.Address, 'left')}
+                    {this.__cell(user.Country, 'left')}
+                    {this.__cell(user.Phone, 'left')}
+                    {this.__cell(status, 'left', `Status ${statusClass}`)}
                 </TableRow>
             )
         })
@@ -317,7 +367,7 @@ class Users extends Component
 
                         <TablePagination
                             className="Pagination"
-                            rowsPerPageOptions={[10, 25, 50, 100]}
+                            rowsPerPageOptions={[10, 15, 25, 50, 100]}
                             component="div"
                             count={this.state.display.length}
                             rowsPerPage={this.state.rowsPerPage}
@@ -333,15 +383,16 @@ class Users extends Component
                         />
                     </Toolbar>
                 </AppBar>
-                <Table className="Table">
+                <Table size='medium' className="Table">
                     <TableHead className="TableHead">
                         <TableRow>
-                            {cell('Username', 'left')}
-                            {cell('Email', 'left')}
-                            {cell('Name', 'left')}
-                            {cell('Surname', 'left')}
-                            {cell('Phone', 'left')}
-                            {cell('Status', 'left')}
+                            {this.__cell('Username', 'left')}
+                            {this.__cell('Email', 'left')}
+                            {this.__cell('Name', 'left')}
+                            {this.__cell('Address', 'left')}
+                            {this.__cell('Country', 'left')}
+                            {this.__cell('Phone', 'left')}
+                            {this.__cell('Status', 'left')}
                         </TableRow>
                     </TableHead>
                     <TableBody className="TableBody">

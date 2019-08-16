@@ -29,6 +29,8 @@ app.post('/api/signup', function(req, res) { controller.signup(req.body, res); }
 
 app.post('/api/admin/validate', function(req, res) { controller.admin_validate(req.body.username, req.body.password, req.body.user, res); });
 
+app.post('/api/admin/reject', function(req, res) {controller.admin_reject(req.body.username, req.body.password, req.body.user, res); });
+
 app.post('/api/search', function(req, res) { controller.search(req.body.category, req.body.text, res); });
 
 app.post('/api/auction', function(req, res) { controller.auction(req.body.auctionId, res); });

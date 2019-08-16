@@ -66,14 +66,14 @@
 - [ ] Auction Page
   - [ ] Post Auction
   - [ ] View - Bid Auction
-- [ ] Admin Page
+- [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing
-  - [ ] Full User Data Display
+  - [x] Full User Data Display
   - [x] Sort by (Username, Status, Date of signup?)
   - [x] Search users by usermame
   - [x] Validate User
-  - [ ] Reject User
+  - [x] Reject User
   - [ ] Support?
 - [ ] About Page
 - [ ] Help Page

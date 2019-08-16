@@ -146,6 +146,19 @@
             {
                 font-size: $small-font-size;
 
+                &.Status
+                {
+                    &.Validated
+                    {
+                        color: $green;
+                    }
+
+                    &.Rejected
+                    {
+                        color: $red;
+                    }
+                }
+
                 .Button
                 {
                     color: white;
@@ -153,6 +166,8 @@
                     margin-right: 5px;
 
                     font-size: $small-font-size;
+                    
+                    width: 85px;
 
                     &.Validate
                     {
@@ -170,6 +185,20 @@
             {
                 .TableRow
                 {
+                    transition: 200ms;
+
+                    cursor: pointer;
+
+                    &:hover
+                    {
+                        background-color: $less-white !important;
+                    }
+
+                    &:active
+                    {
+                        background-color: $lesser-white !important;
+                    }
+
                     &.odd
                     {
                         background-color: $almost-white;
