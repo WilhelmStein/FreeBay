@@ -13,18 +13,52 @@ class DBController
         }
 
         this.query(query, res, 
-            (rows) => {
-                res.send({
-                    error: false,
-                    message: "OK",
-                    // rows[0] because there should be ONLY 1 user with those credentials
-                    data: rows[0]
-                });
+            (users) => {
+                const query = {
+                    string: "Select 1 From Admin Where User_Id = ?",
+                    escape: [users[0].Id]
+                }
+
+                this.query(query, res,
+                    (admins) => {
+
+                        if (admins.length === 1)
+                        {
+                            users[0].admin = true
+                        }
+
+                        res.send({
+                            error: false,
+                            message: "OK",
+                            // users[0] because there should be ONLY 1 user with those credentials
+                            data: users[0]
+                        });
+                    })
             },
             (rows) => {
                 return !(rows.length === 0)
             }
         )
+    }
+
+    admin_users(username, password, res)
+    {
+        this.admin_permission(username, password, res, () => {
+            const query = {
+                string: `Select Concat(gu.Name, ' ', gu.Surname) as Name,
+                                gu.Phone, 
+                                u.Username, 
+                                u.Email, 
+                                gu.Validated,
+                                Concat(a.Street, ' ', a.Number, ', ', a.ZipCode, ' ', a.City) as Address,
+                                a.Country
+                            From General_User as gu, User as u, Address as a 
+                            Where u.Id = gu.User_Id and gu.Address_Id = a.Id Order By gu.Validated`,
+                escape: []
+            }
+
+            this.query(query, res)
+        })
     }
 
     signup(data, res)
@@ -70,6 +104,105 @@ class DBController
                 )
             }
         )
+    }
+
+    admin_permission(username, password, res, callback)
+    {
+        const query = {
+            string: "Select 1 From Admin, User Where User.Id = Admin.User_Id And User.Username = ? And User.Password = ?",
+            escape: [username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            if (rows.length !== 1)
+            {
+                res.send({
+                    error: true,
+                    message: "Permission Denied",
+                })
+
+                return;
+            }
+
+            if (callback) callback();
+        })
+    }
+
+    admin_validate(username, password, user_username, res)
+    {
+
+        this.admin_permission(username, password, res, () => {
+            const query = {
+                string: "Update General_User gu JOIN User u ON (u.Id = gu.User_Id) Set gu.Validated = 1 Where u.Username = ?",
+                escape: [user_username]
+            }
+
+            this.query(query, res);
+        })
+    }
+
+    admin_reject(username, password, user_username, res)
+    {
+        this.admin_permission(username, password, res, () => {
+            const query = {
+                string: `
+                    Select a.Id
+                    From Address as a, General_User as gu, User as u
+                    Where   gu.User_Id = u.Id
+                        and u.Username = ?
+                        and a.Id = gu.Address_Id
+                        and Not Exists (
+                            Select a2.Id
+                            From Address as a2, General_User as gu2
+                            Where   a2.Id = gu2.Address_Id
+                                and gu2.User_id != gu.User_Id
+                                and a.Id = a2.Id
+                        )`,
+                escape: [user_username]
+            }
+
+            this.query(query, res, (rows) => {
+                
+                // This will be done after address has been deleted (or not)
+
+                const delete_g_user = {
+                    string: `
+                        Delete
+                        From General_User
+                        Where General_User.User_Id = (
+                            Select User.Id From User
+                            Where User.Username = ?
+                            )`,
+                    escape: [user_username]
+                }
+
+                this.query(delete_g_user, res, () => {
+                    const delete_user = {
+                        string: "Delete From User Where Username = ?",
+                        escape: [user_username]
+                    }
+
+                    this.query(delete_user, res, () => {
+                        // If there is a row then, delete that address
+                        if (rows.length)
+                        {
+                            const delete_address = {
+                                string: "Delete From Address Where Id = ?",
+                                escape: [rows[0].Id]
+                            }
+
+                            this.query(delete_address, res);
+                            return;
+                        }
+
+                        res.send({
+                            error: false,
+                            message: "OK",
+                        })
+                    });
+                })
+            });
+        });
     }
 
     categories(res)
