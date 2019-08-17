@@ -35,7 +35,7 @@ class AdminPage extends Component
         super(props);
 
         this.state = {
-            options: ["Active Users", "Support"],
+            options: ["Active Users", "Support", "Placeholder", "Lorem Ipsum", "Holderplace", "Ipsum Lorem"],
             active: 0
         }
 
@@ -71,7 +71,7 @@ class AdminPage extends Component
 
         return (
             <div className="AdminPage">
-                <Grid container spacing={3}>
+                <Grid container spacing={1}>
                     <Grid item xs={2}>
                         <Dashboard options={this.state.options} active={this.state.active} onClick={this.actionChange}/>
                     </Grid>
