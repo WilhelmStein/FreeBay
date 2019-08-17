@@ -306,10 +306,12 @@ class Users extends Component
                 {
                     status = (
                         <Box>
-                            <Button variant='contained' size='small' className="Validate Button" onClick={() => this.validateUser(user, index)}>
+                            <Button variant='contained' size='small' className="Validate Button" 
+                                onClick={(event) => {this.validateUser(user, index); event.stopPropagation();}}>
                                 Validate
                             </Button>
-                            <Button variant='contained' size='small' className="Reject Button" onClick={() => this.rejectUser(user, index)}>
+                            <Button variant='contained' size='small' className="Reject Button" 
+                                onClick={(event) => {this.rejectUser(user, index); event.stopPropagation();}}>
                                 Reject
                             </Button>
                         </Box>
@@ -320,7 +322,7 @@ class Users extends Component
             const oddity = index % 2 === 1 ? "odd" : "even";
 
             return (
-                <TableRow onClick={() => {this.props.userClick(user.Username)}} className={`TableRow ${oddity}`} key={user.Username}>
+                <TableRow onClick={(event) => {this.props.userClick(user.Username); event.preventDefault();}} className={`TableRow ${oddity}`} key={user.Username}>
                     {this.__cell(user.Username, 'left')}
                     {this.__cell(user.Email, 'left')}
                     {this.__cell(user.Name, 'left')}
