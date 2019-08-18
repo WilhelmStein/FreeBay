@@ -40,7 +40,7 @@ export default class CarouselWrapper extends Component {
                 <Carousel>
                     {this.state.auctions.map((item) => {
                         return  <CarouselSlide key={item.Id}>
-                                    <div className = "FeaturedItemWrapper Square Grid">
+                                    <div className = "FeaturedItemWrapper Square">
                                         <SquareAuctionItem item={item}/>
                                     </div>
                                 </CarouselSlide>
