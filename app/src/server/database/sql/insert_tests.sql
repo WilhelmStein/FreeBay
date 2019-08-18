@@ -45,9 +45,14 @@ Values  (1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Empo
         (1, "Modest Frock", 333.00, 100.00, 800.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "An elegant frock for the graceful lady."),
         (3, "Venereal Disease", 0.00, 30.00, 69.69, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ";)"),
         (3, "Natural Viagra", 23.00, 10.00, 55.00, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "To make your partner say: 'By Jupiter's Cock!'"),
-        (5, "Your Mother", 4.12, 5.00, 12.00, "Elladistan", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
+        (5, "Your Mother", 6.12, 5.00, 12.00, "Elladistan", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
         (4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
         (1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "");
+
+-- Bid --
+Insert into Bid (Id, User_Id, Auction_Id, Amount, Time)
+Values  (1, 3, 5, 5.00, "2019-01-11 9:01:00"),
+        (2, 4, 5, 6.12, "2019-01-11 9:12:00");
 
 -- Views --
 
@@ -55,7 +60,7 @@ Insert into Views (User_Id, Auction_Id, Time)
 Values  (2, 1, "2019-01-12 9:00:00"),
         (2, 2, "2019-01-12 9:00:00"),
         (3, 5, "2019-01-12 9:00:00"),
-        (4, 5, "2019-01-12 9:00:00"),
+        (4, 5, "2019-01-12 9:10:00"),
         (5, 6, "2019-01-12 9:00:00");
 
 -- Image --

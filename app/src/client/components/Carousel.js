@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { Card, CardContent, CardMedia, Typography, Box, Grid, Button } from '@material-ui/core';
-import { Rating } from '@material-ui/lab';
 import { Carousel, CarouselSlide } from 'material-ui-carousel';
 import { SquareAuctionItem } from '../components/SearchResults';
 import axios from 'axios';
@@ -30,6 +28,7 @@ export default class CarouselWrapper extends Component {
                 auctions: res.data.data
             });
         });
+
     }
 
     render() {
