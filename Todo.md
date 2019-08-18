@@ -9,8 +9,8 @@
 - [x] Add Visited Auction Table MxN User - Auction (bonus)
 - [x] Design Database
 - [x] DB Create Script
-- [ ] DB Fill Script
-- [ ] Setup Image requesting
+- [x] DB Fill Script
+- [x] Setup Image requesting
 
 ### Features
 
@@ -18,7 +18,8 @@
 - [x] Setup SSL encryption
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
-- [ ] XML -> DB generation
+- [x] XML -> DB generation
+  - [ ] Pass 1-2-3 Auction Ids
 - [ ] Search sql queries
 - [ ] Bonus algorithm
 - [ ] Auction retrieval sql query
@@ -43,6 +44,10 @@
       - [x] Implement Functionality
     - [x] Login
     - [x] Styling
+- [ ] Home Page
+  - [ ] Carousel
+  - [ ] Featured Items Algorithm
+  - [ ] Popular Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
@@ -62,7 +67,15 @@
 - [ ] Auction Page
   - [ ] Post Auction
   - [ ] View - Bid Auction
-- [ ] Admin Page
+- [x] Admin Page
+  - [x] Dashboard with options
+  - [x] Login Routing
+  - [x] Full User Data Display
+  - [x] Sort by (Username, Status, Date of signup?)
+  - [x] Search users by usermame
+  - [x] Validate User
+  - [x] Reject User
+  - [ ] Support?
 - [ ] About Page
 - [ ] Help Page
 
