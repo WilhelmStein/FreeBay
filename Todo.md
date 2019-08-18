@@ -9,8 +9,8 @@
 - [x] Add Visited Auction Table MxN User - Auction (bonus)
 - [x] Design Database
 - [x] DB Create Script
-- [ ] DB Fill Script
-- [ ] Setup Image requesting
+- [x] DB Fill Script
+- [x] Setup Image requesting
 
 ### Features
 
@@ -18,7 +18,8 @@
 - [x] Setup SSL encryption
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
-- [ ] XML -> DB generation
+- [x] XML -> DB generation
+  - [ ] Pass 1-2-3 Auction Ids
 - [ ] Search sql queries
 - [ ] Bonus algorithm
 - [ ] Auction retrieval sql query

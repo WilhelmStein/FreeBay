@@ -261,23 +261,23 @@ class DBController
     {
         const query = {
             
-            string: 'SELECT a.Id, JSON_OBJECT(\'Id\', a.Seller_Id, \'Username\', a.Username, \'Seller_Rating\', a.Seller_Rating) as User, i.Images, b.Bids\
-                    FROM (SELECT a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, \
-                                 a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating\
-                         FROM Auction a,\
-                              User u, \
-                              General_User gu \
-                         WHERE a.Id = ? AND a.Seller_Id = u.Id AND u.Id = gu.User_Id) as a \
-                         LEFT JOIN \
-                         (SELECT i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT(\'Id\', i.Id,\'Path\', i.Path)) as Images \
-                          FROM Image i, Auction a \
-                          WHERE i.Auction_Id = a.Id GROUP BY a.Id) as i ON a.Id = i.Auction_Id \
-                         LEFT JOIN \
-                         (SELECT b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT(\'Id\', b.Id, \'Auction_Id\', b.Auction_Id, \'User\', JSON_OBJECT(\'Id\', gu.User_Id, \'Username\', u.Username, \'Seller_Rating\', gu.Seller_Rating), \'Amount\', b.Amount, \'Time\', b.Time)) as Bids\
-                        FROM Bid b,\
-                             User u,\
-                             General_User gu\
-                        WHERE b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id) as b ON b.Auction_Id = a.Id',
+            string: `SELECT a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Seller_Rating', a.Seller_Rating) as User, i.Images, b.Bids
+                    FROM (SELECT a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
+                                 a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                         FROM Auction a,
+                              User u, 
+                              General_User gu 
+                         WHERE a.Id = ? AND a.Seller_Id = u.Id AND u.Id = gu.User_Id) as a 
+                         LEFT JOIN 
+                         (SELECT i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id,'Path', i.Path)) as Images 
+                          FROM Image i, Auction a 
+                          WHERE i.Auction_Id = a.Id GROUP BY a.Id) as i ON a.Id = i.Auction_Id 
+                         LEFT JOIN 
+                         (SELECT b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User', JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating), 'Amount', b.Amount, 'Time', b.Time)) as Bids
+                        FROM Bid b,
+                             User u,
+                             General_User gu
+                        WHERE b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id) as b ON b.Auction_Id = a.Id`,
             escape: [auctionId]
         }
 
@@ -308,24 +308,24 @@ class DBController
         {
             // Remember to add bids to query and place it in a function
             const query = {
-                string: 'SELECT t.Id, JSON_OBJECT(\'Id\', t.Seller_Id, \'Username\', u.Username, \'Seller_Rating\', gu.Seller_Rating) as User,\
-                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,\
-                                t.Description, Count(v.User_Id) AS Times_Viewed, t.Image_Id, t.Path as Path,\
-                                b.Bids\
-                         FROM (SELECT a.Id, a.Seller_Id, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude,\
-                                      a.Longitude, a.Started, a.Ends, a.Description, Min(i.Id) as Image_Id, Min(i.path) as Path\
-                               FROM (Auction a LEFT JOIN Image i ON a.Id = i.Auction_Id) GROUP BY a.Id ) as t \
-                            LEFT JOIN \
-                            (SELECT b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT(\'Id\', b.Id, \'Auction_Id\', b.Auction_Id, \'User\', JSON_OBJECT(\'Id\', gu.User_Id, \'Username\', u.Username, \'Seller_Rating\', gu.Seller_Rating), \'Amount\', b.Amount, \'Time\', b.Time)) as Bids\
-                             FROM Bid b,\
-                                  User u,\
-                                  General_User gu\
-                             WHERE b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id) as b ON b.Auction_Id = t.Id,\
-                            Views v,\
-                            User u,\
-                            General_User gu\
-                        WHERE t.Id = v.Auction_Id AND t.Seller_Id = gu.User_Id AND t.Seller_Id = u.Id\
-                        GROUP BY t.Id ORDER BY Times_Viewed DESC LIMIT 5',
+                string: `SELECT t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating) as User,
+                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,
+                                t.Description, Count(v.User_Id) AS Times_Viewed, t.Image_Id, t.Path as Path,
+                                b.Bids
+                         FROM (SELECT a.Id, a.Seller_Id, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude,
+                                      a.Longitude, a.Started, a.Ends, a.Description, Min(i.Id) as Image_Id, Min(i.path) as Path
+                               FROM (Auction a LEFT JOIN Image i ON a.Id = i.Auction_Id) GROUP BY a.Id ) as t 
+                            LEFT JOIN 
+                            (SELECT b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User', JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating), 'Amount', b.Amount, 'Time', b.Time)) as Bids
+                             FROM Bid b,
+                                  User u,
+                                  General_User gu
+                             WHERE b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id) as b ON b.Auction_Id = t.Id,
+                            Views v,
+                            User u,
+                            General_User gu
+                        WHERE t.Id = v.Auction_Id AND t.Seller_Id = gu.User_Id AND t.Seller_Id = u.Id
+                        GROUP BY t.Id ORDER BY Times_Viewed DESC LIMIT 5`,
                 escape: []
             }
 

@@ -333,26 +333,26 @@ class Generator:
             )
         )
 
-        try:
+        # try:
 
-            search_args = {
-                **Generator.google_images_download_prms,
-                "keywords": auction.get("Name")
-            }
+        #     search_args = {
+        #         **Generator.google_images_download_prms,
+        #         "keywords": auction.get("Name")
+        #     }
 
-            for path in list(self.downloader.download(search_args)[0].values())[0]:
+        #     for path in list(self.downloader.download(search_args)[0].values())[0]:
 
-                self.__register__(
-                    "Image",
-                    self.__generate_image__(
-                        auction_id=auction.get("ItemID"),
-                        path=path
-                    )
-               )
+        #         self.__register__(
+        #             "Image",
+        #             self.__generate_image__(
+        #                 auction_id=auction.get("ItemID"),
+        #                 path=path
+        #             )
+        #        )
 
-        except FileNotFoundError:
+        # except FileNotFoundError:
 
-            pass
+        #     pass
 
         for bid in auction["Bids"]:
 
