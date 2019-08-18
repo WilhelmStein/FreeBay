@@ -50,7 +50,8 @@
 
     h2
     {
-        margin: 0;
+        margin: 0 !important;
+        text-overflow: ellipsis !important;
     }
 
     .Item
@@ -68,15 +69,16 @@
             height: 250px;
 
             display: grid;
-            grid-template-columns: 300px 500px 270px;
+            grid-template-columns: 250px auto 270px;
 
             &.Grid
             {
-                grid-template-columns: 250px 300px 270px;
+                grid-template-columns: 250px auto 270px;
                 height: 250px;
 
                 .Description
                 {
+                    height: 100px;
                     font-size: $smaller-font-size;
                     color: $graphite;
                 }
@@ -84,6 +86,12 @@
 
             .Description
             {
+                height: 135px;
+
+                overflow-y: scroll;
+
+                padding: 10px 20px;
+
                 font-size: $small-font-size;
                 color: $graphite;
 
@@ -95,9 +103,11 @@
     {
         .Item
         {
+            overflow: hidden;
+
             display: grid;
 
-            grid-template-columns: 100px 300px 270px 200px;
+            grid-template-columns: 100px auto 270px 200px;
     
             .ItemBody
             {
@@ -116,6 +126,11 @@
                     padding: 5px;
                     font-size: $small-font-size;
                 }
+            }
+
+            &.Grid
+            {
+                overflow-y: auto;
             }
         }
     }
@@ -156,9 +171,10 @@
         cursor: pointer;
     }
 
-    .Pricing
+    .Pricing, .Buttons
     {
-        margin-top: 10px;
+        background-color: $almost-white;
+        border-left: 0.3px solid $lesser-white;
     }
 
 

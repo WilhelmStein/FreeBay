@@ -20,7 +20,7 @@
   * [Download SSL](https://www.openssl.org/source/)
 - [x] XML -> DB generation
   - [ ] Pass 1-2-3 Auction Ids
-- [ ] Search sql queries
+- [x] Search sql queries
 - [ ] Bonus algorithm
 - [ ] Auction retrieval sql query
 - [ ] Auction post sql query
