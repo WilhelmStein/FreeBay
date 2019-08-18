@@ -296,8 +296,8 @@ function SquareAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
-                image="https://picsum.photos/250/250"
-                title="Generic placeholder"
+                image={`/api/image?path=${props.item.Path}`}
+                title={props.item.Name}
             />
             <CardContent className="ItemBody">
                 <Typography variant="h2">
@@ -318,14 +318,14 @@ function SquareAuctionItem(props)
                         <Typography variant="h5" className="Title">Current Price:</Typography>
                     </Grid>
                     <Grid item xs={6} zeroMinWidth>
-                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently}</Typography>
+                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently.toFixed(2)}</Typography>
                     </Grid>
 
                     <Grid item xs={6}>
                         <Typography variant="h5" className="Title">Buyout Price:</Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price}</Typography>
+                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price.toFixed(2)}</Typography>
                     </Grid>
                 </Grid>
                 <Box mt={3} className="Buttons">
@@ -342,3 +342,4 @@ function SquareAuctionItem(props)
 }
 
 export default withRouter(SearchResults);
+export {SquareAuctionItem};
