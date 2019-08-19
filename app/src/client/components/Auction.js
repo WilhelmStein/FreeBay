@@ -10,30 +10,27 @@ class AuctionPage extends Component
     constructor(props)
     {
         super(props);
+        this.state = {
+            auctionId: props.match.params.auctionId
+        };
+
         autoBind(this);
     }
 
     componentDidMount()
     {
-        const regex =  /{(.*?)}/g;
 
-        const auctionId = this.props.location.search.match(regex)[0].replace(/{|}/g, '');
+        console.log(this.state.auctionId);
 
-        console.log(auctionId);
-
-        this.setState({
-            auctionId: auctionId
-        })
-
-        axios.post("/api/auction", {
-            auctionId: auctionId
-        })
+        axios.get(`/api/auction?id=${this.state.auctionId}`)
         .then(res => {
             this.setState({
                 auction: res.data.data
-            })
+            }, () => console.log(this.state))
         })
         .catch(err => console.log(err));
+
+        
     }
 
     render()
