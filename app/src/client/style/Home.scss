@@ -42,7 +42,6 @@
             &:hover {
                 transition: 200ms;
                 background: $less-white;
-                cursor: pointer;
             }
         }
 
@@ -50,7 +49,11 @@
             height: 256px;
             width: 256px;
             display: block;
-            margin: auto
+            margin: auto;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
 
         .ListItem
