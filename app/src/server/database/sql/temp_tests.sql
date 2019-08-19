@@ -35,7 +35,7 @@ Values  (1, 100.0, 0, "Reginald", "Von Waldberg", "+448795551234", 1, 1),
         (2, 0, 100.0, "Violet", "Grantham", "+441234567890", 3, 1),
         (3, 70.0, 100.0, "Aphrodite", "Zeusdaughtir", "+306969696969", 2, 1),
         (4, 0, 0, "Peter", "Burns", "+440987654321", 4, 0),
-        (5, 20.0, 20.0, "Christis", "Christopulos", "+441111111112", 4, 1),
+        (5, 60.0, 20.0, "Christis", "Christopulos", "+441111111112", 4, 1),
         (7, 100.0, 100.0, 'Userus', 'Passwordius', '1234567890', 5, 0);
 
 -- Auction -- 
@@ -50,6 +50,7 @@ Values  (1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Empo
         (1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "");
 
 -- Bid --
+
 Insert into Bid (Id, User_Id, Auction_Id, Amount, Time)
 Values  (1, 3, 5, 5.00, "2019-01-11 9:01:00"),
         (2, 4, 5, 6.12, "2019-01-11 9:12:00");
@@ -59,6 +60,7 @@ Values  (1, 3, 5, 5.00, "2019-01-11 9:01:00"),
 Insert into Views (User_Id, Auction_Id, Time)
 Values  (2, 1, "2019-01-12 9:00:00"),
         (2, 2, "2019-01-12 9:00:00"),
+        (2, 7, "2019-01-12 9:00:00"),
         (3, 5, "2019-01-12 9:00:00"),
         (4, 5, "2019-01-12 9:10:00"),
         (5, 6, "2019-01-12 9:00:00");
@@ -66,11 +68,15 @@ Values  (2, 1, "2019-01-12 9:00:00"),
 -- Image --
 
 Insert into Image (Id, Path, Auction_Id)
-Values  (1, "1.jpg", 6),
-        (2, "2.jpg", 7),
+Values  (5, "5.png", 1),
         (3, "3.png", 5),
-        (4, "4.jpg", 5);
+        (4, "4.jpg", 5),
+        (1, "1.jpg", 6),
+        (2, "2.jpg", 7);
 
 -- Category --
 
-INSERT INTO Category VALUES (1, "Health & Fitness"), (2, "Electronics & Computers"), (3, "Home & Garden");
+INSERT INTO Category
+VALUES  (1, "Health & Fitness"),
+        (2, "Electronics & Computers"),
+        (3, "Home & Garden");

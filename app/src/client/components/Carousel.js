@@ -12,15 +12,12 @@ export default class CarouselWrapper extends Component {
     {
         super(props);
         this.state = {
-            username: ( (this.props.user == null) ? (null) : (this.props.user.Username) ),
             auctions: []
         };
     }
 
     componentDidMount() {
-        axios.post('/api/featured', {
-            username: this.state.username
-        })
+        axios.get('/api/featured')
         .then( res => {
             console.log(res.data.data)
             
@@ -34,7 +31,7 @@ export default class CarouselWrapper extends Component {
     render() {
 
         return (
-            <div style={{ paddingLeft: '15%', paddingRight: '15%' }}>
+            <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
                 <h2>Featured Auctions</h2>
                 <hr/>
                 <Carousel>
