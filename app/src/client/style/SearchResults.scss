@@ -40,7 +40,8 @@
     ::-webkit-scrollbar-thumb
     {
         background-color: rgba(0,0,0,.1);
-        outline: 1px solid slategrey
+        outline: 1px solid slategrey;
+        border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb:hover
@@ -52,13 +53,6 @@
     {
         margin: 0 !important;
         text-overflow: ellipsis !important;
-    }
-
-    .Item
-    {
-        width: 97%;
-        margin-left: 10px;
-        overflow: auto;
     }
 
     
@@ -87,10 +81,9 @@
             .Description
             {
                 height: 135px;
-
                 overflow-y: scroll;
 
-                padding: 10px 20px;
+                padding: 10px 0;
 
                 font-size: $small-font-size;
                 color: $graphite;
@@ -160,10 +153,18 @@
         transition: 200ms;
     }
 
-    .ItemBody
+
+    .Item
     {
-        margin-left: 30px;
+        width: 97%;
+        margin-left: 10px;
+
+        .ItemBody
+        {
+            overflow: auto;
+        }
     }
+
 
     .Seller
     {
@@ -173,7 +174,7 @@
 
     .Pricing, .Buttons
     {
-        background-color: $almost-white;
+        background-color: $less-white;
         border-left: 0.3px solid $lesser-white;
     }
 
