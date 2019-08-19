@@ -94,6 +94,11 @@ class SearchResults extends Component
         this.props.history.push(`/auction?id={${item.Id}}`);
     }
 
+    userClick(user)
+    {
+        this.props.history.push(`/user/${user.Username}`);
+    }
+
     render()
     {
         let items;
@@ -107,23 +112,23 @@ class SearchResults extends Component
         const type = (item) => {
             if (this.state.view === "Detailed")
             {
-                return <DetailedAuctionItem  item={item}/>;
+                return <DetailedAuctionItem  item={item} userClick={this.userClick}/>;
             }
             else if (this.state.view === "Collapsed")
             {
-                return <CollapsedAuctionItem item={item}/>;
+                return <CollapsedAuctionItem item={item} userClick={this.userClick}/>;
             }
             else if (this.state.view === "Square Grid")
             {
-                return <SquareAuctionItem grid item={item}/>
+                return <SquareAuctionItem grid item={item} userClick={this.userClick}/>
             }
             else if (this.state.view === "Detailed Grid")
             {
-                return <DetailedAuctionItem grid item={item}/>;
+                return <DetailedAuctionItem grid item={item} userClick={this.userClick}/>;
             }
             else if (this.state.view === "Collapsed Grid")
             {
-                return <CollapsedAuctionItem grid item={item}/>;
+                return <CollapsedAuctionItem grid item={item} userClick={this.userClick}/>;
             }
         }
 
@@ -182,18 +187,18 @@ function DetailedAuctionItem(props)
                 <Box mb={2}>
                     <Typography display="inline"> Sold By:</Typography>
 
-                    <Typography className="Seller" display="inline" variant="h5">
+                    <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                         &nbsp; &nbsp;{props.item.User.Username}
                     </Typography>
                         
                     <Rating display="inline" value={rating} precision={0.5} readOnly />
                 </Box>
                 
-                <Paper className="Description">
+                <Box className="Description">
                     {/* <Typography paragraph > */}
                         {props.item.Description === null ? "No Description." : props.item.Description}
                     {/* </Typography> */}
-                </Paper>
+                </Box>
                 
             </CardContent>
 
@@ -262,7 +267,7 @@ function CollapsedAuctionItem(props)
                 <Box mb={3}>
                     <Typography display="inline"> Sold By:</Typography>
 
-                    <Typography className="Seller" display="inline" variant="h5">
+                    <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                         &nbsp; &nbsp;{props.item.User.Username}
                     </Typography>
                         
@@ -319,7 +324,7 @@ function SquareAuctionItem(props)
                 <Box mb={3}>
                     <Typography display="inline"> Sold By:</Typography>
 
-                    <Typography className="Seller" display="inline" variant="h5">
+                    <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                         &nbsp; &nbsp;{props.item.User.Username}
                     </Typography>
                         
