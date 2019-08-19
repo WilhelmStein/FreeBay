@@ -35,7 +35,9 @@ app.post('/api/search', function(req, res) { controller.search(req.body.category
 
 app.get('/api/auction', function(req, res) { controller.auction(req.query.id, res); });
 
-app.post('/api/featured', function(req, res) { controller.featured(req.body.username, res); });
+app.get('/api/featured', function(req, res) { controller.featured(res); });
+
+app.post('/api/recommended', function(req, res) { controller.recommended(req.body.username, res); });
 
 app.get('/api/image', function(req, res) { controller.image(req.query.path, res); });
 

@@ -296,7 +296,7 @@ function SquareAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
-                image={`/api/image?path=${props.item.Path}`}
+                image={`/api/image?path=${props.item.Images[0].Path}`}
                 title={props.item.Name}
             />
             <CardContent className="ItemBody">
