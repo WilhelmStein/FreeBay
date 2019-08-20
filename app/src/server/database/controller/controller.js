@@ -273,7 +273,7 @@ class DBController
                         ) as a 
                             LEFT JOIN
                             (
-                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id,'Path', i.Path)) as Images 
+                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images 
                                 FROM    Image i, 
                                         Auction a 
                                 WHERE   i.Auction_Id = a.Id 
@@ -374,7 +374,64 @@ class DBController
         });
     }
 
-    featured(username, res)
+    featured(res)
+    {   // Change cost function
+        const query = {
+            string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating) as User,
+                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,
+                                t.Description, (Count(v.User_Id)*gu.Seller_Rating) AS Cost, t.Images,
+                                b.Bids
+                        FROM 
+                            (
+                                SELECT  a.Id, a.Seller_Id, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude,
+                                        a.Longitude, a.Started, a.Ends, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+                                FROM
+                                (
+                                    Auction a
+                                    LEFT JOIN Image i ON a.Id = i.Auction_Id
+                                )
+                                GROUP BY a.Id
+                            ) as t 
+                            LEFT JOIN 
+                            (
+                                SELECT  b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User', JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating), 'Amount', b.Amount, 'Time', b.Time)) as Bids
+                                FROM    Bid b,
+                                        User u,
+                                        General_User gu
+                                WHERE   b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id
+                            ) as b ON b.Auction_Id = t.Id
+                            LEFT JOIN
+                            (
+                                Views v
+                            ) ON v.Auction_Id = t.Id,
+                            User u,
+                            General_User gu
+                        WHERE   
+                                t.Seller_Id = gu.User_Id AND 
+                                t.Seller_Id = u.Id
+                        GROUP BY t.Id
+                        ORDER BY Cost DESC
+                        LIMIT 5`,
+            escape: []
+        }
+
+        this.query(query, res, (rows) => {
+            rows = rows.map( (item) => {
+                item.User = JSON.parse(item.User);
+                item.Bids = JSON.parse(item.Bids);
+                item.Images = JSON.parse(item.Images);
+                return item;
+            });
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows
+            });
+        });
+    }
+
+    recommended(username, res)
     {
         if(username)
         {
@@ -382,38 +439,42 @@ class DBController
         }
         else
         {
-            // Remember to add bids to query and place it in a function
             const query = {
                 string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating) as User,
                                     t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,
-                                    t.Description, Count(v.User_Id) AS Times_Viewed, t.Image_Id, t.Path as Path,
+                                    t.Description, Count(v.User_Id) AS Times_Viewed, t.Images,
                                     b.Bids
                             FROM 
                                 (
                                     SELECT  a.Id, a.Seller_Id, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude,
-                                            a.Longitude, a.Started, a.Ends, a.Description, Min(i.Id) as Image_Id, Min(i.path) as Path
+                                            a.Longitude, a.Started, a.Ends, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                                     FROM
                                     (
-                                        Auction a 
+                                        Auction a
                                         LEFT JOIN Image i ON a.Id = i.Auction_Id
                                     )
                                     GROUP BY a.Id
                                 ) as t 
-                                    LEFT JOIN 
-                                    (
-                                        SELECT  b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User', JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating), 'Amount', b.Amount, 'Time', b.Time)) as Bids
-                                        FROM    Bid b,
-                                                User u,
-                                                General_User gu
-                                        WHERE   b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id
-                                    ) as b ON b.Auction_Id = t.Id,
-                                Views v,
+                                LEFT JOIN 
+                                (
+                                    SELECT  b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User', JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating), 'Amount', b.Amount, 'Time', b.Time)) as Bids
+                                    FROM    Bid b,
+                                            User u,
+                                            General_User gu
+                                    WHERE   b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id
+                                ) as b ON b.Auction_Id = t.Id
+                                LEFT JOIN
+                                (
+                                    Views v
+                                ) ON v.Auction_Id = t.Id,
                                 User u,
                                 General_User gu
-                            WHERE   t.Id = v.Auction_Id AND 
+                            WHERE   
                                     t.Seller_Id = gu.User_Id AND 
                                     t.Seller_Id = u.Id
-                            GROUP BY t.Id ORDER BY Times_Viewed DESC LIMIT 5`,
+                            GROUP BY t.Id
+                            ORDER BY Times_Viewed DESC
+                            LIMIT 10`,
                 escape: []
             }
 
@@ -422,6 +483,7 @@ class DBController
                 rows = rows.map( (item) => {
                     item.User = JSON.parse(item.User);
                     item.Bids = JSON.parse(item.Bids);
+                    item.Images = JSON.parse(item.Images);
                     return item;
                 });
 
