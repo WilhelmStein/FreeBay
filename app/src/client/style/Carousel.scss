@@ -58,7 +58,7 @@
 
     .ItemBody
     {
-        margin-left: 100px;
+        margin-left: 50px;
     }
 
     .Seller
@@ -112,8 +112,10 @@
 
         .Time_Remaining
         {
-            margin-left: 80px;
+            margin-left: 60px;
             color: $orange;
+            font-weight: bold;
+            font-size: 155%;
         }
     }
 
