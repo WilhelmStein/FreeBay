@@ -87,14 +87,14 @@ function FeaturedItem(props)
                         <Typography variant="h5" className="Title">Current Price:</Typography>
                     </Grid>
                     <Grid item xs={6} zeroMinWidth>
-                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently.toFixed(2)}</Typography>
+                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently ? props.item.Currently.toFixed(2) : "-"}</Typography>
                     </Grid>
 
                     <Grid item xs={6}>
                         <Typography variant="h5" className="Title">Buyout Price:</Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price.toFixed(2)}</Typography>
+                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price ? props.item.Buy_Price.toFixed(2) : "-"}</Typography>
                     </Grid>
                 </Grid>
 
