@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Carousel, CarouselSlide } from 'material-ui-carousel';
 import { Card, CardContent, CardMedia, Typography, Box, Grid, Button } from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating';
+import Countdown from 'react-countdown-now';
 import axios from 'axios';
 
 import '../style/Carousel.scss';
@@ -103,7 +104,9 @@ function FeaturedItem(props)
                     </Grid>
 
                     <Grid item xs={6}>
-                        <Typography className="Time_Remaining" variant="h3">{(new Date(props.item.Ends) - new Date(props.item.Started))/1000/60/60/24}</Typography>
+                        <Typography className = "Time_Remaining" variant="h3">
+                            <Countdown date={new Date(props.item.Ends)}/>
+                        </Typography>
                     </Grid>
                 </Grid>
 

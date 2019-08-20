@@ -41,13 +41,13 @@ Values  (1, 100.0, 0, "Reginald", "Von Waldberg", "+448795551234", 1, 1),
 -- Auction -- 
 
 Insert into Auction (Seller_Id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description)
-Values  (1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Emporium", NULL, NULL, NOW(), NOW(), "A luxurious suit for the extraordinary gentleman."),
-        (1, "Modest Frock", 333.00, 100.00, 800.00, "Historical Emporium", NULL, NULL, NOW(), NOW(), "An elegant frock for the graceful lady."),
-        (3, "Venereal Disease", 0.00, 30.00, 69.69, "Olympus", NULL, NULL, NOW(), NOW(), ";)"),
-        (3, "Natural Viagra", 23.00, 10.00, 55.00, "Olympus", NULL, NULL, NOW(), NOW(), "To make your partner say: 'By Jupiter's Cock!'"),
-        (5, "Your Mother", 6.12, 5.00, 12.00, "Elladistan", NULL, NULL, NOW(), NOW(), ""),
-        (4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, NOW(), NOW(), ""),
-        (1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, NOW(), NOW(), "");
+Values  (1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Emporium", NULL, NULL, NOW(), NOW() + INTERVAL 15 DAY, "A luxurious suit for the extraordinary gentleman."),
+        (1, "Modest Frock", 333.00, 100.00, 800.00, "Historical Emporium", NULL, NULL, NOW(), NOW() + INTERVAL 15 DAY, "An elegant frock for the graceful lady."),
+        (3, "Venereal Disease", 0.00, 30.00, 69.69, "Olympus", NULL, NULL, NOW(), NOW() + INTERVAL 15 DAY, ";)"),
+        (3, "Natural Viagra", 23.00, 10.00, 55.00, "Olympus", NULL, NULL, NOW(), NOW() + INTERVAL 15 DAY, "To make your partner say: 'By Jupiter's Cock!'"),
+        (5, "Your Mother", 6.12, 5.00, 12.00, "Elladistan", NULL, NULL, NOW(), NOW() + INTERVAL 15 DAY, ""),
+        (4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, NOW(), NOW() + INTERVAL 15 DAY, ""),
+        (1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, NOW(), NOW() + INTERVAL 15 DAY, "");
 
 -- Bid --
 
