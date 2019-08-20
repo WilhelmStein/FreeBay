@@ -156,7 +156,7 @@ class SearchResults extends Component
         return (
             <div className="SearchResultsPage">
                 <h2>
-                    {items.length} results for:
+                    {this.state.items.length} results for:
 
                     <span className="ResultsName">
                         {this.state.text === "" ? "-" : this.state.text}
