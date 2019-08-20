@@ -9,7 +9,14 @@
         font-size: $big-header-font-size;
         margin-left: 15px;
 
-        span
+        .ResultsName
+        {
+            color: $red;
+            font-size: inherit;
+            margin-left: 15px;
+        }
+
+        .View
         {
             margin-left: 50px;
             font-size: $smaller-font-size;
@@ -20,6 +27,16 @@
     {
         font-weight: 400;
         font-size: $small-font-size;
+    }
+
+    .Pagination
+    {
+        button
+        {
+            font-size: $small-font-size !important;
+        }
+
+        margin-bottom: 20px;
     }
 }
 
@@ -40,7 +57,8 @@
     ::-webkit-scrollbar-thumb
     {
         background-color: rgba(0,0,0,.1);
-        outline: 1px solid slategrey
+        outline: 1px solid slategrey;
+        border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb:hover
@@ -50,14 +68,8 @@
 
     h2
     {
-        margin: 0;
-    }
-
-    .Item
-    {
-        width: 97%;
-        margin-left: 10px;
-        overflow: auto;
+        margin: 0 !important;
+        text-overflow: ellipsis !important;
     }
 
     
@@ -68,15 +80,16 @@
             height: 250px;
 
             display: grid;
-            grid-template-columns: 300px 500px 270px;
+            grid-template-columns: 250px auto 270px;
 
             &.Grid
             {
-                grid-template-columns: 250px 300px 270px;
+                grid-template-columns: 250px auto 270px;
                 height: 250px;
 
                 .Description
                 {
+                    height: 100px;
                     font-size: $smaller-font-size;
                     color: $graphite;
                 }
@@ -84,6 +97,11 @@
 
             .Description
             {
+                height: 135px;
+                overflow-y: scroll;
+
+                padding: 10px 0;
+
                 font-size: $small-font-size;
                 color: $graphite;
 
@@ -97,12 +115,13 @@
         {
             display: grid;
 
-            grid-template-columns: 100px 300px 270px 200px;
+            grid-template-columns: 100px auto 270px 200px;
     
             .ItemBody
             {
                 height: 100px;
                 margin-left: 30px;
+                overflow: hidden;
             }
 
             .Buttons
@@ -116,6 +135,11 @@
                     padding: 5px;
                     font-size: $small-font-size;
                 }
+            }
+
+            &.Grid
+            {
+                overflow-y: auto;
             }
         }
     }
@@ -145,9 +169,16 @@
         transition: 200ms;
     }
 
-    .ItemBody
+
+    .Item
     {
-        margin-left: 30px;
+        width: 97%;
+        margin-left: 10px;
+
+        .ItemBody
+        {
+            overflow: auto;
+        }
     }
 
     .Seller
@@ -156,9 +187,10 @@
         cursor: pointer;
     }
 
-    .Pricing
+    .Pricing, .Buttons
     {
-        margin-top: 10px;
+        background-color: $less-white;
+        border-left: 0.3px solid $lesser-white;
     }
 
 
@@ -173,6 +205,7 @@
 
         .Price
         {
+            font-size: fit-width;
             &.Starting
             {
                 color: $blue;
