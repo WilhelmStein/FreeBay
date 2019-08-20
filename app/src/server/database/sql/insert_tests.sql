@@ -32,8 +32,8 @@ Values  (2, 1, "2019-01-12 9:00:00"),
 -- Image --
 
 Insert into Image (Id, Path, Auction_Id)
-Values  (1, "1.jpg", 6),
-        (2, "2.jpg", 7),
+Values  (1, "1.jpg", 4),
+        (2, "2.jpg", 2),
         (3, "3.png", 5),
         (4, "4.jpg", 5);
 

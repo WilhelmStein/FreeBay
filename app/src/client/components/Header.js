@@ -96,6 +96,12 @@ class SearchBar extends Component
 
     submit(event)
     {
+        // if (!this.state.text)
+        // {
+        //     alert("Please search something...");
+        //     return;
+        // }
+        
         this.props.history.push(`/search?category={${this.state.categories[this.state.category].Id}}&text={${this.state.text}}`);
 
         event.preventDefault();
