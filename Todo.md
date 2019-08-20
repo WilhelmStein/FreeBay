@@ -52,12 +52,13 @@
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
   - [x] Implementation
-- [ ] Search Results
-  - [ ] Collapsed
+- [x] Search Results
+  - [x] Collapsed
   - [x] Detailed
   - [x] Detailed Grid
-  - [ ] Collapsed Grid
-  - [x] Square Grid
+  - [x] Collapsed Grid
+  - [x] Square Grid (Scrapped)
+  - [x] Pagination
 - [ ] Account Page
   - [ ] Profile
   - [ ] Posted Auctions
