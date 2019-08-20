@@ -20,9 +20,7 @@ export default class CarouselWrapper extends Component {
 
     componentDidMount() {
         axios.get('/api/featured')
-        .then( res => {
-            console.log(res.data.data)
-            
+        .then( res => {     
             this.setState({
                 auctions: res.data.data
             });
@@ -34,13 +32,13 @@ export default class CarouselWrapper extends Component {
 
         return (
             <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
-                <h2>Featured Auctions</h2>
+                <h2>Featured Items</h2>
                 <hr/>
                 <Carousel>
-                    {this.state.auctions.map((item) => {
+                    {this.state.auctions.map((item, index) => {
                         return  <CarouselSlide key={item.Id}>
                                     <div className = "FeaturedItemWrapper Square">
-                                        <FeaturedItem item={item}/>
+                                        <FeaturedItem item={item} index={index}/>
                                     </div>
                                 </CarouselSlide>
                     })}
@@ -55,9 +53,9 @@ function FeaturedItem(props)
     const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
 
     return (
-        <Card className="Item">
+        <Card className={`Item Item${(props.index % 3) + 1}`}>
             <CardMedia
-                image={`/api/image?path=${props.item.Images[0].Path}`}
+                image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                 title={props.item.Name}
             />
             <CardContent className="ItemBody">

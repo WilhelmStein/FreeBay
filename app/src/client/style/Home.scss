@@ -37,22 +37,20 @@
 
         .Item
         {
+            transition: 200ms;
             overflow: auto;
-            &:hover {
-                transition: 200ms;
+
+            &:hover
+            {
                 background: $less-white;
             }
         }
 
         .Media {
+            object-fit: contain;
             height: 250px;
-            width: 250px;
-            display: block;
-            margin: auto;
 
-            &:hover {
-                cursor: pointer;
-            }
+            cursor: pointer;
         }
 
 
@@ -62,11 +60,12 @@
 
             .Title
             {
+                cursor: pointer;
+                // transition: 200ms;
+
                 &:hover
                 {
-                    cursor: pointer;
-                    transition: 200ms;
-                    color: red;
+                    color: $graphite;
                 }
             }
         }
@@ -75,6 +74,11 @@
         {
             color: $blue;
             cursor: pointer;
+
+            &:hover
+            {
+                filter: brightness(130%);
+            }
         }
 
         .Pricing

@@ -26,8 +26,18 @@ class Home extends Component
     {
         Axios.post('/api/recommended', {username: (this.state.user == null) ? (null) : (this.state.user.Username)})
         .then( res => {
-            this.setState({recommended: res.data.data});
-        });
+            if (res.data.error)
+            {
+                console.error(res.data.message);
+                return;
+            }
+            
+            console.log(res.data.data)
+            this.setState({
+                recommended: res.data.data
+            });
+        })
+        .catch(err => {console.error(err)});
     }
 
     render()
@@ -37,7 +47,7 @@ class Home extends Component
                 <Carousel user={this.state.user} loginHandler={this.props.loginHandler}/>
 
                 <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
-                    <h2>Recommended for you</h2>
+                    <h2>{this.state.user ? "Recommended for you" : "Popular Items"}</h2>
                     <hr/>
                     <Grid container
                         direction = "row"
@@ -58,11 +68,12 @@ class Home extends Component
 
 class RecommendedItem extends Component
 {
-
     constructor(props)
     {
         super(props);
+
         autoBind(this);
+
         this.state = {
             item: props.item
         }
@@ -81,32 +92,34 @@ class RecommendedItem extends Component
     render()
     {
         const rating = Math.round((this.state.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
-        return <Grid key={this.state.item.Id} item xs={2} className = "Wrapper">
-                    <Card className="Item">
-                        <CardMedia className="Media"
-                            image={`/api/image?path=${this.state.item.Images[0].Path}`}
-                            title={this.state.item.Name}
-                            onClick={this.onItemClick}
-                        />
+        return (
+            <Grid key={this.state.item.Id} item xs={2} className = "Wrapper">
+                <Card className="Item">
+                    <CardMedia className="Media"
+                        image={this.state.item.Images && this.state.item.Images.length ? `/api/image?path=${this.state.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                        title={this.state.item.Name}
+                        onClick={this.onItemClick}
+                    />
 
-                        <CardContent className="ItemBody">
-                            <Typography className="Title" variant="h4" onClick={this.onItemClick} noWrap>
-                                {this.state.item.Name}
+                    <CardContent className="ItemBody">
+                        <Typography className="Title" variant="h4" onClick={this.onItemClick} noWrap>
+                            {this.state.item.Name}
+                        </Typography>
+
+                        <Box>
+                            <Typography display="inline"> Sold By:</Typography>
+
+                            <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick}>
+                                &nbsp; &nbsp;{this.state.item.User.Username}
                             </Typography>
+                                
+                            <Rating display="inline" value={rating} precision={0.5} readOnly />
+                        </Box>
 
-                            <Box>
-                                <Typography display="inline"> Sold By:</Typography>
-
-                                <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick}>
-                                    &nbsp; &nbsp;{this.state.item.User.Username}
-                                </Typography>
-                                    
-                                <Rating display="inline" value={rating} precision={0.5} readOnly />
-                            </Box>
-
-                        </CardContent>
-                    </Card>
-                </Grid>
+                    </CardContent>
+                </Card>
+            </Grid>
+        )
     }
 }
 
