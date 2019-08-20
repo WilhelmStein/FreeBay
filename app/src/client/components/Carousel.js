@@ -104,8 +104,13 @@ function FeaturedItem(props)
                     </Grid>
 
                     <Grid item xs={6}>
-                        <Typography className = "Time_Remaining" variant="h3">
-                            <Countdown date={new Date(props.item.Ends)}/>
+                        <Typography className = "Time_Remaining" variant="h4">
+                            <Countdown
+                                date={new Date(props.item.Ends)}
+                                renderer={ (props) =>
+                                    <div>{props.days} Days : {props.hours} Hours : {props.minutes} Minutes : {props.seconds} Seconds</div>
+                                }
+                            />
                         </Typography>
                     </Grid>
                 </Grid>
