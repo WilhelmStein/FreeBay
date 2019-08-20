@@ -9,7 +9,14 @@
         font-size: $big-header-font-size;
         margin-left: 15px;
 
-        span
+        .ResultsName
+        {
+            color: $red;
+            font-size: inherit;
+            margin-left: 15px;
+        }
+
+        .View
         {
             margin-left: 50px;
             font-size: $smaller-font-size;
@@ -20,6 +27,16 @@
     {
         font-weight: 400;
         font-size: $small-font-size;
+    }
+
+    .Pagination
+    {
+        button
+        {
+            font-size: $small-font-size !important;
+        }
+
+        margin-bottom: 20px;
     }
 }
 
@@ -96,8 +113,6 @@
     {
         .Item
         {
-            overflow: hidden;
-
             display: grid;
 
             grid-template-columns: 100px auto 270px 200px;
@@ -106,6 +121,7 @@
             {
                 height: 100px;
                 margin-left: 30px;
+                overflow: hidden;
             }
 
             .Buttons
@@ -165,7 +181,6 @@
         }
     }
 
-
     .Seller
     {
         color: $blue;
@@ -190,6 +205,7 @@
 
         .Price
         {
+            font-size: fit-width;
             &.Starting
             {
                 color: $blue;

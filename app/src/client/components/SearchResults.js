@@ -12,6 +12,7 @@ import Button from '@material-ui/core/Button';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper'
+import Pagination from 'material-ui-flat-pagination';
 
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -32,7 +33,9 @@ class SearchResults extends Component
             items: [],
             category: -1,
             text: "",
-            view: "Detailed Grid"
+            view: "Detailed Grid",
+            offset: 0,
+            resultsPerPage: 6
         }
 
         autoBind(this);
@@ -99,6 +102,13 @@ class SearchResults extends Component
         this.props.history.push(`/user/${user.Username}`);
     }
 
+    paginate(offset, page)
+    {
+        this.setState({
+            offset: offset
+        })
+    }
+
     render()
     {
         let items;
@@ -132,7 +142,9 @@ class SearchResults extends Component
             }
         }
 
-        items = this.state.items.map( (item) => {
+        items = this.state.items
+        .slice(this.state.offset, this.state.offset + this.state.resultsPerPage)
+        .map( (item) => {
             return (
                 <Grid item xs={gridDivision} key={item.Id} >
                     {type(item)}
@@ -144,24 +156,47 @@ class SearchResults extends Component
         return (
             <div className="SearchResultsPage">
                 <h2>
-                    {items.length} results for " {this.state.text} ":
-                    <span>
+                    {items.length} results for:
+
+                    <span className="ResultsName">
+                        {this.state.text === "" ? "-" : this.state.text}
+                    </span>
+
+                    <span className="View">
                         View: &nbsp;
                         <Select className="Select" value={this.state.view} onChange={this.changeView}>
                             <MenuItem value="Detailed">Detailed</MenuItem>
                             <MenuItem value="Collapsed">Collapsed</MenuItem>
                             <MenuItem value="Detailed Grid">Detailed Grid</MenuItem>
                             <MenuItem value="Collapsed Grid">Collapsed Grid</MenuItem>
-                            <MenuItem value="Square Grid">Square Grid</MenuItem>
+                            {/* <MenuItem value="Square Grid">Square Grid</MenuItem> */}
                         </Select>
                     </span>
                 </h2>
 
                 <hr/>
 
+                <Pagination
+                    className="Pagination"
+                    size='large'
+                    limit={this.state.resultsPerPage}
+                    offset={this.state.offset}
+                    total={this.state.items.length}
+                    onClick={(e, offset, page) => this.paginate(offset, page)}
+                />
+
                 <Grid container spacing={3} className={`SearchResults ${this.state.view}`}>
                     {items}
                 </Grid>
+
+                <Pagination
+                    className="Pagination"
+                    size='large'
+                    limit={this.state.resultsPerPage}
+                    offset={this.state.offset}
+                    total={this.state.items.length}
+                    onClick={(e, offset, page) => this.paginate(offset, page)}
+                />
             </div>
         );
     }
