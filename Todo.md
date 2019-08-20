@@ -47,7 +47,7 @@
 - [ ] Home Page
   - [ ] Carousel
   - [ ] Featured Items Algorithm
-  - [ ] Popular Items Query
+  - [x] Popular Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
@@ -60,13 +60,15 @@
   - [x] Square Grid (Scrapped)
   - [x] Pagination
 - [ ] Account Page
-  - [ ] Profile
-  - [ ] Posted Auctions
-  - [ ] Active Auctions
-  - [ ] Messages
-  - [ ] Settings
+  * Everybody
+    - [ ] Profile
+    - [ ] Posted Auctions
+  * Logged User
+    - [ ] Post Auction
+    - [ ] Active Auctions
+    - [ ] Messages
+    - [ ] Settings
 - [ ] Auction Page
-  - [ ] Post Auction
   - [ ] View - Bid Auction
 - [x] Admin Page
   - [x] Dashboard with options

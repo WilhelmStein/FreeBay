@@ -11,7 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper'
 import Pagination from 'material-ui-flat-pagination';
 
 import Card from '@material-ui/core/Card';
@@ -88,7 +87,8 @@ class SearchResults extends Component
     changeView(event)
     {
         this.setState({
-            view: event.target.value
+            view: event.target.value,
+            resultsPerPage: event.target.value.includes("Detailed") ? 6 : 12
         })
     }
 
