@@ -37,7 +37,6 @@
 
         .Item
         {
-            width: 97%;
             overflow: auto;
             &:hover {
                 transition: 200ms;
@@ -46,8 +45,8 @@
         }
 
         .Media {
-            height: 256px;
-            width: 256px;
+            height: 250px;
+            width: 250px;
             display: block;
             margin: auto;
 
@@ -56,15 +55,20 @@
             }
         }
 
-        .ListItem
-        {
-            outline: none;
-            transition: 200ms;
-        }
 
         .ItemBody
         {
             margin-left: 0px;
+
+            .Title
+            {
+                &:hover
+                {
+                    cursor: pointer;
+                    transition: 200ms;
+                    color: red;
+                }
+            }
         }
 
         .Seller
@@ -104,46 +108,6 @@
                 {
                     color: $red;
                 }
-            }
-        }
-
-        .Dates
-        {
-            font-size: $normal-font-size;
-
-            .Date
-            {
-                &.Started
-                {
-                    color: $green;
-                }
-
-                &.Ends
-                {
-                    color: $red;
-                }
-            }
-        }
-
-        .Button
-        {
-            margin-right: 5px;
-            width: 100px;
-            border-radius: 5px;
-            color: white;
-
-            padding: 5px 15px;
-
-            font-size: $normal-font-size;
-            
-            &.Bid
-            {
-                background-color: $green;
-            }
-
-            &.Buyout
-            {
-                background-color: $red;
             }
         }
     }

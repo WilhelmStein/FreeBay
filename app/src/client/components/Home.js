@@ -90,7 +90,7 @@ class RecommendedItem extends Component
                         />
 
                         <CardContent className="ItemBody">
-                            <Typography variant="h4" noWrap>
+                            <Typography className="Title" variant="h4" onClick={this.onItemClick} noWrap>
                                 {this.state.item.Name}
                             </Typography>
 
