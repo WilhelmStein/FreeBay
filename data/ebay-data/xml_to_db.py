@@ -16,7 +16,7 @@ if example_id in parser.auctions:
 
     print(parser.dumps(example_id), sep='\n')
 
-generator = Generator()
+generator = Generator(downloader=None)
 
 for auction in parser.auctions.values():
 
