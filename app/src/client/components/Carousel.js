@@ -37,9 +37,7 @@ export default class CarouselWrapper extends Component {
     render() {
 
         return (
-            <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
-                <h2>Featured Items</h2>
-                {/* <hr/> */}
+            <div /*style={{ paddingLeft: '10%', paddingRight: '10%' }}*/>
                 <Carousel>
                     {
                         this.state.auctions.map((item, index) => {
@@ -58,14 +56,12 @@ export default class CarouselWrapper extends Component {
     }
 }
 
-function FeaturedItem(props)
+function __getTime(string)
 {
-    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
-
-    let ends = props.item.Ends.split(' ');
-    let date = ends[0].split('-')
-    let time = ends[1].split(':');
-    ends = {
+    let ret = string.split(' ');
+    let date = ret[0].split('-')
+    let time = ret[1].split(':');
+    ret = {
         year: date[2],
         month: date[1],
         day: date[0],
@@ -73,17 +69,11 @@ function FeaturedItem(props)
         minute: time[1]
     }
 
-    let started = props.item.Started.split(' ')
-    date = started[0].split('-')
-    time = started[1].split(':');
-    started = {
-        year: date[2],
-        month: date[1],
-        day: date[0],
-        hour: time[0],
-        minute: time[1]
-    }
+    return ret;
+}
 
+function __timeDifference(started, ends)
+{
     let difference = {
         years: ends.year - started.year,
         months: 0,
@@ -123,10 +113,24 @@ function FeaturedItem(props)
         difference.hours -= 1;
     }
 
-    console.log(difference);
+    difference.string = difference.years === 0 ? "" : `${difference.years} years, `;
+    difference.string += difference.months === 0 ? "" : `${difference.months} months, `;
+    difference.string += difference.days === 0 ? "" : `${difference.days} days, `;
+    difference.string += difference.hours === 0 ? "" : `${difference.hours} hours, `;
+    difference.string += `${difference.minutes} minutes`;
+    
+    return difference;
+}
+
+function FeaturedItem(props)
+{
+    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+    // const started = __getTime(props.item.Started);
+    // const ends = __getTime(props.item.Ends);
+    // const difference = __timeDifference(started, ends);
 
     return (
-        <Card className={`Item Item${(props.index % 2) + 1}`}>
+        <Card raised className={`Item Item${(props.index % 2) + 1}`}>
             <CardMedia
                 className="CardMedia"
                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
@@ -177,13 +181,10 @@ function FeaturedItem(props)
 
                     <Grid item xs={6}>
                         <Typography className = "Time_Remaining" variant="h4">
-                            <div>
-                                {/* {`${difference.years} years, ${difference.months} months`} */}
-                            </div>
                             <Countdown
                                 date={new Date(props.item.Ends)}
                                 renderer={ (props) =>
-                                    <div>{props.days} Days: {props.hours} Hours: {props.minutes} Minutes: {props.seconds} Seconds</div>
+                                    <div>{props.days} days, {props.hours}h {props.minutes}m {props.seconds}s</div>
                                 }
                             />
                         </Typography>

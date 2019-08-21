@@ -25,11 +25,6 @@
         background: $lesser-white;
     }
 
-    h2
-    {
-        margin: 0px;
-    }
-
     .Item
     {
         display: grid;
@@ -40,12 +35,12 @@
 
         &.Item1
         {
-            background-color: $less-white;
+            background-color: $almost-white;
         }
 
         &.Item2
         {
-            background-color: $less-white;
+            background-color: $almost-white;
         }
 
         &.Item3
@@ -147,24 +142,4 @@
             }
         }
     }
-
-    .Dates
-    {
-        font-size: $normal-font-size;
-
-        .Date
-        {
-            &.Started
-            {
-                color: $green;
-            }
-
-            &.Ends
-            {
-                color: $red;
-            }
-        }
-    }
-
-    
 }

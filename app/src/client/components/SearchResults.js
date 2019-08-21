@@ -75,8 +75,6 @@ class SearchResults extends Component
                 return;
             }
 
-            console.log(res.data.data)
-
             this.setState({
                 items: res.data.data
             })

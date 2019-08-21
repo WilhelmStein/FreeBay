@@ -2,10 +2,10 @@
 
 mysql -u root -ppassword < ./app/src/server/database/sql/create.sql
 
-# cd ./data/ebay-data
+cd ./data/ebay-data
 
-# python3 xml_to_db.py
+python3 xml_to_db.py
 
-# cd -
+cd -
 
-mysql -u root -ppassword < ./app/src/server/database/sql/temp_tests.sql
+mysql -u root -ppassword < ./app/src/server/database/sql/insert_tests.sql

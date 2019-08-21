@@ -380,7 +380,7 @@ class DBController
         const query = {
             string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
                                 t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude,
-                                DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends,
+                                t.Started, t.Ends,
                                 t.Description, (Count(v.User_Id) * t.Seller_Rating) AS Cost, i.Images, b.Bids
                         FROM 
                         (
