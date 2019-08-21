@@ -122,23 +122,23 @@ class SearchResults extends Component
         const type = (item) => {
             if (this.state.view === "Detailed")
             {
-                return <DetailedAuctionItem  item={item} userClick={this.userClick}/>;
+                return <DetailedAuctionItem  item={item} userClick={this.userClick} pressItem={this.pressItem}/>;
             }
             else if (this.state.view === "Collapsed")
             {
-                return <CollapsedAuctionItem item={item} userClick={this.userClick}/>;
+                return <CollapsedAuctionItem item={item} userClick={this.userClick} pressItem={this.pressItem}/>;
             }
             else if (this.state.view === "Square Grid")
             {
-                return <SquareAuctionItem grid item={item} userClick={this.userClick}/>
+                return <SquareAuctionItem grid item={item} userClick={this.userClick} pressItem={this.pressItem}/>
             }
             else if (this.state.view === "Detailed Grid")
             {
-                return <DetailedAuctionItem grid item={item} userClick={this.userClick}/>;
+                return <DetailedAuctionItem grid item={item} userClick={this.userClick} pressItem={this.pressItem}/>;
             }
             else if (this.state.view === "Collapsed Grid")
             {
-                return <CollapsedAuctionItem grid item={item} userClick={this.userClick}/>;
+                return <CollapsedAuctionItem grid item={item} userClick={this.userClick} pressItem={this.pressItem}/>;
             }
         }
 
@@ -151,8 +151,8 @@ class SearchResults extends Component
                 </Grid>
             );
         })
-    
-        
+
+
         return (
             <div className="SearchResultsPage">
                 <h2>
@@ -215,7 +215,7 @@ function DetailedAuctionItem(props)
             />
             <CardContent className="ItemBody">
 
-                <Typography variant="h2">
+                <Typography variant="h2" onClick={() => {props.pressItem(props.item)}}>
                     {props.item.Name}
                 </Typography>
 
@@ -225,16 +225,16 @@ function DetailedAuctionItem(props)
                     <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                         &nbsp; &nbsp;{props.item.User.Username}
                     </Typography>
-                        
+
                     <Rating display="inline" value={rating} precision={0.5} readOnly />
                 </Box>
-                
+
                 <Box className="Description">
                     {/* <Typography paragraph > */}
                         {props.item.Description === null ? "No Description." : props.item.Description}
                     {/* </Typography> */}
                 </Box>
-                
+
             </CardContent>
 
             <CardContent className="Pricing">
@@ -278,7 +278,7 @@ function DetailedAuctionItem(props)
                         Ends in: <span className="Ends Date">{props.item.Ends}</span>
                     </Typography>
                 </Box>
-                
+
             </CardContent>
         </Card>
     )
@@ -295,7 +295,7 @@ function CollapsedAuctionItem(props)
                 title="Generic placeholder"
             />
             <CardContent className="ItemBody">
-                <Typography variant="h2">
+                <Typography variant="h2" onClick={() => {props.pressItem(props.item)}}>
                     {props.item.Name}
                 </Typography>
 
@@ -305,7 +305,7 @@ function CollapsedAuctionItem(props)
                     <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                         &nbsp; &nbsp;{props.item.User.Username}
                     </Typography>
-                        
+
                     <Rating display="inline" value={rating} precision={0.5} readOnly />
                 </Box>
             </CardContent>
@@ -352,7 +352,7 @@ function SquareAuctionItem(props)
                 title={props.item.Name}
             />
             <CardContent className="ItemBody">
-                <Typography variant="h2">
+                <Typography variant="h2" onClick={() => {props.pressItem(props.item)}}>
                     {props.item.Name}
                 </Typography>
 
@@ -362,7 +362,7 @@ function SquareAuctionItem(props)
                     <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                         &nbsp; &nbsp;{props.item.User.Username}
                     </Typography>
-                        
+
                     <Rating display="inline" value={rating} precision={0.5} readOnly />
                 </Box>
                 <Grid container className="Prices" spacing={1}>
