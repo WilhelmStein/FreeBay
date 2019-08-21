@@ -15,13 +15,13 @@ class AuctionPage extends Component
         };
 
         autoBind(this);
+        this.state = {
+            auctionId: props.match.params.id
+        };
     }
 
     componentDidMount()
     {
-
-        console.log(this.state.auctionId);
-
         axios.get(`/api/auction?id=${this.state.auctionId}`)
         .then(res => {
             this.setState({

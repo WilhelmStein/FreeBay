@@ -20,7 +20,7 @@
   * [Download SSL](https://www.openssl.org/source/)
 - [x] XML -> DB generation
   - [ ] Pass 1-2-3 Auction Ids
-- [ ] Search sql queries
+- [x] Search sql queries
 - [ ] Bonus algorithm
 - [ ] Auction retrieval sql query
 - [ ] Auction post sql query
@@ -52,12 +52,13 @@
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
   - [x] Implementation
-- [ ] Search Results
-  - [ ] Collapsed
+- [x] Search Results
+  - [x] Collapsed
   - [x] Detailed
   - [x] Detailed Grid
-  - [ ] Collapsed Grid
-  - [x] Square Grid
+  - [x] Collapsed Grid
+  - [x] Square Grid (Scrapped)
+  - [x] Pagination
 - [ ] Account Page
   - [ ] Profile
   - [ ] Posted Auctions
