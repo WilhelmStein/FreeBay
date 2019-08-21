@@ -314,6 +314,19 @@ class DBController
         });
     }
 
+    user(username, res)
+    {
+        const query = {
+            string: `SELECT *
+                     FROM User u,
+                          General_User gu
+                     WHERE u.Username=? AND gu.User_Id = u.Id`,
+            escape: [username]
+        };
+
+        this.query(query, res);
+    }
+
     auction(auctionId, res)
     {
         const query = {
