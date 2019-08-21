@@ -21,8 +21,8 @@
 - [x] XML -> DB generation
   - [ ] Pass 1-2-3 Auction Ids
 - [x] Search sql queries
-- [ ] Bonus algorithm
-- [ ] Auction retrieval sql query
+- [ ] Bonus algorithm (Recommended items)
+- [x] Auction retrieval sql query
 - [ ] Auction post sql query
 
 ## Front - End
@@ -46,7 +46,6 @@
     - [x] Styling
 - [ ] Home Page
   - [ ] Carousel
-  - [ ] Featured Items Algorithm
   - [x] Popular Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)

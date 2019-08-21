@@ -250,7 +250,8 @@ class DBController
 
         const query = {
             string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Seller_Rating', a.Seller_Rating) as User, 
-                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, DATE_FORMAT(a.Started, "%d-%m-%Y    %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y    %H:%i") as Ends,
+                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
+                                DATE_FORMAT(a.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y %H:%i") as Ends,
                                 a.Description, i.Images, b.Bids
                         FROM
                         (
@@ -378,7 +379,8 @@ class DBController
     {   // Change cost function
         const query = {
             string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
-                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,
+                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude,
+                                DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends,
                                 t.Description, (Count(v.User_Id) * t.Seller_Rating) AS Cost, i.Images, b.Bids
                         FROM 
                         (
@@ -436,13 +438,18 @@ class DBController
     {
         if(username)
         {
-            // LSH Nearest Neighbour Algorithm Here 
+            res.send({
+                error: false,
+                message: "OK",
+                data: []
+            })
         }
         else
         {
             const query = {
                 string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
-                                    t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, t.Started, t.Ends,
+                                    t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, 
+                                    DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends,
                                     t.Description, Count(v.User_Id) AS Times_Viewed, i.Images
                             FROM 
                             (

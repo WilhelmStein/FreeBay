@@ -4,7 +4,7 @@ import { Card, Grid, CardMedia, CardContent, Typography, Box} from '@material-ui
 import Rating from '@material-ui/lab/Rating'
 import Carousel from './Carousel';
 import '../style/Home.scss';
-import Axios from 'axios';
+import axios from 'axios';
 import autoBind  from 'auto-bind';
 
 class Home extends Component
@@ -14,7 +14,7 @@ class Home extends Component
         super(props);
 
         this.state = {
-            user: this.props.user,
+            // user: this.props.user,
             recommended: [],
             history: props.history
         };
@@ -24,7 +24,20 @@ class Home extends Component
 
     componentDidMount()
     {
-        Axios.post('/api/recommended', {username: (this.state.user == null) ? (null) : (this.state.user.Username)})
+        this.getRecommended(this.props.user);
+    }
+
+    componentWillReceiveProps(nextProps)
+    {
+        if (nextProps.user !== this.props.user)
+        {
+            this.getRecommended(nextProps.user);
+        }
+    }
+
+    getRecommended(user)
+    {
+        axios.post('/api/recommended', {username: user === null ? null : user.Username})
         .then( res => {
             if (res.data.error)
             {
@@ -32,7 +45,6 @@ class Home extends Component
                 return;
             }
             
-            console.log(res.data.data)
             this.setState({
                 recommended: res.data.data
             });
@@ -44,10 +56,10 @@ class Home extends Component
     {
         return (
             <div className="Home">
-                <Carousel user={this.state.user} loginHandler={this.props.loginHandler}/>
+                <Carousel user={this.props.user} loginHandler={this.props.loginHandler}/>
 
                 <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
-                    <h2>{this.state.user ? "Recommended for you" : "Popular Items"}</h2>
+                    <h2>{this.props.user ? "Recommended for you" : "Popular Items"}</h2>
                     <hr/>
                     <Grid container
                         direction = "row"

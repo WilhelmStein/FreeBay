@@ -40,9 +40,11 @@
             transition: 200ms;
             overflow: auto;
 
+            background-color: $almost-white;
+
             &:hover
             {
-                background: $less-white;
+                background-color: $less-white;
             }
         }
 
@@ -61,7 +63,6 @@
             .Title
             {
                 cursor: pointer;
-                // transition: 200ms;
 
                 &:hover
                 {

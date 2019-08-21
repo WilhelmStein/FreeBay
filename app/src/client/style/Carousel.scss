@@ -32,105 +32,119 @@
 
     .Item
     {
-        margin-left: 10px;
-        overflow: auto;
+        display: grid;
+        grid-template-columns: 450px auto;
+
+        height: 450px;
+        position: relative;
 
         &.Item1
         {
-            background-color: $orange;
+            background-color: $less-white;
         }
 
         &.Item2
         {
-            background-color: $red;
+            background-color: $less-white;
         }
 
         &.Item3
         {
             background-color: $blue;
         }
-    }
 
-    &.Square
-    {
-        .Item
+        
+        .ItemBody
         {
-            height: 450px;
-            padding: 25px;
+            padding-left: 0;
+            position: relative;
 
-            display: grid;
-            grid-template-columns: 450px 300px;
+            .Title, .SellerBox
+            {
+                margin-left: 20px;
+            }
+
+            .Seller
+            {
+                color: $blue;
+                cursor: pointer;
+            }
+        
+            .Prices
+            {
+                color: $graphite;
+                width: 250px;
+        
+                .Title
+                {
+                    font-weight: 300;
+                }
+        
+                .Price
+                {
+                    &.Starting
+                    {
+                        color: $blue;
+                    }
+        
+                    &.Current
+                    {
+                        color: $green;
+                    }
+        
+                    &.Buyout
+                    {
+                        color: $red;
+                    }
+                }
+            }
+        
+            .Timer
+            {
+                margin-top: 10px;
+                width: 250px;
+        
+                .Title
+                {
+                    color: $graphite;
+                }
+        
+                .Time_Remaining
+                {
+                    margin-left: 60px;
+                    color: $orange;
+                    font-weight: bold;
+                    font-size: 155%;
+                }
+            }
 
             .Buttons
             {
+                width: 100%;
+                bottom: 0;
+                position: absolute;
+
                 .Button
                 {
-                    margin-right: 15px;
+                    width: 50%;
+
+                    color: white;
+
+                    padding: 10px 20px;
+
+                    font-size: $normal-font-size;
+                    
+                    &.Bid
+                    {
+                        background-color: $green;
+                    }
+
+                    &.Buyout
+                    {
+                        background-color: $red;
+                    }
                 }
             }
-        }
-    }
-
-    .ItemBody
-    {
-        margin-left: 50px;
-    }
-
-    .Seller
-    {
-        color: $blue;
-        cursor: pointer;
-    }
-
-    .Pricing
-    {
-        margin-top: 10px;
-    }
-
-
-    .Prices
-    {
-        color: $graphite;
-
-        .Title
-        {
-            font-weight: 300;
-        }
-
-        .Price
-        {
-            &.Starting
-            {
-                color: $blue;
-            }
-
-            &.Current
-            {
-                color: $green;
-            }
-
-            &.Buyout
-            {
-                color: $red;
-            }
-        }
-    }
-
-    .Timer
-    {
-        margin-top: 10px;
-
-        .Title
-        {
-            color: $graphite;
-        }
-
-        .Time_Remaining
-        {
-            margin-left: 60px;
-            color: $orange;
-            font-weight: bold;
-            font-size: 155%;
         }
     }
 
@@ -152,25 +166,5 @@
         }
     }
 
-    .Button
-    {
-        margin-right: 5px;
-        width: 150px;
-        border-radius: 5px;
-        color: white;
-
-        padding: 10px 20px;
-
-        font-size: $normal-font-size;
-        
-        &.Bid
-        {
-            background-color: $green;
-        }
-
-        &.Buyout
-        {
-            background-color: $red;
-        }
-    }
+    
 }
