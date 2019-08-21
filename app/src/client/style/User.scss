@@ -1,0 +1,58 @@
+@import 'global'; 
+
+.UserGrid
+{
+    padding-left: 15%;
+    padding-right: 15%;
+
+    padding-top: 2%;
+
+    .UserData
+    {
+        .UserMedia
+        {
+            height: 250px;
+            width: 250px;
+            display: block;
+            margin: auto;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        .UserDetails
+        {
+            .Title
+            {
+                color: $graphite;
+            }
+
+            .Data
+            {
+                color: $blue;
+            }
+
+            .Validated
+            {
+                color: green;
+            }
+
+            .Invalidated
+            {
+                color: red;
+            }
+        }
+
+        .UserMenu
+        {
+            .UserTabs
+            {
+                .Tab
+                {
+                    font-size: 500%;
+                }
+            }
+        }
+    }
+}
