@@ -337,9 +337,24 @@ class DBController
 
     updateUser(body, res)
     {
+        //console.log(body)
         const query = {
-            string: '',
-            escape: []
+            string: `UPDATE User u, General_User gu, Address a
+                     SET u.Username = ?,
+                         u.Email = ?,
+                         u.Password = ?,
+                         gu.Name = ?,
+                         gu.Surname = ?,
+                         gu.Phone = ?,
+                         a.Street = ?,
+                         a.Number = ?,
+                         a.ZipCode = ?,
+                         a.Country = ?,
+                         a.City = ?
+                     WHERE u.Username = ? AND
+                           u.Id = gu.User_Id AND
+                           gu.Address_Id = a.Id`,
+            escape: [body.username, body.email, body.password, body.name, body.surname, body.phone, body.street, body.number, body.zipcode, body.country, body.city, body.oldUsername]
         }
 
         this.query(query, res);
