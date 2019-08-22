@@ -59,7 +59,7 @@ class App extends React.Component {
                     <Route exact path='/' render={(props) => <Home user={this.state.user} loginHandler={this.loginHandler} />} />
                     <Route path='/search' component={SearchResults} />
                     <Route path='/auction/:id' component={AuctionPage} />
-                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user} username={props.match.params.username}/>}/>
+                    <Route path='/user/:username' render={(props) => <UserPage loginHandler={this.loginHandler} user={this.state.user} username={props.match.params.username}/>}/>
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
                     <Route path='*' component={NotFound} />
                 </Switch>
