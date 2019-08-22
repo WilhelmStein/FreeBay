@@ -35,7 +35,7 @@ class Header extends Component
                     <p>FreeBay</p>
                 </Link>
                 <SearchBar history={this.props.history}/>
-                <AccountSnapshot user={this.props.user} loginHandler={this.props.loginHandler}/>
+                <AccountSnapshot user={this.props.user} history={this.props.history} loginHandler={this.props.loginHandler}/>
             </div>
         );
     }
@@ -210,8 +210,8 @@ function AccountSnapshot(props)
                     position="bottom right"
                 >
                     <div className = "AccountMenu">
-                        <button onClick={() => {}}>
-                            Settings
+                        <button onClick={() => { props.history.push(`/user/${props.user.Username}`); }}>
+                            Account
                         </button>
                         <button onClick={() => { sessionStorage.removeItem("LoggedUser"); props.loginHandler(null); }}>
                             Log out
