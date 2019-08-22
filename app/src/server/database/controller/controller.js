@@ -263,9 +263,27 @@ class DBController
             string: `SELECT *
                      FROM User u,
                           General_User gu
+                          LEFT JOIN
+                          Address a ON gu.Address_Id = a.Id
                      WHERE u.Username=? AND gu.User_Id = u.Id`,
             escape: [username]
         };
+
+        this.query(query, res, (rows) => {
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows[0]
+            });
+        });
+    }
+
+    updateUser(body, res)
+    {
+        const query = {
+            string: '',
+            escape: []
+        }
 
         this.query(query, res);
     }
@@ -302,7 +320,7 @@ class DBController
                     item.Bids = JSON.parse(item.Bids);
                     return item;
                 });
-                console.log(rows)
+
                 res.send({
                     error: false,
                     message: "OK",
