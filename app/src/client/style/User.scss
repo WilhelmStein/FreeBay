@@ -2,20 +2,36 @@
 
 .UserGrid
 {
-    padding-left: 15%;
-    padding-right: 15%;
+    padding-left: 3%;
+    padding-right: 3%;
 
     padding-top: 2%;
 
+    .UserForm
+    {
+        .DialogText
+        {
+            label
+            {
+                font-size: large;
+            }
+
+            input
+            {
+                font-size: $normal-font-size !important;
+            }
+        }
+
+    }   
+
     .UserData
     {
+        width: 320px;
+
         .UserMedia
         {
-            height: 250px;
-            width: 250px;
-            display: block;
-            margin: auto;
-
+            height: 320px;
+            object-fit: contain;
             &:hover {
                 cursor: pointer;
             }
@@ -26,11 +42,13 @@
             .Title
             {
                 color: $graphite;
+                font-size: 1em;
             }
 
             .Data
             {
                 color: $blue;
+                font-size: 1.2em;
             }
 
             .Validated
@@ -41,6 +59,12 @@
             .Invalidated
             {
                 color: red;
+            }
+
+            .Submit
+            {
+                color: white;
+                background: $blue;
             }
         }
 
