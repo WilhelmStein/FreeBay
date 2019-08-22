@@ -46,6 +46,8 @@
     - [x] Styling
 - [ ] Home Page
   - [ ] Carousel
+  - [x] General Styling
+  - [x] Popular / Recommended Grid
   - [x] Popular Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)

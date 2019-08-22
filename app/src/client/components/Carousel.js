@@ -8,6 +8,7 @@ import axios from 'axios';
 import '../style/Carousel.scss';
 
 
+
 export default class CarouselWrapper extends Component {
 
     constructor(props)
@@ -37,19 +38,21 @@ export default class CarouselWrapper extends Component {
     render() {
 
         return (
-            <div /*style={{ paddingLeft: '10%', paddingRight: '10%' }}*/>
+            <div style={{ paddingTop: "30px", paddingBottom: "20px", backgroundColor: "rgb(235, 235, 235)"}}>
                 <Carousel>
-                    {
-                        this.state.auctions.map((item, index) => {
-                            return (
-                                <CarouselSlide key={item.Id}>
-                                    <div className = "FeaturedItemWrapper Square">
-                                        <FeaturedItem item={item} index={index}/>
-                                    </div>
-                                </CarouselSlide>
-                            )
-                        })
-                    }
+                {
+                    this.state.auctions.map((item, index) => {
+                        return (
+                            <CarouselSlide 
+                                style={{paddingBottom: "0", paddingTop: "0"}}
+                                key={item.Id}>
+                                <div className="FeaturedItemWrapper Square">
+                                    <FeaturedItem item={item} index={index}/>
+                                </div>
+                            </CarouselSlide>
+                        )
+                    })
+                }
                 </Carousel>
             </div>
         )
@@ -192,6 +195,9 @@ function FeaturedItem(props)
                 </Grid>
 
                 <Box mt={3}>
+                    {/* <Button className="View Button" variant="contained">
+                        View Now
+                    </Button> */}
                     <ButtonGroup className="Buttons">
                         <Button className="Bid Button" variant="contained">
                             Bid

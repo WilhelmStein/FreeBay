@@ -105,7 +105,7 @@ class RecommendedItem extends Component
         const rating = Math.round((this.state.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
         return (
             <Grid key={this.state.item.Id} item className = "Wrapper">
-                <Card className="Item">
+                <Card raised className="Item">
                     <CardMedia className="Media"
                         image={this.state.item.Images && this.state.item.Images.length ? `/api/image?path=${this.state.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                         title={this.state.item.Name}

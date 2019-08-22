@@ -208,6 +208,7 @@ function DetailedAuctionItem(props)
     return (
         <Card className={`Item ${props.grid ? "Grid" : ""}`}>
             <CardMedia
+                className="CardMedia"
                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                 title="Generic placeholder"
             />
@@ -289,7 +290,8 @@ function CollapsedAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
-                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/100x100/ffffff/4a4a4a.png&text=No+Image"}
+                className="CardMedia"
+                image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/100x100/ffffff/4a4a4a.png&text=No+Image"}
                 title="Generic placeholder"
             />
             <CardContent className="ItemBody">
@@ -346,6 +348,7 @@ function SquareAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
+                className="CardMedia"
                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                 title={props.item.Name}
             />

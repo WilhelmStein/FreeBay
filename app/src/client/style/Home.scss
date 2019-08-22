@@ -6,7 +6,7 @@
     border-top: 0.3px solid rgb(182, 182, 182);
 
     padding-left: 50px;
-    background-color: $basically-white;
+    // background-color: $basically-white;
 }
 
 
@@ -39,8 +39,6 @@
 
     .Wrapper
     {
-        // margin-right: 20px;
-        // margin-bottom: 10px;
         width: 250px;
 
         .Item
@@ -62,6 +60,8 @@
             height: 250px;
 
             cursor: pointer;
+
+            background-color: white;
         }
 
 

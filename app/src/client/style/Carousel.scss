@@ -28,9 +28,9 @@
     .Item
     {
         display: grid;
-        grid-template-columns: 450px auto;
+        grid-template-columns: 400px auto;
 
-        height: 450px;
+        height: 400px;
         position: relative;
 
         &.Item1
@@ -48,7 +48,11 @@
             background-color: $blue;
         }
 
-        
+        .CardMedia
+        {
+            background-color: white;
+        }
+
         .ItemBody
         {
             padding-left: 0;

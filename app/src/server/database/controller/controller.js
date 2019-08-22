@@ -375,6 +375,16 @@ class DBController
         });
     }
 
+    test_featured(res)
+    {
+        const query = {
+            string: `   Select a.Id, JSON_OBJECT('Username', )
+
+            `,
+            escape: []
+        }
+    }
+
     featured(res)
     {   // Change cost function
         const query = {
@@ -475,7 +485,7 @@ class DBController
                                 ) ON v.Auction_Id = t.Id
                             GROUP BY t.Id
                             ORDER BY Times_Viewed DESC
-                            LIMIT 10`,
+                            LIMIT 14`,
                 escape: []
             }
 
