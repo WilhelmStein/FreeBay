@@ -34,6 +34,23 @@
 
     padding-top: 2%; 
 
+    .UserForm
+    {
+        .DialogText
+        {
+            label
+            {
+                font-size: large;
+            }
+
+            input
+            {
+                font-size: $normal-font-size !important;
+            }
+        }
+
+    }   
+
     .UserData
     {
         width: 320px;
