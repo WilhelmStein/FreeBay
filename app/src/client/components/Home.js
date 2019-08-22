@@ -113,14 +113,14 @@ class RecommendedItem extends Component
                     />
 
                     <CardContent className="ItemBody">
-                        <Typography className="Title" variant="h4" onClick={this.onItemClick} noWrap>
+                        <Typography className="Title" variant="h4" onClick={this.onItemClick} title={this.state.item.Name} noWrap>
                             {this.state.item.Name}
                         </Typography>
 
                         <Box>
-                            <Typography display="inline"> Sold By:</Typography>
+                            <Typography display="inline" noWrap> Sold By:</Typography>
 
-                            <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick}>
+                            <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick} noWrap>
                                 &nbsp; &nbsp;{this.state.item.User.Username}
                             </Typography>
                                 
