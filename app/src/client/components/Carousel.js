@@ -123,7 +123,7 @@ function FeaturedItem(props)
         difference.hours -= 1;
     }
 
-    console.log(difference);
+    //console.log(difference);
 
     return (
         <Card className={`Item Item${(props.index % 2) + 1}`}>
