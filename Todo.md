@@ -45,10 +45,13 @@
     - [x] Login
     - [x] Styling
 - [ ] Home Page
-  - [ ] Carousel
+  - [x] Carousel
+    - [ ] Create custom carousel component
+    - [ ] Experiment with colouring
+    - [ ] Category captions
   - [x] General Styling
   - [x] Popular / Recommended Grid
-  - [x] Popular Items Query
+  - [x] Carousel Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling

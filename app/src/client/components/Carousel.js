@@ -1,22 +1,25 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import { Carousel, CarouselSlide } from 'material-ui-carousel';
-import { Card, CardContent, CardMedia, Typography, Box, Grid, Button, ButtonGroup } from '@material-ui/core';
-import Rating from '@material-ui/lab/Rating';
-import Countdown from 'react-countdown-now';
+import { Card, CardContent, CardMedia, Typography, Grid, Button } from '@material-ui/core';
 
+import autoBind from 'auto-bind';
 import axios from 'axios';
 import '../style/Carousel.scss';
 
 
 
-export default class CarouselWrapper extends Component {
+class CarouselWrapper extends Component {
 
     constructor(props)
     {
         super(props);
+
         this.state = {
-            auctions: []
+            categories: []
         };
+
+        autoBind(this);
     }
 
     componentDidMount() {
@@ -27,12 +30,47 @@ export default class CarouselWrapper extends Component {
                 console.error(res.data.message);
                 return;
             }
-            
+            console.log(res.data.data)
             this.setState({
-                auctions: res.data.data
+                categories: res.data.data
             });
         })
         .catch(err => {console.error(err);})
+    }
+
+    pressImage(auction)
+    {
+        this.props.history.push(`/auction?id={${auction.Id}}`);
+    }
+
+    pressView(category)
+    {
+        this.props.history.push(`search?category={${category}}&text={}`);
+    }
+
+    getProps(index)
+    {
+        let props ={};
+        const mod = index % this.state.categories.length;
+
+        if (mod === this.state.categories.length - 1)
+        {
+            props.contentPosition = "right";
+        }
+        else if (mod === 0 || mod === 3)
+        {
+            props.contentPosition = "left";
+        }
+        else if (mod === 1 || mod === 4) 
+        {
+            props.contentPosition = "middle";
+        }
+        else 
+        {
+            props.contentPosition = "right"
+        }
+
+        return props;
     }
 
     render() {
@@ -41,13 +79,20 @@ export default class CarouselWrapper extends Component {
             <div style={{ paddingTop: "30px", paddingBottom: "20px", backgroundColor: "rgb(235, 235, 235)"}}>
                 <Carousel>
                 {
-                    this.state.auctions.map((item, index) => {
+                    this.state.categories.map((category, index) => {
+                        const props = this.getProps(index)
+
                         return (
                             <CarouselSlide 
                                 style={{paddingBottom: "0", paddingTop: "0"}}
-                                key={item.Id}>
+                                key={category.Id}>
                                 <div className="FeaturedItemWrapper Square">
-                                    <FeaturedItem item={item} index={index}/>
+                                    <CategoryBanner 
+                                        item={category}
+                                        contentPosition={props.contentPosition}
+                                        pressImage={this.pressImage}
+                                        pressView={this.pressView}
+                                    />
                                 </div>
                             </CarouselSlide>
                         )
@@ -57,6 +102,79 @@ export default class CarouselWrapper extends Component {
             </div>
         )
     }
+}
+
+
+
+function CategoryBanner(props)
+{
+    const contentPosition = props.contentPosition ? props.contentPosition : "left"
+    const totalItems = props.length ? props.length : 3;
+    const mediaLength = totalItems - 1;
+
+    let items = [];
+    const content = (
+        <Grid item xs={12 / totalItems} key="content">
+            <CardContent className="Content">
+                <Typography className="Title">
+                    {props.item.Name}
+                </Typography>
+
+                <Typography className="Caption">
+                    Lorem ipsum dolor sit amet!
+                </Typography>
+
+                <Button variant="outlined" className="View Button" onClick={() => {props.pressView(props.item.Id)}}>
+                    View Now
+                </Button>
+            </CardContent>
+        </Grid>
+    )
+
+    
+    for (let i = 0; i < mediaLength; i++)
+    {
+        const auction = props.item.Auctions[i];
+
+        const media = (
+            <Grid item xs={12 / totalItems} key={auction.Name}>
+                <CardMedia
+                    className="Media"
+                    image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : 
+                            "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                    title={auction.Name}
+                    
+                >
+                    <Typography className="MediaCaption" onClick={() => {props.pressImage(auction);}}>
+                        {auction.Name}
+                    </Typography>
+                </CardMedia>
+            </Grid>
+        )
+
+        items.push(media);
+    }
+
+    if (contentPosition === "left")
+    {
+        items.unshift(content);
+    }
+    else if (contentPosition === "right")
+    {
+        items.push(content);
+    }
+    else if (contentPosition === "middle")
+    {
+        items.splice(items.length / 2, 0, content);
+    }
+
+    return (
+        <Card raised className="CategoryBanner">
+            <Grid container spacing={0} className="BannerGrid">
+                {items}
+            </Grid>
+        </Card>
+    )
 }
 
 function __getTime(string)
@@ -125,89 +243,4 @@ function __timeDifference(started, ends)
     return difference;
 }
 
-function FeaturedItem(props)
-{
-    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
-    // const started = __getTime(props.item.Started);
-    // const ends = __getTime(props.item.Ends);
-    // const difference = __timeDifference(started, ends);
-
-    return (
-        <Card raised className={`Item Item${(props.index % 2) + 1}`}>
-            <CardMedia
-                className="CardMedia"
-                image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                title={props.item.Name}
-            />
-            <CardContent className="ItemBody">
-                <Typography className="Title" variant="h2">
-                    {props.item.Name}
-                </Typography>
-
-                <Box mb={3} className="SellerBox">
-                    <Typography display="inline"> Sold By:</Typography>
-
-                    <Typography className="Seller" display="inline" variant="h5">
-                        &nbsp; &nbsp;{props.item.User.Username}
-                    </Typography>
-                        
-                    <Rating display="inline" value={rating} precision={0.5} readOnly />
-                </Box>
-                
-                <Grid container className="Prices" spacing={1}>
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Starting Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography className="Starting Price" variant="h4">EUR {props.item.First_Bid.toFixed(2)}</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Current Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6} zeroMinWidth>
-                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently ? props.item.Currently.toFixed(2) : "-"}</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price ? props.item.Buy_Price.toFixed(2) : "-"}</Typography>
-                    </Grid>
-                </Grid>
-
-                <Grid container className="Timer">
-                    <Grid item xs={6}>
-                        <Typography className="Title" variant="h4">Time Remaining:</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Typography className = "Time_Remaining" variant="h4">
-                            <Countdown
-                                date={new Date(props.item.Ends)}
-                                renderer={ (props) =>
-                                    <div>{props.days} days, {props.hours}h {props.minutes}m {props.seconds}s</div>
-                                }
-                            />
-                        </Typography>
-                    </Grid>
-                </Grid>
-
-                <Box mt={3}>
-                    {/* <Button className="View Button" variant="contained">
-                        View Now
-                    </Button> */}
-                    <ButtonGroup className="Buttons">
-                        <Button className="Bid Button" variant="contained">
-                            Bid
-                        </Button>
-                        <Button className="Buyout Button" variant="contained">
-                            Buyout
-                        </Button>
-                    </ButtonGroup>
-                </Box>
-            </CardContent>
-        </Card>
-    )
-}
+export default withRouter(CarouselWrapper);

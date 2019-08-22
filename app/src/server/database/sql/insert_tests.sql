@@ -19,6 +19,8 @@ Values  (1, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical E
         (6, 4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
         (7, 1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "");
 
+Insert into Auction_has_Category
+Values (1, 1), (2, 1), (3, 2), (4, 2), (5, 3), (6, 3), (7, 3);
 
 -- Views --
 
@@ -32,10 +34,11 @@ Values  (2, 1, "2019-01-12 9:00:00"),
 -- Image --
 
 Insert into Image (Id, Path, Auction_Id)
-Values  (1, "1.jpg", 4),
-        (2, "2.jpg", 2),
-        (3, "3.png", 5),
-        (4, "4.jpg", 5);
+Values  (5, "5.jpg", 1),
+        (2, "2.jpg", 7),
+        (4, "4.jpg", 5),
+        (1, "1.jpg", 6),
+        (6, "6.jpg", 2);
 
 -- Category --
 
