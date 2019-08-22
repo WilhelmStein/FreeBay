@@ -36,20 +36,35 @@
 
     .UserForm
     {
-        .DialogText
+        label
         {
-            label
-            {
-                font-size: large;
-            }
-
-            input
-            {
-                font-size: $normal-font-size !important;
-            }
+            font-size: $small-font-size;
         }
 
-    }   
+        input
+        {
+            font-size: $normal-font-size;
+        }
+    }
+
+    h6
+    {
+        margin-top: 35px;
+    }
+
+    .DialogButton
+    {
+        font-size: $small-font-size;
+    }
+}  
+
+
+.UserGrid
+{
+    padding-left: 3%;
+    padding-right: 3%;
+
+    padding-top: 2%; 
 
     .UserData
     {
