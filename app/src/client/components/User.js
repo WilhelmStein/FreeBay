@@ -625,6 +625,94 @@ class AccountForm extends Component {
                                 fullWidth
                             />
                         </Grid>
+
+                        <Grid item xs={6}>
+
+                            <TextField
+								className="DialogText"
+                                margin="dense"
+                                id="Name"
+                                label="Name"
+                                placeholder="e.g. Josiah"
+                                defaultValue={this.props.userData.Name}
+                                onChange={this.hNameChange}
+                                fullWidth
+                            />
+                        
+                            <TextField
+								className="DialogText"
+                                margin="dense"
+                                id="Surname"
+                                label="Surname"
+                                placeholder="e.g. Trelawny"
+                                defaultValue={this.props.userData.Surname}
+                                onChange={this.hSurnameChange}
+                                fullWidth
+                            />
+
+                            <TextField
+								className="DialogText"
+                                margin="dense"
+                                id="Country"
+                                label="Country"
+                                placeholder="e.g. United Kingdom"
+                                defaultValue={this.props.userData.Country}
+                                onChange={this.hCountryChange}
+                                fullWidth
+                            />
+
+                            <TextField
+								className="DialogText"
+                                margin="dense"
+                                id="City"
+                                label="City"
+                                placeholder="e.g. London"
+                                defaultValue={this.props.userData.City}
+                                onChange={this.hCityChange}
+                                fullWidth
+                            />
+
+                            <Grid container spacing={2}>
+
+                                <Grid item xs={8}>
+                                    <TextField
+								        className="DialogText"
+                                        margin="dense"
+                                        id="StreetName"
+                                        label="Street Name"
+                                        placeholder="e.g. Baker St"
+                                        defaultValue={this.props.userData.Street}
+                                        onChange={this.hStreetChange}
+                                        fullWidth
+                                    />
+                                </Grid>
+
+                                <Grid item xs={4}>
+                                    <TextField
+								        className="DialogText"
+                                        margin="dense"
+                                        id="StreetNumber"
+                                        label="Street Number"
+                                        type="number"
+                                        placeholder="e.g. 15"
+                                        defaultValue={this.props.userData.Number}
+                                        onChange={this.hStreetNumberChange}
+                                        fullWidth
+                                    />
+                                </Grid>
+                            </Grid>
+
+                            <TextField
+								className="DialogText"
+                                margin="dense"
+                                id="Zipcode"
+                                label="Zip Code"
+                                placeholder="e.g. 16561"
+                                defaultValue={this.props.userData.ZipCode}
+                                onChange={this.hZipCodeChange}
+                                fullWidth
+                            />
+                        </Grid>
                     </Grid>
                 </DialogContent>
 
