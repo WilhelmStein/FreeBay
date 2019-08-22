@@ -79,7 +79,8 @@ export default class User extends Component {
 
                 <AccountForm open={this.state.dialogOpen}
                              toggleDialog={this.toggleDialog}
-                             userData={this.state.userData}/>
+                             userData={this.state.userData}
+                             updateUserInfo={this.props.loginHandler}/>
 
                 <AccountDetails userData={this.state.userData}
                     canChangeSettings={this.state.canChangeSettings}
@@ -274,7 +275,7 @@ function AccountDetails(props) {
 
     async confirmOldPasswordCheck()
     {
-        if (this.state.oldPassword != this.props.userData.Password && this.state.passwordError != undefined)
+        if (this.state.oldPassword != this.props.userData.Password && (!this._empty("newPassword") || !this._empty("newPassword2")) )
             this.setState({oldpasswordError: "Incorrect Password."});
         else
             this.setState({oldpasswordError: undefined});
@@ -407,7 +408,6 @@ function AccountDetails(props) {
                 return;
             }
 
-
             Axios.post('/api/updateUser', {
                 oldUsername: this.props.userData.Username,
                 username: this.state.newUsername,
@@ -428,7 +428,9 @@ function AccountDetails(props) {
                     alert(res.data.message);
                     return;
                 }
+
                 this.props.toggleDialog();
+                //this.props.updateUserInfo();
             }).catch(err => console.error(err))
         });
     }
