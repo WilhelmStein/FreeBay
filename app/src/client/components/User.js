@@ -220,71 +220,240 @@ function AccountDetails(props) {
     constructor(props)
     {
         super(props);
-        this.state = {
-            newUsername: "",
-            oldPassword: "",
-            newPassword: "",
-            newPassword2: "",
-            newEmail: "",
-            newPhone: "",
-            newName: "",
-            newSurname: "",
-
-        };
-
+        this.state = {};
         autoBind(this);
     }
 
+    componentDidMount()
+    {
+        this.clearState();
+    }
+
+    clearState()
+    {
+        this.setState ({
+            newUsername: this.props.userData.Username,
+            oldPassword: "",
+            newPassword: "",
+            newPassword2: "",
+            newEmail: this.props.userData.Email,
+            newPhone: this.props.userData.Phone,
+            newName: this.props.userData.Name,
+            newSurname: this.props.userData.Surname,
+            newCountry: this.props.userData.Country,
+            newCity: this.props.userData.City,
+            newStreet: this.props.userData.Street,
+            newStreetNumber: this.props.userData.Number,
+            newZipCode: this.props.userData.ZipCode,
+            emailError: undefined,
+            passwordError: undefined,
+            password2Error: undefined,
+            usernameError: undefined
+        });
+    }
+
+    _empty(name)
+    {
+        return this.state[name] === ""
+    }
+
+    blur(event, name)
+    {
+        if (name === 'newPassword' || name === 'newPassword2' || name === 'oldPassword') return this.confirmNewPasswordCheck();
+        if (name === 'newUsername') return this.usernameCheck();
+        if (name === 'newEmail') return this.emailCheck();
+    }
+
+    change(event, name)
+    {
+        let newState = this.state;
+        newState[name] = event.target.value;
+
+        this.setState(newState);
+    } 
+
+    async confirmOldPasswordCheck()
+    {
+        if (this.state.oldPassword != this.props.userData.Password && this.state.passwordError != undefined)
+            this.setState({oldpasswordError: "Incorrect Password."});
+        else
+            this.setState({oldpasswordError: undefined});
+    }
+
+    confirmNewPasswordCheck()
+    {
+
+        if (this.state.newPassword !== this.state.newPassword2)
+        {
+            this.setState({
+                passwordError: "Passwords do not match.",
+                password2Error: "Passwords do not match."
+            })
+        }
+        else
+        {
+            this.setState({
+                passwordError: undefined,
+                password2Error: undefined
+            })
+        }
+    }
+
+    usernameCheck()
+    {
+        if(this.state.newUsername === this.props.userData.Username)
+        {
+            this.setState({
+                usernameError: undefined
+            })
+
+            return;
+        }
+
+        Axios.post('/api/username', {
+            username: this.state.newUsername,
+        })
+        .then(res => {
+            if (res.data.error) {
+                console.error(res.data.message);
+                return;
+            }
+
+            if (res.data.data.length > 0)
+            {
+                this.setState({
+                    usernameError: "Username already exists.",
+                })
+            }
+            else
+            {
+                this.setState({
+                    usernameError: undefined
+                })
+            }
+        })
+        .catch(err => console.error(err))
+    }
+
+    emailCheck()
+    {
+        if(this.state.newEmail === this.props.userData.Email)
+        {
+            this.setState({
+                emailError: undefined
+            })
+            
+            return;
+        }
+
+        Axios.post('/api/email', {
+            email: this.state.newEmail,
+        })
+        .then(res => {
+            if (res.data.error) {
+                console.error(res.data.message);
+                return;
+            }
+
+            if (res.data.data.length > 0)
+            {
+                this.setState({
+                    emailError: "E-mail already exists.",
+                })
+            }
+            else
+            {
+                this.setState({
+                    emailError: undefined
+                })
+            }
+        })
+        .catch(err => console.error(err))
+    }
+
+
     cancel()
     {
+        this.clearState();
         this.props.toggleDialog();
     }
 
     submit()
     {
-        this.props.toggleDialog();
-    }
+        this.confirmOldPasswordCheck()
+        .then(() => {
+            if (this.state.oldpasswordError ||
+                this.state.usernameError ||
+                this.state.passwordError ||
+                this.state.password2Error ||
+                this.state.emailError)
+            {
+                alert("Please fix all errors.");
+                return;
+            }
+
+            if (this._empty("newUsername") ||
+                this._empty("newEmail") ||
+                this._empty("newName") ||
+                this._empty("newSurname") ||
+                this._empty("newPhone") ||
+                this._empty("newStreet") ||
+                this._empty("newStreetNumber") ||
+                this._empty("newZipCode") ||
+                this._empty("newCity") ||
+                this._empty("newCountry"))
+            {
+                alert("Please fill all fields.");
+                return;
+            }
 
 
-    hUsernameChange(event)
-    {
-        this.setState({newUsername: event.target.value});
-    }
-
-    hEmailChange(event)
-    {
-        this.setState({newEmail: event.target.value});
-    }
-
-    hOldPasswordChange(event)
-    {
-        this.setState({oldPassword: event.target.value});
+            Axios.post('/api/updateUser', {
+                oldUsername: this.props.userData.Username,
+                username: this.state.newUsername,
+                password: ((this._empty("newPassword") && this._empty("newPassword2")) ? (this.props.userData.Password) : (this.state.newPassword) ),
+                email: this.state.newEmail,
+                name: this.state.newName,
+                surname: this.state.newSurname,
+                phone: this.state.newPhone,
+                street: this.state.newStreet,
+                number: this.state.newStreetNumber,
+                zipcode: this.state.newZipCode,
+                city: this.state.newCity,
+                country: this.state.newCountry,
+            })
+            .then(res => {
+                if (res.data.error) {
+                    console.error(res.data.message);
+                    alert(res.data.message);
+                    return;
+                }
+                this.props.toggleDialog();
+            }).catch(err => console.error(err))
+        });
     }
     
     render()
     {
         return(
-            <Dialog open={this.props.open} onClose={this.props.toggleDialog} className="UserForm">
-                <DialogTitle id="form-dialog-title">Change Settings</DialogTitle>
+            <Dialog open={this.props.open} onClose={ () => { this.clearState(); this.props.toggleDialog();}} className="UserForm" maxWidth="md">
                 <DialogContent>
-                    <DialogContentText>
-                        Here you may update your user settings.
-                    </DialogContentText>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={6}>
 
                         <Grid item xs={6}>
 
-                            <DialogTitle>Change </DialogTitle>
-
+                            <h6>Update General Details</h6>
+                        
                             <TextField
 								className="DialogText"
                                 margin="dense"
                                 id="Username"
                                 label="Username"
+                                error={this.state.usernameError}
                                 placeholder="e.g. thisismyusername77"
                                 defaultValue={this.props.userData.Username}
-                                onChange={this.hUsernameChange}
-                                fullWidth
+                                onChange={ (e) => {this.change(e, "newUsername"); } }
+                                onBlur={(e) => this.blur(e, "newUsername")}
                             />
                         
                             <TextField
@@ -292,83 +461,99 @@ function AccountDetails(props) {
                                 margin="dense"
                                 id="Email"
                                 label="Email Address"
+                                error={this.state.emailError}
                                 type="email"
                                 placeholder="e.g. example@domain.com"
                                 defaultValue={this.props.userData.Email}
-                                onChange={this.hEmailChange}
+                                onChange={ (e) => {this.change(e, "newEmail"); } }
+                                onBlur={(e) => this.blur(e, "newEmail")}
                                 fullWidth
                             />
-                        
-                            <TextField
-								className="DialogText"
-                                margin="dense"
-                                id="OldPassword"
-                                label="Old Password"
-                                type="password"
-                                placeholder="e.g. aXsdfFrtewWcv1#@!11f"
-                                onChange={this.hOldPasswordChange}
-                                fullWidth
-                            />
-                        
-                            <TextField
-								className="DialogText"
-                                margin="dense"
-                                id="NewPassword"
-                                label="New Password"
-                                type="password"
-                                placeholder="e.g. aXsdfFrtewWcv1#@!11f"
-                                onChange={this.hNewPasswordChange}
-                                fullWidth
-                            />
-                       
-                            <TextField
-								className="DialogText"
-                            margin="dense"
-                            id="NewPassword2"
-                            label="New Password"
-                            type="password"
-                            placeholder="e.g. aXsdfFrtewWcv1#@!11f"
-                            onChange={this.hNewPassword2Change}
-                            fullWidth
-                            />
-                        
-                            <TextField
-								className="DialogText"
-                                margin="dense"
-                                id="phone"
-                                label="Phone"
-                                type="tel"
-                                placeholder="e.g. 1234567890"
-                                defaultValue={this.props.userData.Phone}
-                                onChange={this.hPhoneChange}
-                                fullWidth
-                            />
+                            
+                            <div style={{marginTop: '95px'}}>
+                                <h6>Change Client Details</h6>
+
+                                <TextField
+                                    className="DialogText"
+                                    margin="dense"
+                                    id="Name"
+                                    label="Name"
+                                    placeholder="e.g. Josiah"
+                                    defaultValue={this.props.userData.Name}
+                                    onChange={ (e) => {this.change(e, "newName"); } }
+                                    fullWidth
+                                />
+                            
+                                <TextField
+                                    className="DialogText"
+                                    margin="dense"
+                                    id="Surname"
+                                    label="Surname"
+                                    placeholder="e.g. Trelawny"
+                                    defaultValue={this.props.userData.Surname}
+                                    onChange={ (e) => {this.change(e, "newSurname"); } }
+                                    fullWidth
+                                />
+
+                                <TextField
+                                    className="DialogText"
+                                    margin="dense"
+                                    id="phone"
+                                    label="Phone"
+                                    type="tel"
+                                    placeholder="e.g. 1234567890"
+                                    defaultValue={this.props.userData.Phone}
+                                    onChange={ (e) => {this.change(e, "newPhone"); } }
+
+                                    fullWidth
+                                />
+                            </div>
 
                         </Grid>
 
                         <Grid item xs={6}>
+                            
+                            <h6>Change Password</h6>
 
                             <TextField
-								className="DialogText"
+                                className="DialogText"
                                 margin="dense"
-                                id="Name"
-                                label="Name"
-                                placeholder="e.g. Josiah"
-                                defaultValue={this.props.userData.Name}
-                                onChange={this.hNameChange}
+                                id="OldPassword"
+                                label="Old Password"
+                                error={this.state.oldpasswordError}
+                                type="password"
+                                placeholder="e.g. aXsdfFrtewWcv1#@!11f"
+                                onChange={ (e) => {this.change(e, "oldPassword"); } }
                                 fullWidth
                             />
-                        
+
                             <TextField
-								className="DialogText"
+                                className="DialogText"
                                 margin="dense"
-                                id="Surname"
-                                label="Surname"
-                                placeholder="e.g. Trelawny"
-                                defaultValue={this.props.userData.Surname}
-                                onChange={this.hSurnameChange}
+                                id="NewPassword"
+                                label="New Password"
+                                error={this.state.passwordError}
+                                type="password"
+                                placeholder="e.g. aXsdfFrtewWcv1#@!11f"
+                                onChange={ (e) => {this.change(e, "newPassword"); } }
+                                onBlur={(e) => this.blur(e, "newPassword")}
                                 fullWidth
                             />
+
+                            <TextField
+                                className="DialogText"
+                                margin="dense"
+                                id="NewPassword2"
+                                label="New Password"
+                                error={this.state.password2Error}
+                                type="password"
+                                placeholder="e.g. aXsdfFrtewWcv1#@!11f"
+                                onChange={ (e) => {this.change(e, "newPassword2"); } }
+                                onBlur={(e) => this.blur(e, "newPassword2")}
+                                fullWidth
+                            />
+
+                            <h6>Change Address</h6>
 
                             <TextField
 								className="DialogText"
@@ -377,7 +562,7 @@ function AccountDetails(props) {
                                 label="Country"
                                 placeholder="e.g. United Kingdom"
                                 defaultValue={this.props.userData.Country}
-                                onChange={this.hCountryChange}
+                                onChange={ (e) => {this.change(e, "newCountry"); } }
                                 fullWidth
                             />
 
@@ -388,7 +573,7 @@ function AccountDetails(props) {
                                 label="City"
                                 placeholder="e.g. London"
                                 defaultValue={this.props.userData.City}
-                                onChange={this.hCityChange}
+                                onChange={ (e) => {this.change(e, "newCity"); } }
                                 fullWidth
                             />
 
@@ -402,7 +587,7 @@ function AccountDetails(props) {
                                         label="Street Name"
                                         placeholder="e.g. Baker St"
                                         defaultValue={this.props.userData.Street}
-                                        onChange={this.hStreetChange}
+                                        onChange={ (e) => {this.change(e, "newStreet"); } }
                                         fullWidth
                                     />
                                 </Grid>
@@ -416,7 +601,7 @@ function AccountDetails(props) {
                                         type="number"
                                         placeholder="e.g. 15"
                                         defaultValue={this.props.userData.Number}
-                                        onChange={this.hStreetNumberChange}
+                                        onChange={ (e) => {this.change(e, "newStreetNumber"); } }
                                         fullWidth
                                     />
                                 </Grid>
@@ -429,7 +614,7 @@ function AccountDetails(props) {
                                 label="Zip Code"
                                 placeholder="e.g. 16561"
                                 defaultValue={this.props.userData.ZipCode}
-                                onChange={this.hZipCodeChange}
+                                onChange={ (e) => {this.change(e, "newZipCode"); } }
                                 fullWidth
                             />
                         </Grid>
@@ -437,10 +622,10 @@ function AccountDetails(props) {
                 </DialogContent>
 
                 <DialogActions>
-                    <Button onClick={this.cancel} color="primary">
+                    <Button onClick={this.cancel} color="primary" className="DialogButton">
                         Cancel
                     </Button>
-                    <Button onClick={this.submit} color="primary">
+                    <Button onClick={this.submit} color="primary" className="DialogButton">
                         Submit
                     </Button>
                 </DialogActions>
