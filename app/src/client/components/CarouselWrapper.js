@@ -50,7 +50,7 @@ class CarouselWrapper extends Component {
 
     getProps(index)
     {
-        let props ={};
+        let props = {};
         const mod = index % this.state.categories.length;
 
         if (mod === this.state.categories.length - 1)
@@ -110,7 +110,7 @@ function CategoryBanner(props)
     let items = [];
     const content = (
         <Grid item xs={12 / totalItems} key="content">
-            <CardContent className="Content">
+            <CardContent className="Content" onClick={() => {props.pressView(props.item.Id)}}>
                 <Typography className="Title">
                     {props.item.Name}
                 </Typography>
@@ -119,7 +119,7 @@ function CategoryBanner(props)
                     Lorem ipsum dolor sit amet!
                 </Typography>
 
-                <Button variant="outlined" className="ViewButton" onClick={() => {props.pressView(props.item.Id)}}>
+                <Button variant="outlined" className="ViewButton">
                     View Now
                 </Button>
             </CardContent>

@@ -73,7 +73,7 @@
             cursor: pointer;
             &:hover
             {
-                filter: brightness(120%);
+                filter: brightness(115%);
             }
         }
 
@@ -88,7 +88,22 @@
             background-color: $dark-red;
             height: 100%;
 
+            cursor: pointer;
+
             padding: 30px;
+
+            transition: 300ms;
+
+            &:hover, &:active
+            {
+                background-color: $dark-red-active;
+
+                .ViewButton
+                {
+                    background-color: $almost-white;
+                    color: $dark-red
+                }
+            }
 
             .Title
             {
@@ -112,11 +127,6 @@
                 text-transform: capitalize;
 
                 transition: 200ms;
-                &:hover, &:active
-                {
-                    background-color: $almost-white;
-                    color: $dark-red
-                }
             }
         }
     }
