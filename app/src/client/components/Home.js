@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Card, Grid, CardMedia, CardContent, Typography, Box} from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating'
-import Carousel from './Carousel';
+import Carousel from './CarouselWrapper';
 import '../style/Home.scss';
 import axios from 'axios';
 import autoBind  from 'auto-bind';

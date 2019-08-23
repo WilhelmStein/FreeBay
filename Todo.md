@@ -24,6 +24,8 @@
 - [ ] Bonus algorithm (Recommended items)
 - [x] Auction retrieval sql query
 - [ ] Auction post sql query
+- [ ] Category Captions
+- [ ] Category Filling
 
 ## Front - End
 
@@ -44,11 +46,10 @@
       - [x] Implement Functionality
     - [x] Login
     - [x] Styling
-- [ ] Home Page
+- [x] Home Page
   - [x] Carousel
-    - [ ] Create custom carousel component
+    - [x] Create custom carousel component
     - [ ] Experiment with colouring
-    - [ ] Category captions
   - [x] General Styling
   - [x] Popular / Recommended Grid
   - [x] Carousel Items Query
