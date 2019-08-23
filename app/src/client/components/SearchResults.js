@@ -94,7 +94,7 @@ class SearchResults extends Component
 
     pressItem(item)
     {
-        this.props.history.push(`/auction?id={${item.Id}}`);
+        this.props.history.push(`/auction/${item.Id}`);
     }
 
     userClick(user)
