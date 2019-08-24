@@ -52,7 +52,7 @@ export default class User extends Component {
                     this.setState({ loggedAsTargetUser: true });
                 } else this.setState({ loggedAsTargetUser: false });
             });
-        })
+        });
     }
 
     componentWillReceiveProps(nextProps) {
