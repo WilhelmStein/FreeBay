@@ -12,6 +12,7 @@ class Downloader:
 
     def __init__(
         self,
+        no_download=False,
         format="jpg",
         min_limit=0, max_limit=3,
         size=">400*300",
@@ -22,6 +23,8 @@ class Downloader:
         self.min_limit, self.max_limit = min_limit, max_limit
 
         self.parameters = {
+            "no_download": no_download,
+            "print_paths": True,
             "format": format,
             "size": size,
             "aspect_ratio": aspect_ratio,
@@ -32,20 +35,28 @@ class Downloader:
 
         self.underlying = google_images_download.googleimagesdownload()
 
-        self.max_size = max_size
+        self.max_size = None if no_download else max_size
 
 
     def download(self, keywords):
 
         try:
 
-            search_args = {
-                **self.parameters,
-                "keywords": keywords,
-                "limit": randrange(self.max_limit - self.min_limit)
-            }
+            limit = randrange(self.max_limit - self.min_limit)
 
-            paths = list(self.underlying.download(search_args)[0].values())[0]
+            print("[Downloader] Downloading %d image(s) at most" % limit)
+
+            paths = []
+
+            if limit > 0:
+
+                search_args = {
+                    **self.parameters,
+                    "keywords": keywords,
+                    "limit": limit
+                }
+
+                paths = list(self.underlying.download(search_args)[0].values())[0]
 
             if self.max_size:
 

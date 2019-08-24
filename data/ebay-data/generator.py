@@ -11,8 +11,6 @@ import json
 
 import os
 
-from downloader import Downloader
-
 
 class Generator:
 
@@ -69,6 +67,7 @@ class Generator:
 
     def __init__(
         self,
+        downloader=None,
         seed=123456789,
         verbose=True,
         tables_to_drop=[
@@ -86,8 +85,7 @@ class Generator:
         views_to_drop=[],
         rating_lower=0.0, rating_upper=58823.0, rating_digits=1,
         dollar_digits=2,
-        validated_percentage=0.7,
-        downloader=Downloader()):
+        validated_percentage=0.7):
 
         self.verbose = verbose
 
