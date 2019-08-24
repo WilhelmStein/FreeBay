@@ -11,9 +11,7 @@ import json
 
 import os
 
-from google_images_download import google_images_download
-
-from PIL import Image
+from downloader import Downloader
 
 
 class Generator:
@@ -24,16 +22,6 @@ class Generator:
         "host": "127.0.0.1",
         "database": "freebay",
         "raise_on_warnings": False
-    }
-
-    google_images_download_prms = {
-        "format": "jpg",
-        "limit": 2,
-        "size": ">400*300",
-        "aspect_ratio": "panoramic",
-        "output_directory": "auction_images",
-        "delay": 0.0,
-        "silent_mode": True
     }
 
     queries = {
@@ -79,7 +67,7 @@ class Generator:
         )
     }
 
-    def __init__(self, seed=123456789, verbose=True, tables_to_drop=["Auction_has_Category", "Bid", "Image", "Auction", "General_User", "User", "Address", "Category"], rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2, validated_percentage=0.7, normalized_image_size=(640, 640)):
+    def __init__(self, seed=123456789, verbose=True, tables_to_drop=["Auction_has_Category", "Bid", "Image", "Auction", "General_User", "User", "Address", "Category"], rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2, validated_percentage=0.7, downloader=Downloader()):
 
         self.verbose = verbose
 
@@ -90,9 +78,7 @@ class Generator:
         self.validated_percentage = validated_percentage
 
 
-        self.normalized_image_size = normalized_image_size
-
-        self.downloader = google_images_download.googleimagesdownload()
+        self.downloader = downloader
 
 
         self.cnx = connector.connect(**Generator.config)
@@ -114,6 +100,8 @@ class Generator:
 
         self.generator.seed(seed)
 
+
+        self.auction_id = 0
 
         self.users = {}
 
@@ -207,7 +195,7 @@ class Generator:
         }
 
 
-    def __generate_auction__(self, auction_id, seller_id, name, currently, first_bid, started, ends, description, buy_price=None, location=None):
+    def __generate_auction__(self, seller_id, name, currently, first_bid, started, ends, description, buy_price=None, location=None):
 
         if not location:
 
@@ -219,8 +207,10 @@ class Generator:
 
             latitude, longitude, location = location["Latitude"], location["Longitude"], location["Place"]
 
+        self.auction_id += 1
+
         return {
-            "Id": auction_id,
+            "Id": self.auction_id,
             "Seller_id": seller_id,
             "Name": name,
             "Currently": self.__normalize_dollars__(currently),
@@ -251,14 +241,6 @@ class Generator:
     def __generate_image__(self, auction_id, path):
 
         self.image_id += 1
-
-        if self.normalized_image_size:
-
-            image = Image.open(path)
-
-            image.thumbnail(self.normalized_image_size, Image.ANTIALIAS)
-
-            image.save(path)
 
         return {
             "Id": self.image_id,
@@ -321,7 +303,6 @@ class Generator:
 
         self.__register__("Auction",
             self.__generate_auction__(
-                auction_id=auction.get("ItemID"),
                 seller_id=self.users[seller["UserID"]],
                 name=auction.get("Name"),
                 currently=auction.get("Currently"),
@@ -334,26 +315,11 @@ class Generator:
             )
         )
 
-        # try:
+        if self.downloader:
 
-        #     search_args = {
-        #         **Generator.google_images_download_prms,
-        #         "keywords": auction.get("Name")
-        #     }
+            for path in self.downloader.download(auction["Name"]):
 
-        #     for path in list(self.downloader.download(search_args)[0].values())[0]:
-
-        #         self.__register__(
-        #             "Image",
-        #             self.__generate_image__(
-        #                 auction_id=auction.get("ItemID"),
-        #                 path=path
-        #             )
-        #        )
-
-        # except FileNotFoundError:
-
-        #     pass
+                self.__register__("Image", self.__generate_image__(self.auction_id, path))
 
         for bid in auction["Bids"]:
 
@@ -367,7 +333,7 @@ class Generator:
 
                 self.__register__("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]], bidder_rating=bidder["Rating"]))
 
-                self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=auction["ItemID"], amount=bid["Amount"], time=bid["Time"]))
+                self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=self.auction_id, amount=bid["Amount"], time=bid["Time"]))
 
         for category in auction["Category"]:
 
@@ -375,5 +341,5 @@ class Generator:
 
                 self.__register__("Category", self.__generate_category__(category))
 
-                self.__register__("Auction_has_Category", self.__generate_auction_has_category__(auction["ItemID"], self.categories[category]))
+                self.__register__("Auction_has_Category", self.__generate_auction_has_category__(self.auction_id, self.categories[category]))
 
