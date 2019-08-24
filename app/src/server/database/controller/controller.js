@@ -274,7 +274,7 @@ class DBController
                         ) as a 
                             LEFT JOIN
                             (
-                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id,'Path', i.Path)) as Images 
+                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images 
                                 FROM    Image i, 
                                         Auction a 
                                 WHERE   i.Auction_Id = a.Id 
