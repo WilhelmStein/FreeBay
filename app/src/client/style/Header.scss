@@ -70,6 +70,8 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
         select
         {
+            cursor: pointer;
+
             font-size: inherit;
 
             border-top-left-radius: 5px;
@@ -87,13 +89,27 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
             padding: 10px;
 
+            color: $graphite;
+
             background-color: $less-white;
 
-            color: $graphite;
+            transition: 200ms;
+
+            &:hover, &:focus, &:active
+            {
+                background-color: $lesser-white;
+            }
+
+            option
+            {
+                padding: 20px;
+            }            
         }
 
         input
         {
+            cursor: pointer;
+
             font-size: inherit;
 
             border: none;
@@ -106,6 +122,19 @@ $Search-height: calc(#{$Header-height} / 2.2);
             background-color: $almost-white;
 
             color: $graphite;
+
+            transition: 200ms;
+
+            &:hover, &:focus, &:active
+            {
+                background-color: $basically-white;
+            }
+
+            &:active, &:focus
+            {
+                background-color: $lesser-white;
+                cursor: text;
+            }
         }
 
         button
@@ -125,85 +154,86 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
     .AccountSnapshot
     {
-        text-shadow: 1px 1px 1px $graphite;
-
-        line-height: $normal-font-size;
-        font-size: $normal-font-size;
-
-        height: $Header-height;
-
-        box-sizing: border-box;
-        padding: calc((#{$Header-height} - #{$normal-font-size} - 1px) / 2) 50px;
-
-        .AccountPopup-content
+        &.Empty
         {
-            box-shadow: 1px 1px 5px $graphite !important;
-            border: none !important;
-            border-radius: 5px !important;
-            padding: 0 !important;
-            background-color: $almost-white !important;
+            text-shadow: 1px 1px 1px $graphite;
 
-            .AccountMenu
+            line-height: $normal-font-size;
+            font-size: $normal-font-size;
+    
+            height: $Header-height;
+    
+            box-sizing: border-box;
+            padding: calc((#{$Header-height} - #{$normal-font-size} - 1px) / 2) 50px;
+
+            .Login
             {
-                padding: 0;
-                margin: 0 auto;
-                width: 100%;
-                height: 100%;
-
-                button
+                transition: 200ms;
+                &:hover
                 {
-                    border-radius: 5px;
-
-                    height: 100%;
-                    width: 100%;
-                    
-                    font-size: $normal-font-size;
-                    color: $graphite;
-                    
-                    background-color: $almost-white;
-
-                    border: none;
-                    outline: none;
-
-                    cursor: pointer;
-
-                    padding: 10px;
-
-                    transition: 200ms;
-
-                    &:hover
-                    {
-                        background-color: $less-white;
-                    }
-
-                    &:active
-                    {
-                        background-color: $lesser-white;
-                    }
+                    filter: brightness(120%);
                 }
             }
         }
 
-        .account_button, .account_button_downward
+        &.Full
         {
-            margin-left: 8px;
-        
-            display: inline-block;
-        
-            width: 0;
-            height: 0;
-        
-            border-top: 0;
-            border-bottom: 10px solid $secondary-color;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
+            padding: 20px 0;
+            display: grid;
+            grid-template-columns: 100px auto;
+
+            .Avatar
+            {
+                cursor: pointer;
+
+                height: 50px;
+                width: 50px;
+                padding: 10px;
+
+                text-transform: capitalize;
+
+                background-color: $blue;
+
+                font-size: $normal-font-size;
+
+                transition: 200ms;
+
+                margin-left: 30px;
+
+                &:hover
+                {
+                    filter: brightness(120%);
+                }
+            }
+    
+            .Username
+            {
+                cursor: pointer;
+
+                font-size: $bigger-font-size;
+
+                transition: 200ms;
+                &:hover
+                {
+                    color: $less-white;
+                }
+            }
+    
+            .Logout
+            {
+                cursor: pointer;
+                font-size: $small-font-size;
+                color: $grey;
+                text-transform: capitalize;
+
+                transition: 200ms;
+                &:hover
+                {
+                    filter: brightness(120%);
+                }
+            }
         }
         
-        .account_button_downward
-        {
-            border-top: 10px solid $secondary-color;
-            border-bottom: 0;
-        }
     }
 }
 

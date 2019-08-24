@@ -44,6 +44,9 @@
     - [x] Search
       - [x] Implement Functionality
     - [x] Login
+      - [x] Redo Popup with Dialog
+    - [x] Account Snapshot
+      - [x] Redo with Material UI
     - [x] Styling
 - [x] Home Page
   - [x] Carousel

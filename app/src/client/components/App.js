@@ -38,6 +38,12 @@ class App extends React.Component {
                 {
                     this.props.history.push("/admin");
                 }
+
+            }
+            else
+            {
+                if (this.props.location.pathname === "/admin")
+                    this.props.history.push("/");
             }
         });
     }
