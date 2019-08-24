@@ -67,7 +67,27 @@ class Generator:
         )
     }
 
-    def __init__(self, seed=123456789, verbose=True, tables_to_drop=["Auction_has_Category", "Bid", "Image", "Auction", "General_User", "User", "Address", "Category"], rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2, validated_percentage=0.7, downloader=Downloader()):
+    def __init__(
+        self,
+        seed=123456789,
+        verbose=True,
+        tables_to_drop=[
+            "Auction_has_Category",
+            "Bid",
+            "Image",
+            "Views",
+            "Auction",
+            "General_User",
+            "Admin",
+            "User",
+            "Address",
+            "Category"
+            ],
+        views_to_drop=[],
+        rating_lower=0.0, rating_upper=58823.0, rating_digits=1,
+        dollar_digits=2,
+        validated_percentage=0.7,
+        downloader=Downloader()):
 
         self.verbose = verbose
 
@@ -85,11 +105,19 @@ class Generator:
 
         self.cur = self.cnx.cursor()
 
+        if isinstance(views_to_drop, list) and views_to_drop:
+
+            for view in views_to_drop:
+
+                print("[Generator] Dropping view '%s'" % view)
+
+                self.cur.execute("DROP VIEW IF EXISTS {}".format(view))
+
         if isinstance(tables_to_drop, list) and tables_to_drop:
 
-            print("[Generator] Tables", ",".join(["'{}'".format(table) for table in tables_to_drop]), "were dropped")
-
             for table in tables_to_drop:
+
+                print("[Generator] Deleting all rows from table '%s'" % table)
 
                 self.cur.execute("DELETE FROM {}".format(table))
 

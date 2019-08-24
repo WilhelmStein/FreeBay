@@ -3,16 +3,26 @@ from google_images_download import google_images_download
 
 from PIL import Image
 
-import os
+from os.path import relpath
+
+from random import randrange
 
 
 class Downloader:
 
-    def __init__(self, format="jpg", limit=2, size=">400*300", aspect_ratio="panoramic", output_directory="auction_images", max_size=(640, 640)):
+    def __init__(
+        self,
+        format="jpg",
+        min_limit=0, max_limit=3,
+        size=">400*300",
+        aspect_ratio="panoramic",
+        output_directory="auction_images",
+        max_size=(640, 640)):
+
+        self.min_limit, self.max_limit = min_limit, max_limit
 
         self.parameters = {
             "format": format,
-            "limit": limit,
             "size": size,
             "aspect_ratio": aspect_ratio,
             "output_directory": output_directory,
@@ -31,7 +41,8 @@ class Downloader:
 
             search_args = {
                 **self.parameters,
-                "keywords": keywords
+                "keywords": keywords,
+                "limit": randrange(self.max_limit - self.min_limit)
             }
 
             paths = list(self.underlying.download(search_args)[0].values())[0]
@@ -40,7 +51,7 @@ class Downloader:
 
                 for path in paths:
 
-                    print("[Downloader] Resizing '{}' to {}".format(os.path.relpath(path), self.max_size))
+                    print("[Downloader] Resizing '{}' to {}".format(relpath(path), self.max_size))
 
                     image = Image.open(path)
 
