@@ -11,7 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper'
 import Pagination from 'material-ui-flat-pagination';
 
 import Card from '@material-ui/core/Card';
@@ -76,8 +75,6 @@ class SearchResults extends Component
                 return;
             }
 
-            console.log(res.data.data)
-
             this.setState({
                 items: res.data.data
             })
@@ -88,7 +85,8 @@ class SearchResults extends Component
     changeView(event)
     {
         this.setState({
-            view: event.target.value
+            view: event.target.value,
+            resultsPerPage: event.target.value.includes("Detailed") ? 6 : 12
         })
     }
 
@@ -210,6 +208,7 @@ function DetailedAuctionItem(props)
     return (
         <Card className={`Item ${props.grid ? "Grid" : ""}`}>
             <CardMedia
+                className="CardMedia"
                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                 title="Generic placeholder"
             />
@@ -291,7 +290,8 @@ function CollapsedAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
-                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/100x100/ffffff/4a4a4a.png&text=No+Image"}
+                className="CardMedia"
+                image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/100x100/ffffff/4a4a4a.png&text=No+Image"}
                 title="Generic placeholder"
             />
             <CardContent className="ItemBody">
@@ -348,6 +348,7 @@ function SquareAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
+                className="CardMedia"
                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                 title={props.item.Name}
             />

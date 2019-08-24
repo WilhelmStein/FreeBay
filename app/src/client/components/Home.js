@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Card, Grid, CardMedia, CardContent, Typography, Box} from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating'
-import Carousel from './Carousel';
+import Carousel from './CarouselWrapper';
 import '../style/Home.scss';
-import Axios from 'axios';
+import axios from 'axios';
 import autoBind  from 'auto-bind';
 
 class Home extends Component
@@ -14,7 +14,7 @@ class Home extends Component
         super(props);
 
         this.state = {
-            user: this.props.user,
+            // user: this.props.user,
             recommended: [],
             history: props.history
         };
@@ -24,26 +24,47 @@ class Home extends Component
 
     componentDidMount()
     {
-        Axios.post('/api/recommended', {username: (this.state.user == null) ? (null) : (this.state.user.Username)})
+        this.getRecommended(this.props.user);
+    }
+
+    componentWillReceiveProps(nextProps)
+    {
+        if (nextProps.user !== this.props.user)
+        {
+            this.getRecommended(nextProps.user);
+        }
+    }
+
+    getRecommended(user)
+    {
+        axios.post('/api/recommended', {username: user === null ? null : user.Username})
         .then( res => {
-            this.setState({recommended: res.data.data});
-        });
+            if (res.data.error)
+            {
+                console.error(res.data.message);
+                return;
+            }
+            
+            this.setState({
+                recommended: res.data.data
+            });
+        })
+        .catch(err => {console.error(err)});
     }
 
     render()
     {
         return (
             <div className="Home">
-                <Carousel user={this.state.user} loginHandler={this.props.loginHandler}/>
+                <Carousel user={this.props.user} loginHandler={this.props.loginHandler}/>
 
-                <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
-                    <h2>Recommended for you</h2>
-                    <hr/>
+                <div className="Recommended">
+                    <h2>{this.props.user ? "Recommended for you" : "Popular Items"}</h2>
                     <Grid container
                         direction = "row"
                         justify = "flex-start"
                         alignItems = "center"
-                        spacing={2}
+                        spacing={3}
                         className="RecommendedGrid"
                     >
                         {this.state.recommended.map( (item) => {
@@ -58,11 +79,12 @@ class Home extends Component
 
 class RecommendedItem extends Component
 {
-
     constructor(props)
     {
         super(props);
+
         autoBind(this);
+
         this.state = {
             item: props.item
         }
@@ -71,42 +93,46 @@ class RecommendedItem extends Component
     onItemClick(e)
     {
         this.props.history.push(`/auction/${this.state.item.Id}`);
+
+        e.stopPropagation();
     }
 
     onSellerClick(e)
     {
         this.props.history.push(`/user/${this.state.item.User.Username}`);
+        e.stopPropagation();
     }
 
     render()
     {
         const rating = Math.round((this.state.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
-        return <Grid key={this.state.item.Id} item xs={2} className = "Wrapper">
-                    <Card className="Item">
-                        <CardMedia className="Media"
-                            image={`/api/image?path=${this.state.item.Images[0].Path}`}
-                            title={this.state.item.Name}
-                            onClick={this.onItemClick}
-                        />
+        return (
+            <Grid key={this.state.item.Id} item className = "Wrapper">
+                <Card raised className="Item" onClick={this.onItemClick}>
+                    <CardMedia className="Media"
+                        image={this.state.item.Images && this.state.item.Images.length ? `/api/image?path=${this.state.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                        title={this.state.item.Name}
+                    />
 
-                        <CardContent className="ItemBody">
-                            <Typography className="Title" variant="h4" onClick={this.onItemClick} noWrap>
-                                {this.state.item.Name}
+                    <CardContent className="ItemBody">
+                        <Typography className="Title" variant="h4" title={this.state.item.Name} noWrap>
+                            {this.state.item.Name}
+                        </Typography>
+
+                        <Box>
+                            <Typography display="inline" noWrap> Sold By:</Typography>
+
+                            <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick} noWrap>
+                                &nbsp; &nbsp;{this.state.item.User.Username}
                             </Typography>
+                                
+                            <Rating display="inline" value={rating} precision={0.5} readOnly />
+                        </Box>
 
-                            <Box>
-                                <Typography display="inline"> Sold By:</Typography>
-
-                                <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick}>
-                                    &nbsp; &nbsp;{this.state.item.User.Username}
-                                </Typography>
-                                    
-                                <Rating display="inline" value={rating} precision={0.5} readOnly />
-                            </Box>
-
-                        </CardContent>
-                    </Card>
-                </Grid>
+                    </CardContent>
+                </Card>
+            </Grid>
+        )
     }
 }
 

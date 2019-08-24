@@ -39,26 +39,21 @@ class App extends React.Component {
                     this.props.history.push("/admin");
                 }
             }
-            else
-            {
-                this.props.history.push("/");
-            }
         });
     }
 
     render()
     {
-
         return (
             <div className="App">
                 {/* Header is here because it will always render in the website. It also gives login status to every other page */}
                 <Header user={this.state.user} loginHandler={this.loginHandler}/>
                 <Menu active={this.props.location.pathname}/>
                 <Switch>
-                    <Route exact path='/' render={(props) => <Home user={this.state.user} loginHandler={this.loginHandler} />} />
+                    <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
-                    <Route path='/auction/:auctionId' component={AuctionPage} />
-                    <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
+                    <Route path='/auction/:id' component={AuctionPage} />
+                    <Route path='/admin' render={ () => <AdminPage user={this.state.user}/> } />
                     <Route path='*' component={NotFound} />
                 </Switch>
             </div>
