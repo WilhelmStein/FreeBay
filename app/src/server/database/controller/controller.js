@@ -303,6 +303,32 @@ class DBController
         this.query(query, res);
     }
 
+    userAuctions(username, res)
+    {
+        const query = {
+            string: `SELECT a.Id
+                     FROM 
+                        (
+                            SELECT u.Id
+                            FROM User u
+                            WHERE u.Username = ?
+                        ) as u,
+                        Auction a
+                     WHERE a.Seller_Id = u.Id`,
+            escape: [username]
+        };
+
+        this.query(query, res, (rows) => {
+            console.log(rows)
+            
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows
+            });
+        });
+    }
+
     auction(auctionId, res)
     {
         const query = {

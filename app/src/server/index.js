@@ -39,6 +39,8 @@ app.get('/api/user', function(req, res) { controller.user(req.query.username, re
 
 app.post('/api/updateUser', function(req, res) { controller.updateUser(req.body, res); });
 
+app.get('/api/userAuctions', function(req, res) { controller.userAuctions(req.query.username, res); });
+
 app.get('/api/featured', function(req, res) { controller.featured(res); });
 
 app.post('/api/recommended', function(req, res) { controller.recommended(req.body.username, res); });
