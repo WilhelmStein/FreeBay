@@ -10,6 +10,10 @@ class AuctionPage extends Component
     constructor(props)
     {
         super(props);
+        this.state = {
+            auctionId: props.match.params.auctionId
+        };
+
         autoBind(this);
         this.state = {
             auctionId: props.match.params.id
@@ -22,9 +26,11 @@ class AuctionPage extends Component
         .then(res => {
             this.setState({
                 auction: res.data.data
-            })
+            }, () => console.log(this.state))
         })
         .catch(err => console.log(err));
+
+        
     }
 
     render()

@@ -24,6 +24,8 @@
 - [ ] Bonus algorithm (Recommended items)
 - [x] Auction retrieval sql query
 - [ ] Auction post sql query
+- [x] Category Captions
+- [ ] Category Filling
 
 ## Front - End
 
@@ -32,9 +34,8 @@
 - [x] Create React app
 - [x] Setup Router
 - [x] Setup Sass
-- [x] Test Bootstrap
+- [x] Test Bootstrap (Scrapped)
 - [x] Integrate Material UI
-- [ ] Design UI - Adobe XD
 
 ### Components
 
@@ -44,9 +45,13 @@
       - [x] Implement Functionality
     - [x] Login
     - [x] Styling
-- [ ] Home Page
-  - [ ] Carousel
-  - [x] Popular Items Query
+- [x] Home Page
+  - [x] Carousel
+    - [x] Create custom carousel component
+    - [ ] Experiment with colouring
+  - [x] General Styling
+  - [x] Popular / Recommended Grid
+  - [x] Carousel Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling

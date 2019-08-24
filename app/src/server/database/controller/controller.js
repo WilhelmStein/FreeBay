@@ -448,11 +448,66 @@ class DBController
     }
 
     featured(res)
+    {
+        const query = {
+            string: `   SELECT  c.Name, c.Id, c.Caption,
+                                JSON_ARRAYAGG(JSON_OBJECT("Id", a.Id, "Name", a.Name, "User", a.User, "Images", a.Images)) as Auctions
+                        FROM    Category c, 
+                                Auction_has_Category ahc,
+                                (
+                                    SELECT t.Id, t.Name, JSON_OBJECT('Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User, i.Images
+                                    FROM
+                                    (
+                                        SELECT  a.Id, a.Name, a.Seller_Id, u.Username, gu.Seller_Rating
+                                        FROM    Auction a,
+                                                User u,
+                                                General_User gu
+                                        WHERE   a.Seller_Id = u.Id AND
+                                                u.Id = gu.User_Id
+                                    ) as t
+                                        LEFT JOIN
+                                        (
+                                            SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images 
+                                            FROM    Image i, 
+                                                    Auction a 
+                                            WHERE   i.Auction_Id = a.Id 
+                                            GROUP BY a.Id
+                                        ) as i ON t.Id = i.Auction_Id 
+                                ) as a
+                        WHERE   c.Id = ahc.Category_Id and
+                                ahc.Auction_Id = a.Id
+                        GROUP BY c.Id
+                        HAVING COUNT(distinct(a.Id)) > 1
+                        ORDER BY count(distinct(a.Id)) Desc Limit 5
+            `,
+            escape: []
+        }
+        
+        this.query(query, res, (rows) => {
+            rows = rows.map( (category) => {
+                category.Auctions = JSON.parse(category.Auctions)
+                category.Auctions = category.Auctions.map( auction => {
+                    auction.Images = auction.Images === null ? [] : auction.Images
+                    return auction;
+                })
+                
+                return category;
+            });
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows
+            });
+        });
+    }
+
+    scrapped_featured(res)
     {   // Change cost function
         const query = {
             string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
                                 t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude,
-                                DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends,
+                                t.Started, t.Ends,
                                 t.Description, (Count(v.User_Id) * t.Seller_Rating) AS Cost, i.Images, b.Bids
                         FROM 
                         (
@@ -547,7 +602,7 @@ class DBController
                                 ) ON v.Auction_Id = t.Id
                             GROUP BY t.Id
                             ORDER BY Times_Viewed DESC
-                            LIMIT 10`,
+                            LIMIT 14`,
                 escape: []
             }
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Card, Grid, CardMedia, CardContent, Typography, Box} from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating'
-import Carousel from './Carousel';
+import Carousel from './CarouselWrapper';
 import '../style/Home.scss';
 import axios from 'axios';
 import autoBind  from 'auto-bind';
@@ -58,14 +58,13 @@ class Home extends Component
             <div className="Home">
                 <Carousel user={this.props.user} loginHandler={this.props.loginHandler}/>
 
-                <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
+                <div className="Recommended">
                     <h2>{this.props.user ? "Recommended for you" : "Popular Items"}</h2>
-                    <hr/>
                     <Grid container
                         direction = "row"
                         justify = "flex-start"
                         alignItems = "center"
-                        spacing={2}
+                        spacing={3}
                         className="RecommendedGrid"
                     >
                         {this.state.recommended.map( (item) => {
@@ -94,34 +93,36 @@ class RecommendedItem extends Component
     onItemClick(e)
     {
         this.props.history.push(`/auction/${this.state.item.Id}`);
+
+        e.stopPropagation();
     }
 
     onSellerClick(e)
     {
         this.props.history.push(`/user/${this.state.item.User.Username}`);
+        e.stopPropagation();
     }
 
     render()
     {
         const rating = Math.round((this.state.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
         return (
-            <Grid key={this.state.item.Id} item xs={2} className = "Wrapper">
-                <Card className="Item">
+            <Grid key={this.state.item.Id} item className = "Wrapper">
+                <Card raised className="Item" onClick={this.onItemClick}>
                     <CardMedia className="Media"
                         image={this.state.item.Images && this.state.item.Images.length ? `/api/image?path=${this.state.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                         title={this.state.item.Name}
-                        onClick={this.onItemClick}
                     />
 
                     <CardContent className="ItemBody">
-                        <Typography className="Title" variant="h4" onClick={this.onItemClick} noWrap>
+                        <Typography className="Title" variant="h4" title={this.state.item.Name} noWrap>
                             {this.state.item.Name}
                         </Typography>
 
                         <Box>
-                            <Typography display="inline"> Sold By:</Typography>
+                            <Typography display="inline" noWrap> Sold By:</Typography>
 
-                            <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick}>
+                            <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick} noWrap>
                                 &nbsp; &nbsp;{this.state.item.User.Username}
                             </Typography>
                                 

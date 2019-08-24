@@ -1,7 +1,18 @@
 @import 'global';
 
+
+.Recommended
+{
+    border-top: 0.3px solid rgb(182, 182, 182);
+
+    padding-left: 50px;
+}
+
+
 .RecommendedGrid
 {
+    margin-top: 20px !important;
+
     ::-webkit-scrollbar 
     {
         width: 0.4em;
@@ -25,20 +36,16 @@
         background: $lesser-white;
     }
 
-    h2
-    {
-        margin: 0;
-    }
-
     .Wrapper
     {
-        margin-left: 10px;
-        margin-right: 10px;
+        width: 250px;
 
         .Item
         {
             transition: 200ms;
             overflow: auto;
+
+            cursor: pointer;
 
             background-color: $almost-white;
 
@@ -48,11 +55,11 @@
             }
         }
 
-        .Media {
-            object-fit: contain;
+        .Media
+        {
             height: 250px;
 
-            cursor: pointer;
+            background-color: white;
         }
 
 
@@ -62,8 +69,6 @@
 
             .Title
             {
-                cursor: pointer;
-
                 &:hover
                 {
                     color: $graphite;
@@ -79,40 +84,6 @@
             &:hover
             {
                 filter: brightness(130%);
-            }
-        }
-
-        .Pricing
-        {
-            margin-top: 10px;
-        }
-
-
-        .Prices
-        {
-            color: $graphite;
-
-            .Title
-            {
-                font-weight: 300;
-            }
-
-            .Price
-            {
-                &.Starting
-                {
-                    color: $blue;
-                }
-
-                &.Current
-                {
-                    color: $green;
-                }
-
-                &.Buyout
-                {
-                    color: $red;
-                }
             }
         }
     }

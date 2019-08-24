@@ -1,206 +1,148 @@
 import React, { Component } from 'react';
-import { Carousel, CarouselSlide } from 'material-ui-carousel';
-import { Card, CardContent, CardMedia, Typography, Box, Grid, Button, ButtonGroup } from '@material-ui/core';
-import Rating from '@material-ui/lab/Rating';
-import Countdown from 'react-countdown-now';
+import {Fade, IconButton} from '@material-ui/core';
+import autoBind from 'auto-bind';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
-import axios from 'axios';
 import '../style/Carousel.scss';
 
-
-export default class CarouselWrapper extends Component {
-
+export default class Carousel extends Component
+{
     constructor(props)
     {
         super(props);
         this.state = {
-            auctions: []
-        };
+            active: 0
+        }
+
+        this.timer = null;
+        this.interval = this.props.interval ? this.props.interval : 4000;
+        this.autoPlay = this.props.autoPlay ? this.props.autoPlay : true;
+
+        autoBind(this);
     }
 
-    componentDidMount() {
-        axios.get('/api/featured')
-        .then( res => {
-            if (res.data.error)
-            {
-                console.error(res.data.message);
-                return;
-            }
-            
-            this.setState({
-                auctions: res.data.data
-            });
-        })
-        .catch(err => {console.error(err);})
+    componentDidMount()
+    {
+        this.start();
     }
 
-    render() {
+    stop()
+    {
+        if (this.autoPlay)
+        {
+            if (this.timer)
+                clearInterval(this.timer);
+        }
+    }
 
+    start()
+    {
+        if (this.autoPlay)
+        {
+            this.timer = setInterval(this.next, this.interval);
+        }
+    }
+
+    reset()
+    {
+        if (this.autoPlay)
+        {
+            this.stop();
+            this.start();
+        }
+    }
+
+    pressIndicator(index)
+    {
+        this.setState({
+            active: index
+        }, this.reset)
+    }
+
+    next(event)
+    {
+        const next = this.state.active + 1 > this.props.children.length - 1 ? 0 : this.state.active + 1;
+
+        this.setState({
+            active: next
+        }, this.reset)
+
+        if (event)
+            event.stopPropagation();
+    }
+
+    prev(event)
+    {
+        const prev = this.state.active - 1 < 0 ? this.props.children.length - 1 : this.state.active - 1;
+
+        this.setState({
+            active: prev
+        }, this.reset)
+
+        if (event)
+            event.stopPropagation();
+    }
+
+    render()
+    {
         return (
-            <div style={{ paddingLeft: '10%', paddingRight: '10%' }}>
-                <h2>Featured Items</h2>
-                {/* <hr/> */}
-                <Carousel>
-                    {
-                        this.state.auctions.map((item, index) => {
-                            return (
-                                <CarouselSlide key={item.Id}>
-                                    <div className = "FeaturedItemWrapper Square">
-                                        <FeaturedItem item={item} index={index}/>
-                                    </div>
-                                </CarouselSlide>
-                            )
-                        })
-                    }
-                </Carousel>
+            <div className="Carousel" onMouseEnter={this.stop} onMouseOut={this.reset}>
+                {
+                    this.props.children.map( (child, index) => {
+                        return (
+                            <CarouselItem key={index} active={index === this.state.active ? true : false} child={child}/>
+                        )
+                    })
+                }
+                
+                <div className="Next ButtonWrapper">
+                    <IconButton className="Next Button mui--align-middle" onClick={this.next}>
+                        <NavigateNextIcon/>
+                    </IconButton>
+                </div>
+
+                <div className="Prev ButtonWrapper">
+                    <IconButton className="Prev Button mui--align-middle" onClick={this.prev}>
+                        <NavigateBeforeIcon/>
+                    </IconButton>
+                </div>
+                
+                <Indicators length={this.props.children.length} active={this.state.active} press={this.pressIndicator}/>
             </div>
         )
     }
 }
 
-function FeaturedItem(props)
+function CarouselItem(props)
 {
-    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+    return (
+        props.active ? 
+        (
+            <div className="CarouselItem">
+                <Fade in={props.active} timeout={500}>
+                    {props.child}
+                </Fade>
+            </div>
+        ) : null
+    )
+}
 
-    let ends = props.item.Ends.split(' ');
-    let date = ends[0].split('-')
-    let time = ends[1].split(':');
-    ends = {
-        year: date[2],
-        month: date[1],
-        day: date[0],
-        hour: time[0],
-        minute: time[1]
-    }
+function Indicators(props)
+{
+    let indicators = [];
+    for (let i = 0; i < props.length; i++)
+    {
+        const className = i === props.active ? "Active Indicator" : "Indicator";
+        const item = <FiberManualRecordIcon key={i} size='small' className={className} onClick={() => {props.press(i)}}/>;
 
-    let started = props.item.Started.split(' ')
-    date = started[0].split('-')
-    time = started[1].split(':');
-    started = {
-        year: date[2],
-        month: date[1],
-        day: date[0],
-        hour: time[0],
-        minute: time[1]
+        indicators.push(item);
     }
-
-    let difference = {
-        years: ends.year - started.year,
-        months: 0,
-        days: 0,
-        hours: 0,
-        minutes: 0
-    }
-
-    difference.months = ends.month - started.month;
-    if (difference.months < 0)
-    {
-        difference.months += 12;
-        difference.years -= 1;
-    }
-    difference.days = ends.day - started.day;
-    if (difference.days < 0)
-    {
-        difference.days += 30;
-        difference.months -= 1;
-    }
-    difference.days = ends.day - started.day;
-    if (difference.days < 0)
-    {
-        difference.days += 30;
-        difference.months -= 1;
-    }
-    difference.hours = ends.hour - started.hour;
-    if (difference.hours < 0)
-    {
-        difference.hours += 24
-        difference.days -= 1;
-    }
-    difference.minutes = ends.minute - started.minute;
-    if (difference.hours < 0)
-    {
-        difference.minutes += 60
-        difference.hours -= 1;
-    }
-
-    //console.log(difference);
 
     return (
-        <Card className={`Item Item${(props.index % 2) + 1}`}>
-            <CardMedia
-                className="CardMedia"
-                image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                title={props.item.Name}
-            />
-            <CardContent className="ItemBody">
-                <Typography className="Title" variant="h2">
-                    {props.item.Name}
-                </Typography>
-
-                <Box mb={3} className="SellerBox">
-                    <Typography display="inline"> Sold By:</Typography>
-
-                    <Typography className="Seller" display="inline" variant="h5">
-                        &nbsp; &nbsp;{props.item.User.Username}
-                    </Typography>
-                        
-                    <Rating display="inline" value={rating} precision={0.5} readOnly />
-                </Box>
-                
-                <Grid container className="Prices" spacing={1}>
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Starting Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography className="Starting Price" variant="h4">EUR {props.item.First_Bid.toFixed(2)}</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Current Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6} zeroMinWidth>
-                        <Typography className="Current Price" variant="h4">EUR {props.item.Currently ? props.item.Currently.toFixed(2) : "-"}</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography className="Buyout Price" variant="h4">EUR {props.item.Buy_Price ? props.item.Buy_Price.toFixed(2) : "-"}</Typography>
-                    </Grid>
-                </Grid>
-
-                <Grid container className="Timer">
-                    <Grid item xs={6}>
-                        <Typography className="Title" variant="h4">Time Remaining:</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Typography className = "Time_Remaining" variant="h4">
-                            <div>
-                                {/* {`${difference.years} years, ${difference.months} months`} */}
-                            </div>
-                            <Countdown
-                                date={new Date(props.item.Ends)}
-                                renderer={ (props) =>
-                                    <div>{props.days} Days: {props.hours} Hours: {props.minutes} Minutes: {props.seconds} Seconds</div>
-                                }
-                            />
-                        </Typography>
-                    </Grid>
-                </Grid>
-
-                <Box mt={3}>
-                    <ButtonGroup className="Buttons">
-                        <Button className="Bid Button" variant="contained">
-                            Bid
-                        </Button>
-                        <Button className="Buyout Button" variant="contained">
-                            Buyout
-                        </Button>
-                    </ButtonGroup>
-                </Box>
-            </CardContent>
-        </Card>
+        <div className="Indicators">
+            {indicators}
+        </div>
     )
 }
