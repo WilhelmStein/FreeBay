@@ -24,7 +24,7 @@
 - [ ] Bonus algorithm (Recommended items)
 - [x] Auction retrieval sql query
 - [ ] Auction post sql query
-- [ ] Category Captions
+- [x] Category Captions
 - [ ] Category Filling
 
 ## Front - End
@@ -34,9 +34,8 @@
 - [x] Create React app
 - [x] Setup Router
 - [x] Setup Sass
-- [x] Test Bootstrap
+- [x] Test Bootstrap (Scrapped)
 - [x] Integrate Material UI
-- [ ] Design UI - Adobe XD
 
 ### Components
 

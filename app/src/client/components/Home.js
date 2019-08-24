@@ -93,11 +93,14 @@ class RecommendedItem extends Component
     onItemClick(e)
     {
         this.props.history.push(`/auction/${this.state.item.Id}`);
+
+        e.stopPropagation();
     }
 
     onSellerClick(e)
     {
         this.props.history.push(`/user/${this.state.item.User.Username}`);
+        e.stopPropagation();
     }
 
     render()
@@ -105,15 +108,14 @@ class RecommendedItem extends Component
         const rating = Math.round((this.state.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
         return (
             <Grid key={this.state.item.Id} item className = "Wrapper">
-                <Card raised className="Item">
+                <Card raised className="Item" onClick={this.onItemClick}>
                     <CardMedia className="Media"
                         image={this.state.item.Images && this.state.item.Images.length ? `/api/image?path=${this.state.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                         title={this.state.item.Name}
-                        onClick={this.onItemClick}
                     />
 
                     <CardContent className="ItemBody">
-                        <Typography className="Title" variant="h4" onClick={this.onItemClick} title={this.state.item.Name} noWrap>
+                        <Typography className="Title" variant="h4" title={this.state.item.Name} noWrap>
                             {this.state.item.Name}
                         </Typography>
 

@@ -54,8 +54,8 @@ class Generator:
         ),
         "Category": (
             "INSERT INTO Category"
-            "(Id, Name)"
-            "VALUES (%(Id)s, %(Name)s)"
+            "(Id, Name, Caption)"
+            "VALUES (%(Id)s, %(Name)s, %(Caption)s)"
         ),
         "Auction_has_Category": (
             "INSERT INTO Auction_has_Category"
@@ -194,7 +194,8 @@ class Generator:
 
         return {
             "Id": len(self.categories),
-            "Name": name
+            "Name": name,
+            "Caption": "Lorem ispum solor sit amet! Sit ipsum De lora.."
         }
 
 

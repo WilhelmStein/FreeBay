@@ -116,7 +116,7 @@ function CategoryBanner(props)
                 </Typography>
 
                 <Typography className="Caption">
-                    Lorem ipsum dolor sit amet!
+                    {props.item.Caption}
                 </Typography>
 
                 <Button variant="outlined" className="ViewButton">

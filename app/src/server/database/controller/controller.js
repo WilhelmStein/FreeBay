@@ -378,7 +378,7 @@ class DBController
     featured(res)
     {
         const query = {
-            string: `   SELECT  c.Name, c.Id,
+            string: `   SELECT  c.Name, c.Id, c.Caption,
                                 JSON_ARRAYAGG(JSON_OBJECT("Id", a.Id, "Name", a.Name, "User", a.User, "Images", a.Images)) as Auctions
                         FROM    Category c, 
                                 Auction_has_Category ahc,

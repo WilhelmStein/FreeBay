@@ -6,7 +6,6 @@
     border-top: 0.3px solid rgb(182, 182, 182);
 
     padding-left: 50px;
-    // background-color: $basically-white;
 }
 
 
@@ -46,6 +45,8 @@
             transition: 200ms;
             overflow: auto;
 
+            cursor: pointer;
+
             background-color: $almost-white;
 
             &:hover
@@ -56,10 +57,7 @@
 
         .Media
         {
-            object-fit: contain;
             height: 250px;
-
-            cursor: pointer;
 
             background-color: white;
         }
@@ -71,8 +69,6 @@
 
             .Title
             {
-                cursor: pointer;
-
                 &:hover
                 {
                     color: $graphite;
