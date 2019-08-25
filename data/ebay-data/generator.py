@@ -33,6 +33,11 @@ class Generator:
             "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated)"
             "VALUES (%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
         ),
+        "Admin": (
+            "INSERT INTO Admin"
+            "(User_Id)"
+            "VALUES (%(User_Id)s)"
+        ),
         "Address": (
             "INSERT INTO Address"
             "(Id, Street, Number, ZipCode, Country, City)"
@@ -67,6 +72,11 @@ class Generator:
 
     def __init__(
         self,
+        admin={
+            "Username": "admin",
+            "Password": "admin",
+            "Email": "admin@admin.admin"
+        },
         downloader=None,
         seed=123456789,
         verbose=True,
@@ -139,6 +149,16 @@ class Generator:
 
         self.image_id = 0
 
+        self.__register__("User",
+            self.__generate_user__(
+                username=admin["Username"],
+                password=admin["Password"],
+                email=admin["Email"]
+            )
+        )
+
+        self.__register__("Admin", self.__generate_admin__(self.users[admin["Username"]]))
+
 
     def __del__(self):
 
@@ -185,6 +205,13 @@ class Generator:
             "Phone": phone if phone else self.generator.phone_number(),
             "Address_Id": self.address_id,
             "Validated": self.random.random() <= self.validated_percentage
+        }
+
+
+    def __generate_admin__(self, user_id):
+
+        return {
+            "User_Id": user_id
         }
 
 
