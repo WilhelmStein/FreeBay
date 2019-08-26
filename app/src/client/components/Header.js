@@ -4,7 +4,6 @@ import autoBind from 'auto-bind';
 import axios from "axios"
 
 import LoginPopup from './LoginPopup';
-import Popup from 'reactjs-popup';
 import Logo from '../images/Logo2.png';
 
 import SearchIcon from '@material-ui/icons/Search'

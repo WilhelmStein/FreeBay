@@ -51,7 +51,8 @@ class SearchResults extends Component
 
         this.setState({
             category: category,
-            text: text
+            text: text,
+            offset: 0
         })
 
         axios.post("/api/search", {
