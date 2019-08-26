@@ -42,30 +42,114 @@ export default class User extends Component {
     }
 
     componentDidMount() {
-        Axios.get(`/api/user?username=${this.props.username}`).then(res => {
-            this.setState({ userData: res.data.data }, () => {
-                if (
-                    this.state.userData != null &&
-                    this.props.user != null &&
-                    this.state.userData.Username === this.props.user.Username
-                ) {
-                    this.setState({ loggedAsTargetUser: true });
-                } else this.setState({ loggedAsTargetUser: false });
-            });
-        });
+
+        if(this.props.user && this.props.user.Username === this.props.username)
+        {
+            Axios.post(`/api/getUser`, {
+                username: this.props.user.Username,
+                password: this.props.user.Password
+            })
+            .then(res => {
+
+                if(res.data.error)
+                {
+                    console.log(res.data.message);
+                    return;
+                }
+
+                this.setState({ userData: res.data.data }, () => {
+                    if (
+                        this.state.userData != null &&
+                        this.props.user != null &&
+                        this.state.userData.Username === this.props.user.Username
+                    ) {
+                        this.setState({ loggedAsTargetUser: true });
+                    } else this.setState({ loggedAsTargetUser: false });
+                });
+            })
+            .catch(err => console.log(err));
+        }
+        else
+        {
+            Axios.get(`/api/publicUserDetails?username=${this.props.username}`)
+            .then(res => {
+
+                if(res.data.error)
+                {
+                    console.log(res.data.message);
+                    return;
+                }
+
+                this.setState({ userData: res.data.data }, () => {
+                    if (
+                        this.state.userData != null &&
+                        this.props.user != null &&
+                        this.state.userData.Username === this.props.user.Username
+                    ) {
+                        this.setState({ loggedAsTargetUser: true });
+                    } else this.setState({ loggedAsTargetUser: false });
+                });
+            })
+            .catch(err => console.log(err));
+        }
+
     }
 
     componentWillReceiveProps(nextProps) {
-        if (
-            this.state.userData != null &&
-            nextProps.user != null &&
-            this.state.userData.Username === nextProps.user.Username
-        ) {
-            this.setState({ loggedAsTargetUser: true });
-        } else this.setState({ loggedAsTargetUser: false });
+
+        if(nextProps.user && nextProps.user.Username === nextProps.username)
+        {
+            Axios.post(`/api/getUser`, {
+                username: nextProps.user.Username,
+                password: nextProps.user.Password
+            })
+            .then(res => {
+
+                if(res.data.error)
+                {
+                    console.log(res.data.message);
+                    return;
+                }
+
+                this.setState({ userData: res.data.data }, () => {
+                    if (
+                        this.state.userData != null &&
+                        this.props.user != null &&
+                        this.state.userData.Username === this.props.user.Username
+                    ) {
+                        this.setState({ loggedAsTargetUser: true });
+                    } else this.setState({ loggedAsTargetUser: false });
+                });
+            })
+            .catch(err => console.log(err));
+        }
+        else
+        {
+            Axios.get(`/api/publicUserDetails?username=${nextProps.username}`)
+            .then(res => {
+
+                if(res.data.error)
+                {
+                    console.log(res.data.message);
+                    return;
+                }
+
+                this.setState({ userData: res.data.data }, () => {
+                    if (
+                        this.state.userData != null &&
+                        this.props.user != null &&
+                        this.state.userData.Username === this.props.user.Username
+                    ) {
+                        this.setState({ loggedAsTargetUser: true });
+                    } else this.setState({ loggedAsTargetUser: false });
+                });
+            })
+            .catch(err => console.log(err));
+        }
     }
 
     toggleDialog(e) {
+        //console.log("TOGGLIN BOAH")
         this.setState({ dialogOpen: !this.state.dialogOpen });
     }
 
@@ -75,7 +159,7 @@ export default class User extends Component {
         }
 
         return (
-            <Grid container direction="row" justify="flex-start" className="UserGrid">
+            <div>
                 <AccountForm
                     open={this.state.dialogOpen}
                     toggleDialog={this.toggleDialog}
@@ -83,17 +167,24 @@ export default class User extends Component {
                     updateUserInfo={this.props.loginHandler}
                 />
 
-                <AccountDetails
-                    userData={this.state.userData}
-                    loggedAsTargetUser={this.state.loggedAsTargetUser}
-                    toggleDialog={this.toggleDialog}
-                />
+                <Grid container direction="row" justify="flex-start" className="UserGrid" spacing={5}>
 
-                <AccountMenu
-                    userData={this.state.UserData}
-                    loggedAsTargetUser={this.state.loggedAsTargetUser}
-                />
-            </Grid>
+                    <Grid item xs={3}>
+                        <AccountDetails
+                            userData={this.state.userData}
+                            loggedAsTargetUser={this.state.loggedAsTargetUser}
+                            toggleDialog={this.toggleDialog}
+                        />
+                    </Grid> 
+                    
+                    <Grid item xs={9} className="UserMenu">
+                        <AccountMenu
+                            userData={this.state.UserData}
+                            loggedAsTargetUser={this.state.loggedAsTargetUser}
+                        />
+                    </Grid>
+                </Grid>
+            </div>
         );
     }
 }
@@ -103,7 +194,7 @@ function AccountDetails(props) {
         Math.round(((props.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
 
     return (
-        <Grid item xs={3}>
+        // <Grid item xs={3}>
             <Card className="UserData">
                 <CardMedia
                     className="UserMedia"
@@ -205,7 +296,7 @@ function AccountDetails(props) {
                     </Grid>
                 </CardContent>
             </Card>
-        </Grid>
+        // </Grid>
     );
 }
 
@@ -238,7 +329,8 @@ class AccountForm extends Component {
             emailError: undefined,
             passwordError: undefined,
             password2Error: undefined,
-            usernameError: undefined
+            usernameError: undefined,
+            noChangeError: undefined
         });
     }
 
@@ -262,15 +354,6 @@ class AccountForm extends Component {
         newState[name] = event.target.value;
 
         this.setState(newState);
-    }
-
-    async confirmOldPasswordCheck() {
-        if (
-            this.state.oldPassword !== this.props.userData.Password &&
-            (!this._empty("newPassword") || !this._empty("newPassword2"))
-        )
-            this.setState({ oldpasswordError: "Incorrect Password." });
-        else this.setState({ oldpasswordError: undefined });
     }
 
     confirmNewPasswordCheck() {
@@ -349,68 +432,117 @@ class AccountForm extends Component {
             .catch(err => console.error(err));
     }
 
+    noChangesCheck()
+    {
+        if (this.state.newUsername === this.props.userData.Username &&
+            this.state.oldPassword === "" &&
+            this.state.newPassword === "" &&
+            this.state.newPassword2 === "" &&
+            this.state.newEmail === this.props.userData.Email &&
+            this.state.newPhone === this.props.userData.Phone &&
+            this.state.newName === this.props.userData.Name &&
+            this.state.newSurname === this.props.userData.Surname &&
+            this.state.newCountry === this.props.userData.Country &&
+            this.state.newCity === this.props.userData.City &&
+            this.state.newStreet === this.props.userData.Street &&
+            this.state.newStreetNumber === this.props.userData.Number &&
+            this.state.newZipCode === this.props.userData.ZipCode)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+            
+    }
+
     cancel() {
         this.clearState();
         this.props.toggleDialog();
     }
 
     submit() {
-        this.confirmOldPasswordCheck().then(() => {
-            if (
-                this.state.oldpasswordError ||
-                this.state.usernameError ||
-                this.state.passwordError ||
-                this.state.password2Error ||
-                this.state.emailError
-            ) {
-                alert("Please fix all errors.");
-                return;
-            }
 
-            if (
-                this._empty("newUsername") ||
-                this._empty("newEmail") ||
-                this._empty("newName") ||
-                this._empty("newSurname") ||
-                this._empty("newPhone") ||
-                this._empty("newStreet") ||
-                this._empty("newStreetNumber") ||
-                this._empty("newZipCode") ||
-                this._empty("newCity") ||
-                this._empty("newCountry")
-            ) {
-                alert("Please fill all fields.");
-                return;
-            }
+        if(this.noChangesCheck())
+        {
+            alert("No changes to submit.");
+            return;
+        }
 
-            Axios.post("/api/updateUser", {
-                oldUsername: this.props.userData.Username,
-                username: this.state.newUsername,
-                password:
-                    this._empty("newPassword") && this._empty("newPassword2")
-                        ? this.props.userData.Password
-                        : this.state.newPassword,
-                email: this.state.newEmail,
-                name: this.state.newName,
-                surname: this.state.newSurname,
-                phone: this.state.newPhone,
-                street: this.state.newStreet,
-                number: this.state.newStreetNumber,
-                zipcode: this.state.newZipCode,
-                city: this.state.newCity,
-                country: this.state.newCountry
-            })
-                .then(res => {
-                    if (res.data.error) {
+        if (
+            this.state.noChangeError ||
+            this.state.usernameError ||
+            this.state.passwordError ||
+            this.state.password2Error ||
+            this.state.emailError
+        ) {
+            alert("Please fix all errors.");
+            return;
+        }
+
+        if (
+            this._empty("newUsername") ||
+            this._empty("newEmail") ||
+            this._empty("newName") ||
+            this._empty("newSurname") ||
+            this._empty("newPhone") ||
+            this._empty("newStreet") ||
+            this._empty("newStreetNumber") ||
+            this._empty("newZipCode") ||
+            this._empty("newCity") ||
+            this._empty("newCountry")
+        ) {
+            alert("Please fill all fields.");
+            return;
+        }
+
+        let oldPass, pass;
+
+        if(this._empty("newPassword") && this._empty("newPassword2") && this._empty("oldPassword"))
+        {
+            oldPass = this.props.userData.Password;
+            pass = oldPass;
+        }
+        else
+        {
+            oldPass = this.state.oldPassword;
+            pass = this.state.newPassword;
+        }
+
+        Axios.post("/api/updateUser", {
+            oldUsername: this.props.userData.Username,
+            username: this.state.newUsername,
+            oldPassword: oldPass,
+            password: pass,
+            email: this.state.newEmail,
+            name: this.state.newName,
+            surname: this.state.newSurname,
+            phone: this.state.newPhone,
+            street: this.state.newStreet,
+            number: this.state.newStreetNumber,
+            zipcode: this.state.newZipCode,
+            city: this.state.newCity,
+            country: this.state.newCountry
+        })
+            .then(res => {
+                if (res.data.error) {
+                    if(res.data.data == false)
+                    {
+                        this.setState({ oldpasswordError: "Old password does not match."});
+                    }
+                    else
+                    {
                         console.error(res.data.message);
                         alert(res.data.message);
-                        return;
                     }
 
-                    this.props.toggleDialog();
-                })
-                .catch(err => console.error(err));
-        });
+                    return;
+                }
+                this.setState({ oldpasswordError: undefined});
+                this.props.toggleDialog();
+            })
+            .catch(err => console.error(err));
     }
 
     render() {
@@ -660,6 +792,11 @@ class AccountMenu extends Component {
         autoBind(this);
     }
 
+    componentDidMount()
+    {
+        //Axios
+    }
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.loggedAsTargetUser) {
             this.setState({
@@ -670,6 +807,13 @@ class AccountMenu extends Component {
                 ]
             });
         }
+        else
+        {
+            this.setState({
+                tabValue: 0,
+                tabs: [{ label: "Active Auctions" }]
+            });
+        }
     }
 
     changeTabValue(event, newValue) {
@@ -678,21 +822,25 @@ class AccountMenu extends Component {
 
     render() {
         return (
-            <Grid container item className="UserMenu" xs={9} /*sm={3}*/>
-                <Grid item className="UserTabs" xs={12}>
-                    <AppBar position="static" color="default">
-                        <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
-                            {this.state.tabs.map(tab => (
-                                <Tab key={tab.label} label={tab.label} className="Tab" />
-                            ))}
-                        </Tabs>
-                    </AppBar>
-                </Grid>
+            // <Grid item className="UserMenu" xs={9} /*sm={3}*/>
+                <Grid container>
+                    <Grid item className="UserTabs" xs={12}>
+                        <AppBar position="static" color="default">
+                            <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
+                                {this.state.tabs.map(tab => (
+                                    <Tab key={tab.label} label={tab.label} className="Tab" />
+                                ))}
+                            </Tabs>
+                        </AppBar>
+                    </Grid>
 
-                <Grid container item className="" xs={12}>
-                    <Grid item xs={3} />
+                    <Grid item className="" xs={12}>
+                        <Grid container>
+                            
+                        </Grid>
+                    </Grid>
                 </Grid>
-            </Grid>
+            // </Grid>
         );
     }
 }

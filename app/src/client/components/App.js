@@ -11,6 +11,7 @@ import UserPage from './User';
 import NotFound from './NotFound';
 
 import '../style/App.scss';
+import Axios from 'axios';
 
 class App extends React.Component {
     
@@ -43,6 +44,12 @@ class App extends React.Component {
         });
     }
 
+    updateHandler()
+    {
+        //Axios.post()
+        //sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
+    }
+
     render()
     {
         return (
@@ -54,7 +61,12 @@ class App extends React.Component {
                     <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
                     <Route path='/auction/:id' component={AuctionPage} />
-                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user} username={props.match.params.username}/>}/>
+                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user}
+                                                                               username={props.match.params.username}
+                                                                               updateHandler={this.updateHandler()}
+                                                                     />
+                                                         }
+                    />
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
                     <Route path='*' component={NotFound} />
                 </Switch>

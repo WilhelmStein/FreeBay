@@ -11,34 +11,34 @@ INSERT INTO General_User VALUES (1010, 100.0, 100.0, 'Userus', 'Passwordius', '1
 
 
 Insert into Auction (Id, Seller_Id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description)
-Values  (1, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "A luxurious suit for the extraordinary gentleman."),
-        (2, 1, "Modest Frock", 333.00, 100.00, 800.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-9-18 9:00:00", "An elegant frock for the graceful lady."),
-        (3, 3, "Venereal Disease", 0.00, 30.00, 69.69, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-12-18 9:00:00", ";)"),
-        (4, 3, "Natural Viagra", 23.00, 10.00, 55.00, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-10-18 9:00:00", "To make your partner say: 'By Jupiter's Cock!'"),
-        (5, 5, "Your Mother", 6.12, 5.00, 12.00, "Elladistan", NULL, NULL, "2019-01-11 9:00:00", "2019-10-18 9:00:00", ""),
-        (6, 4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
-        (7, 1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "");
+Values  (501, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "A luxurious suit for the extraordinary gentleman."),
+        (502, 1, "Modest Frock", 333.00, 100.00, 800.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-9-18 9:00:00", "An elegant frock for the graceful lady."),
+        (503, 3, "Venereal Disease", 0.00, 30.00, 69.69, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-12-18 9:00:00", ";)"),
+        (504, 3, "Natural Viagra", 23.00, 10.00, 55.00, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-10-18 9:00:00", "To make your partner say: 'By Jupiter's Cock!'"),
+        (505, 5, "Your Mother", 6.12, 5.00, 12.00, "Elladistan", NULL, NULL, "2019-01-11 9:00:00", "2019-10-18 9:00:00", ""),
+        (506, 4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
+        (507, 1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "");
 
 Insert into Auction_has_Category
-Values (1, 1), (2, 1), (3, 2), (4, 2), (5, 3), (6, 3), (7, 3);
+Values (501, 1), (502, 1), (503, 2), (504, 2), (505, 3), (506, 3), (507, 3);
 
 -- Views --
 
 Insert into Views (User_Id, Auction_Id, Time)
-Values  (2, 1, "2019-01-12 9:00:00"),
-        (2, 2, "2019-01-12 9:00:00"),
-        (3, 5, "2019-01-12 9:00:00"),
-        (4, 5, "2019-01-12 9:10:00"),
-        (5, 6, "2019-01-12 9:00:00");
+Values  (2, 501, "2019-01-12 9:00:00"),
+        (2, 502, "2019-01-12 9:00:00"),
+        (3, 505, "2019-01-12 9:00:00"),
+        (4, 505, "2019-01-12 9:10:00"),
+        (5, 506, "2019-01-12 9:00:00");
 
 -- Image --
 
 Insert into Image (Id, Path, Auction_Id)
-Values  (5, "5.jpg", 1),
-        (2, "2.jpg", 7),
-        (4, "4.jpg", 5),
-        (1, "1.jpg", 6),
-        (6, "6.jpg", 2);
+Values  (5, "5.jpg", 501),
+        (2, "2.jpg", 507),
+        (4, "4.jpg", 505),
+        (1, "1.jpg", 506),
+        (6, "6.jpg", 502);
 
 -- Category --
 

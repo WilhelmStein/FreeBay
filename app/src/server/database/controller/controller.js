@@ -314,15 +314,13 @@ class DBController
         });
     }
 
-    user(username, res)
+    getPublicUserDetails(username, res)
     {
         const query = {
-            string: `SELECT *
-                     FROM User u,
-                          General_User gu
-                          LEFT JOIN
-                          Address a ON gu.Address_Id = a.Id
-                     WHERE u.Username=? AND gu.User_Id = u.Id`,
+            string: `SELECT u.Id, u.Username, gu.Seller_Rating
+                     FROM User u
+                          JOIN
+                          General_User gu ON u.Username = ? AND u.Id = gu.User_Id`,
             escape: [username]
         };
 
@@ -335,29 +333,119 @@ class DBController
         });
     }
 
+    getUser(username, password, res)
+    {
+
+        const query = {
+            string: "SELECT 1 FROM User WHERE Username=? AND Password=?",
+            escape: [username, password]
+        }
+
+        this.query(query, res, (rows) => {
+
+            
+            if(rows.length === 0)
+            {
+                res.send({
+                    error: true,
+                    message: "Authentication Failed.",
+                    data: false
+                });
+
+                return;
+            }
+
+            const query = {
+                string: `SELECT *
+                        FROM User u,
+                            General_User gu
+                            LEFT JOIN
+                            Address a ON gu.Address_Id = a.Id
+                        WHERE u.Username=? AND gu.User_Id = u.Id`,
+                escape: [username]
+            };
+
+            this.query(query, res, (rows) => {
+                res.send({
+                    error: false,
+                    message: "OK",
+                    data: rows[0]
+                });
+            });
+        });
+    }
+
+
+
     updateUser(body, res)
     {
         //console.log(body)
+
         const query = {
-            string: `UPDATE User u, General_User gu, Address a
-                     SET u.Username = ?,
-                         u.Email = ?,
-                         u.Password = ?,
-                         gu.Name = ?,
-                         gu.Surname = ?,
-                         gu.Phone = ?,
-                         a.Street = ?,
-                         a.Number = ?,
-                         a.ZipCode = ?,
-                         a.Country = ?,
-                         a.City = ?
-                     WHERE u.Username = ? AND
-                           u.Id = gu.User_Id AND
-                           gu.Address_Id = a.Id`,
-            escape: [body.username, body.email, body.password, body.name, body.surname, body.phone, body.street, body.number, body.zipcode, body.country, body.city, body.oldUsername]
+            string: "SELECT 1 FROM User WHERE Username=? AND Password=?",
+            escape: [body.oldUsername, body.oldPassword]
         }
 
-        this.query(query, res);
+        this.query(query, res, (rows) => {
+
+            
+            if(rows.length === 0)
+            {
+                res.send({
+                    error: true,
+                    message: "Authentication Failed.",
+                    data: false
+                });
+
+                return;
+            }
+
+
+            const query = {
+                string: `UPDATE 
+                        (
+                            (
+                                User u 
+                                JOIN
+                                General_User gu ON u.Id = gu.User_Id
+                            )
+                            LEFT JOIN 
+                            Address a ON a.Id = gu.Address_Id
+                        )
+                         SET u.Username = ?,
+                             u.Email = ?,
+                             u.Password = ?,
+                             gu.Name = ?,
+                             gu.Surname = ?,
+                             gu.Phone = ?,
+                             a.Street = ?,
+                             a.Number = ?,
+                             a.ZipCode = ?,
+                             a.Country = ?,
+                             a.City = ?
+                         WHERE u.Username = ?`,
+                escape: [body.username, body.email, body.password, body.name, body.surname, body.phone, body.street, body.number, body.zipcode, body.country, body.city, body.oldUsername]
+            }
+    
+            this.query(query, res, (err, rows) => {
+                if (err)
+                {
+                    console.error(err);
+                    res.send({
+                        error: true,
+                        message: "Something went wrong in database update. Please try again."
+                    });
+                    return;
+                }
+
+                res.send({
+                    error: false,
+                    message: "OK",
+                    data: true
+                });
+            });
+
+        });
     }
 
     userAuctions(username, res)
