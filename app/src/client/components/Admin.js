@@ -320,7 +320,7 @@ class Users extends Component
             const oddity = index % 2 === 1 ? "odd" : "even";
 
             return (
-                <TableRow onClick={(event) => {this.props.userClick(user.Username); event.preventDefault();}} className={`TableRow ${oddity}`} key={user.Username}>
+                <TableRow onClick={(event) => {this.props.userClick(event, user.Username); event.preventDefault();}} className={`TableRow ${oddity}`} key={user.Username}>
                     {__cell(user.Username, 'left')}
                     {__cell(user.Email, 'left')}
                     {__cell(user.Name, 'left')}
