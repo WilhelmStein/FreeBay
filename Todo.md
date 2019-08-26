@@ -44,6 +44,9 @@
     - [x] Search
       - [x] Implement Functionality
     - [x] Login
+      - [x] Redo Popup with Dialog
+    - [x] Account Snapshot
+      - [x] Redo with Material UI
     - [x] Styling
 - [x] Home Page
   - [x] Carousel
@@ -71,9 +74,13 @@
     - [ ] Post Auction
     - [ ] Active Auctions
     - [ ] Messages
+      - [ ] Notifications
+      - [ ] Received / Sent Sorting
+      - [ ] Delete Message
     - [ ] Settings
 - [ ] Auction Page
   - [ ] View - Bid Auction
+  - [ ] Export to XML by admin
 - [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing
@@ -82,7 +89,8 @@
   - [x] Search users by usermame
   - [x] Validate User
   - [x] Reject User
-  - [ ] Support?
+  - [ ] Press user -> More details / Auctions
+    - [ ] Export Selected auctions
 - [ ] About Page
 - [ ] Help Page
 
