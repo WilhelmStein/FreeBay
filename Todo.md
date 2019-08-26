@@ -80,7 +80,7 @@
     - [ ] Settings
 - [ ] Auction Page
   - [ ] View - Bid Auction
-  - [ ] Export to XML by admin
+  - [x] Export to XML by admin
 - [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing
@@ -89,8 +89,11 @@
   - [x] Search users by usermame
   - [x] Validate User
   - [x] Reject User
-  - [ ] Press user -> More details / Auctions
-    - [ ] Export Selected auctions
+  - [x] View Auctions (Search, Sort)
+    - [x] Select Auctions
+    - [x] Export Selected auctions
+      - [x] XMl
+      - [x] JSON
 - [ ] About Page
 - [ ] Help Page
 
