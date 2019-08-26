@@ -20,8 +20,10 @@ $dark-red-active: rgb(87, 17, 17);
 $green: #159c2b;
 
 $almost-white: rgb(241, 241, 241);
+$basically-white: rgb(235, 235, 235);
 $less-white: rgb(230, 230, 230);
 $lesser-white: rgb(216, 216, 216);
+$grey: rgb(175, 175, 175);
 $graphite: rgb(73, 73, 73);
 
 $font: Ubuntu, Helvetica, Arial, sans-serif;
@@ -32,6 +34,7 @@ $normal-font-size: 18px;
 $bigger-font-size: 21px;
 $header-font-size: 25px;
 $big-header-font-size: 30px;
+$huge-font-size: 40px;
 
 $main-color: $red;
 $main-dim: $red-dim;
@@ -76,5 +79,4 @@ body, #root, .App
 
     color: $blue;
 }
-
 

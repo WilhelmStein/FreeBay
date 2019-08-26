@@ -1,0 +1,90 @@
+@import 'global';
+
+
+.Recommended
+{
+    border-top: 0.3px solid rgb(182, 182, 182);
+
+    padding-left: 50px;
+}
+
+
+.RecommendedGrid
+{
+    margin-top: 20px !important;
+
+    ::-webkit-scrollbar 
+    {
+        width: 0.4em;
+        height: 0.4em;
+    }
+
+    ::-webkit-scrollbar-track
+    {
+        box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+    }
+
+    ::-webkit-scrollbar-thumb
+    {
+        background-color: rgba(0,0,0,.1);
+        outline: 1px solid slategrey
+    }
+
+    ::-webkit-scrollbar-thumb:hover
+    {
+        background: $lesser-white;
+    }
+
+    .Wrapper
+    {
+        width: 250px;
+
+        .Item
+        {
+            transition: 200ms;
+            overflow: auto;
+
+            cursor: pointer;
+
+            background-color: $almost-white;
+
+            &:hover
+            {
+                background-color: $less-white;
+            }
+        }
+
+        .Media
+        {
+            height: 250px;
+
+            background-color: white;
+        }
+
+
+        .ItemBody
+        {
+            margin-left: 0px;
+
+            .Title
+            {
+                &:hover
+                {
+                    color: $graphite;
+                }
+            }
+        }
+
+        .Seller
+        {
+            color: $blue;
+            cursor: pointer;
+
+            &:hover
+            {
+                filter: brightness(130%);
+            }
+        }
+    }
+}

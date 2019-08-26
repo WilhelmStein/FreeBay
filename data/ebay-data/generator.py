@@ -7,9 +7,11 @@ from datetime import datetime
 
 import random
 
-import math
-
 import json
+
+import os
+
+from downloader import Downloader
 
 
 class Generator:
@@ -19,91 +21,77 @@ class Generator:
         "password": "password",
         "host": "127.0.0.1",
         "database": "freebay",
-        "raise_on_warnings": True
+        "raise_on_warnings": False
     }
 
     queries = {
         "User": (
-            "INSERT INTO User "
-            "(Id, Username, Password, Email) "
+            "INSERT INTO User"
+            "(Id, Username, Password, Email)"
             "VALUES (%(Id)s, %(Username)s, %(Password)s, %(Email)s)"
         ),
         "General_User": (
-            "INSERT INTO General_User "
-            "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated) "
+            "INSERT INTO General_User"
+            "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated)"
             "VALUES (%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
         ),
         "Address": (
-            "INSERT INTO Address "
-            "(Id, Street, Number, ZipCode, Country, City) "
+            "INSERT INTO Address"
+            "(Id, Street, Number, ZipCode, Country, City)"
             "VALUES (%(Id)s, %(Street)s, %(Number)s, %(ZipCode)s, %(Country)s, %(City)s)"
         ),
         "Category": (
-            "INSERT INTO Category "
-            "(Id, Name) "
-            "VALUES (%(Id)s, %(Name)s)"
+            "INSERT INTO Category"
+            "(Id, Name, Caption)"
+            "VALUES (%(Id)s, %(Name)s, %(Caption)s)"
         ),
         "Auction_has_Category": (
-            "INSERT INTO Auction_has_Category "
-            "(Auction_Id, Category_Id) "
+            "INSERT INTO Auction_has_Category"
+            "(Auction_Id, Category_Id)"
             "VALUES (%(Auction_Id)s, %(Category_Id)s)"
         ),
         "Auction": (
-            "INSERT INTO Auction "
-            "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description) "
+            "INSERT INTO Auction"
+            "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description)"
             "VALUES (%(Id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s)"
         ),
         "Bid": (
             "INSERT INTO Bid"
             "(Id, User_id, Auction_Id, Amount, Time)"
             "VALUES (%(Id)s, %(User_id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
+        ),
+        "Image": (
+            "INSERT INTO Image"
+            "(Id, Path, Auction_Id)"
+            "VALUES (%(Id)s, %(Path)s, %(Auction_Id)s)"
         )
     }
 
-    def __init__(self, create_script_path='/home/massiva/Documents/Courses/Web Application Technologies/FreeBay/app/src/server/database/sql/create.sql', seed=123456789, verbose=False, drop_all=False, rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2):
+    def __init__(self, seed=123456789, verbose=True, tables_to_drop=["Auction_has_Category", "Bid", "Image", "Auction", "General_User", "User", "Address", "Category"], rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2, validated_percentage=0.7, downloader=Downloader()):
 
         self.verbose = verbose
 
-
         self.rating_lower, self.rating_upper, self.rating_digits = rating_lower, rating_upper, rating_digits
 
-
         self.dollar_digits = dollar_digits
+
+        self.validated_percentage = validated_percentage
+
+
+        self.downloader = downloader
 
 
         self.cnx = connector.connect(**Generator.config)
 
         self.cur = self.cnx.cursor()
 
-        if drop_all:
+        if isinstance(tables_to_drop, list) and tables_to_drop:
 
-            for table in ["Auction_has_Category", "Bid", "Auction", "General_User", "User", "Address", "Category"]:
+            print("[Generator] Tables", ",".join(["'{}'".format(table) for table in tables_to_drop]), "were dropped")
+
+            for table in tables_to_drop:
 
                 self.cur.execute("DELETE FROM {}".format(table))
-
-        else:
-
-            if create_script_path:
-
-                with open(create_script_path, 'r') as create_script:
-
-                    for query in create_script.read().split(';'):
-
-                        query = query.strip()
-
-                        if query != '' and not query.startswith('--'):
-
-                            try:
-
-                                self.cur.execute(query)
-
-                            except Exception as exception:
-
-                                code, message = str(exception).split(": ")
-
-                                print("[ERROR {}] {}".format(code, message))
-
-                                exit(1)
 
 
         self.random = random.Random(seed)
@@ -113,6 +101,8 @@ class Generator:
         self.generator.seed(seed)
 
 
+        self.auction_id = 0
+
         self.users = {}
 
         self.categories = {}
@@ -120,6 +110,8 @@ class Generator:
         self.address_id = 0
 
         self.bid_id = 0
+
+        self.image_id = 0
 
 
     def __del__(self):
@@ -166,7 +158,7 @@ class Generator:
             "Surname": surname if surname else self.generator.last_name(),
             "Phone": phone if phone else self.generator.phone_number(),
             "Address_Id": self.address_id,
-            "Validated": True
+            "Validated": self.random.random() <= self.validated_percentage
         }
 
 
@@ -190,7 +182,8 @@ class Generator:
 
         return {
             "Id": len(self.categories),
-            "Name": name
+            "Name": name,
+            "Caption": "Lorem ispum solor sit amet! Sit ipsum De lora.."
         }
 
 
@@ -202,7 +195,7 @@ class Generator:
         }
 
 
-    def __generate_auction__(self, auction_id, seller_id, name, currently, first_bid, started, ends, description, buy_price=None, location=None):
+    def __generate_auction__(self, seller_id, name, currently, first_bid, started, ends, description, buy_price=None, location=None):
 
         if not location:
 
@@ -214,8 +207,10 @@ class Generator:
 
             latitude, longitude, location = location["Latitude"], location["Longitude"], location["Place"]
 
+        self.auction_id += 1
+
         return {
-            "Id": auction_id,
+            "Id": self.auction_id,
             "Seller_id": seller_id,
             "Name": name,
             "Currently": self.__normalize_dollars__(currently),
@@ -240,6 +235,17 @@ class Generator:
             "Auction_Id": auction_id,
             "Amount": self.__normalize_dollars__(amount),
             "Time": time
+        }
+
+
+    def __generate_image__(self, auction_id, path):
+
+        self.image_id += 1
+
+        return {
+            "Id": self.image_id,
+            "Path": path,
+            "Auction_Id": auction_id
         }
 
 
@@ -272,7 +278,7 @@ class Generator:
 
             code, message = str(error).split(": ")
 
-            print("[ERROR {}] {}".format(code, message), dump, sep='\n')
+            print("[Generator] [ERROR {}] {}".format(code, message), dump, sep='\n\n')
 
             exit(1)
 
@@ -283,7 +289,7 @@ class Generator:
 
         if self.verbose:
 
-            print("Processing auction '%s'" % auction["ItemID"])
+            print("[Generator] Processing auction '%s'" % auction["ItemID"])
 
         seller = auction["Seller"]
 
@@ -297,7 +303,6 @@ class Generator:
 
         self.__register__("Auction",
             self.__generate_auction__(
-                auction_id=auction.get("ItemID"),
                 seller_id=self.users[seller["UserID"]],
                 name=auction.get("Name"),
                 currently=auction.get("Currently"),
@@ -309,6 +314,12 @@ class Generator:
                 description=auction.get("Description")
             )
         )
+
+        if self.downloader:
+
+            for path in self.downloader.download(auction["Name"]):
+
+                self.__register__("Image", self.__generate_image__(self.auction_id, path))
 
         for bid in auction["Bids"]:
 
@@ -322,7 +333,7 @@ class Generator:
 
                 self.__register__("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]], bidder_rating=bidder["Rating"]))
 
-                self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=auction["ItemID"], amount=bid["Amount"], time=bid["Time"]))
+                self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=self.auction_id, amount=bid["Amount"], time=bid["Time"]))
 
         for category in auction["Category"]:
 
@@ -330,5 +341,5 @@ class Generator:
 
                 self.__register__("Category", self.__generate_category__(category))
 
-                self.__register__("Auction_has_Category", self.__generate_auction_has_category__(auction["ItemID"], self.categories[category]))
+                self.__register__("Auction_has_Category", self.__generate_auction_has_category__(self.auction_id, self.categories[category]))
 

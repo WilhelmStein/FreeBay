@@ -7,6 +7,7 @@ import Home from './Home';
 import SearchResults from './SearchResults';
 import AdminPage from './Admin';
 import AuctionPage from './Auction';
+import UserPage from './User';
 import NotFound from './NotFound';
 
 import '../style/App.scss';
@@ -38,26 +39,28 @@ class App extends React.Component {
                 {
                     this.props.history.push("/admin");
                 }
+
             }
             else
             {
-                this.props.history.push("/");
+                if (this.props.location.pathname === "/admin")
+                    this.props.history.push("/");
             }
         });
     }
 
     render()
     {
-
         return (
             <div className="App">
                 {/* Header is here because it will always render in the website. It also gives login status to every other page */}
                 <Header user={this.state.user} loginHandler={this.loginHandler}/>
                 <Menu active={this.props.location.pathname}/>
                 <Switch>
-                    <Route exact path='/' component={Home} />
+                    <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
-                    <Route path='/auction' component={AuctionPage} />
+                    <Route path='/auction/:id' component={AuctionPage} />
+                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user} username={props.match.params.username}/>}/>
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
                     <Route path='*' component={NotFound} />
                 </Switch>
