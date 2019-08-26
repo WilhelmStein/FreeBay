@@ -7,7 +7,7 @@ Values  ("TheSmilingGentleman", "luxuriousattire", "iamnotovercompensating@yahoo
         ("LadyGrantham", "whatisaweekend", "dowagercountess@arpanet.gov"),
         ("Venus", "fire", "desire@hotmail.com"),
         ("spinme", "rightround", "babyrightround@hotmail.com"),
-        ("user", "password", "min@edu.gov"),
+        ("graikos", "password", "min@edu.gov"),
         ("JordanPeterson", "postmodernneomarxism", "daddeh@gmail.com"),
         ('user', 'password', 'user@password.com');
 
@@ -69,6 +69,7 @@ Values  (2, 1, NOW()),
 
 Insert into Image (Id, Path, Auction_Id)
 Values  (5, "5.png", 1),
+        (6, "6.gif", 4),
         (3, "3.png", 5),
         (4, "4.jpg", 5),
         (1, "1.jpg", 6),
