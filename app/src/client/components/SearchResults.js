@@ -3,20 +3,9 @@ import autoBind from 'auto-bind';
 import { withRouter } from 'react-router-dom';
 import axios from "axios";
 
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import Container from '@material-ui/core/Container'
-import Grid from '@material-ui/core/Grid';
-
-import Button from '@material-ui/core/Button';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import Paper from '@material-ui/core/Paper'
+import {Fade, Typography, Box, Container, Grid, Button, Select, MenuItem, Card, CardMedia, CardContent} from '@material-ui/core';
 import Pagination from 'material-ui-flat-pagination';
 
-import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
 
 import Rating from '@material-ui/lab/Rating';
 
@@ -62,7 +51,8 @@ class SearchResults extends Component
 
         this.setState({
             category: category,
-            text: text
+            text: text,
+            offset: 0
         })
 
         axios.post("/api/search", {
@@ -76,8 +66,6 @@ class SearchResults extends Component
                 return;
             }
 
-            console.log(res.data.data)
-
             this.setState({
                 items: res.data.data
             })
@@ -88,7 +76,8 @@ class SearchResults extends Component
     changeView(event)
     {
         this.setState({
-            view: event.target.value
+            view: event.target.value,
+            resultsPerPage: event.target.value.includes("Detailed") ? 6 : 12
         })
     }
 
@@ -156,7 +145,7 @@ class SearchResults extends Component
         return (
             <div className="SearchResultsPage">
                 <h2>
-                    {items.length} results for:
+                    {this.state.items.length} results for:
 
                     <span className="ResultsName">
                         {this.state.text === "" ? "-" : this.state.text}
@@ -208,79 +197,83 @@ function DetailedAuctionItem(props)
     const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
 
     return (
-        <Card className={`Item ${props.grid ? "Grid" : ""}`}>
-            <CardMedia
-                image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                title="Generic placeholder"
-            />
-            <CardContent className="ItemBody">
+        <Fade in={true}>
+            <Card className={`Item ${props.grid ? "Grid" : ""}`}>
+                <CardMedia
+                    className="CardMedia"
+                    image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                    title="Generic placeholder"
+                />
+                <CardContent className="ItemBody">
 
-                <Typography variant="h2">
-                    {props.item.Name}
-                </Typography>
-
-                <Box mb={2}>
-                    <Typography display="inline"> Sold By:</Typography>
-
-                    <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
-                        &nbsp; &nbsp;{props.item.User.Username}
+                    <Typography variant="h2">
+                        {props.item.Name}
                     </Typography>
-                        
-                    <Rating display="inline" value={rating} precision={0.5} readOnly />
-                </Box>
-                
-                <Box className="Description">
-                    {/* <Typography paragraph > */}
-                        {props.item.Description === null ? "No Description." : props.item.Description}
-                    {/* </Typography> */}
-                </Box>
-                
-            </CardContent>
 
-            <CardContent className="Pricing">
-                <Grid container className="Prices" spacing={1}>
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Starting Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography className="Starting Price" variant="h4">{props.item.First_Bid ? `EUR ${parseFloat(props.item.First_Bid).toFixed(2)}` : "-"}</Typography>
+                    <Box mb={2}>
+                        <Typography display="inline"> Sold By:</Typography>
+
+                        <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
+                            &nbsp; &nbsp;{props.item.User.Username}
+                        </Typography>
+                            
+                        <Rating display="inline" value={rating} precision={0.5} readOnly />
+                    </Box>
+                    
+                    <Box className="Description">
+                        {/* <Typography paragraph > */}
+                            {props.item.Description === null ? "No Description." : props.item.Description}
+                        {/* </Typography> */}
+                    </Box>
+                    
+                </CardContent>
+
+                <CardContent className="Pricing">
+                    <Grid container className="Prices" spacing={1}>
+                        <Grid item xs={6}>
+                            <Typography variant="h5" className="Title">Starting Price:</Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Typography className="Starting Price" variant="h4">{props.item.First_Bid ? `EUR ${parseFloat(props.item.First_Bid).toFixed(2)}` : "-"}</Typography>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <Typography variant="h5" className="Title">Current Price:</Typography>
+                        </Grid>
+                        <Grid item xs={6} zeroMinWidth>
+                            <Typography className="Current Price" variant="h4">{props.item.Currently ? `EUR ${parseFloat(props.item.Currently).toFixed(2)}` : "-"}</Typography>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <Typography variant="h5" className="Title">Buyout Price:</Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Typography className="Buyout Price" variant="h4">{props.item.Buy_Price ? `EUR ${parseFloat(props.item.Buy_Price).toFixed(2)}` : "-"}</Typography>
+                        </Grid>
                     </Grid>
 
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Current Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6} zeroMinWidth>
-                        <Typography className="Current Price" variant="h4">{props.item.Currently ? `EUR ${parseFloat(props.item.Currently).toFixed(2)}` : "-"}</Typography>
-                    </Grid>
+                    <Box className="Buttons" mt={3}>
+                        <Button className="Bid Button" variant="contained">
+                            Bid
+                        </Button>
+                        <Button className="Buyout Button" variant="contained">
+                            Buyout
+                        </Button>
+                    </Box>
 
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography className="Buyout Price" variant="h4">{props.item.Buy_Price ? `EUR ${parseFloat(props.item.Buy_Price).toFixed(2)}` : "-"}</Typography>
-                    </Grid>
-                </Grid>
-
-                <Box className="Buttons" mt={3}>
-                    <Button className="Bid Button" variant="contained">
-                        Bid
-                    </Button>
-                    <Button className="Buyout Button" variant="contained">
-                        Buyout
-                    </Button>
-                </Box>
-
-                <Box className="Dates" mt={2}>
-                    <Typography>
-                        Started in: <span className="Started Date">{props.item.Started}</span>
-                    </Typography>
-                    <Typography>
-                        Ends in: <span className="Ends Date">{props.item.Ends}</span>
-                    </Typography>
-                </Box>
-                
-            </CardContent>
-        </Card>
+                    <Box className="Dates" mt={2}>
+                        <Typography>
+                            Started in: <span className="Started Date">{props.item.Started}</span>
+                        </Typography>
+                        <Typography>
+                            Ends in: <span className="Ends Date">{props.item.Ends}</span>
+                        </Typography>
+                    </Box>
+                    
+                </CardContent>
+            </Card>
+        </Fade>
+        
     )
 }
 
@@ -289,55 +282,58 @@ function CollapsedAuctionItem(props)
     const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
 
     return (
-        <Card className="Item">
-            <CardMedia
-                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/100x100/ffffff/4a4a4a.png&text=No+Image"}
-                title="Generic placeholder"
-            />
-            <CardContent className="ItemBody">
-                <Typography variant="h2">
-                    {props.item.Name}
-                </Typography>
-
-                <Box mb={3}>
-                    <Typography display="inline"> Sold By:</Typography>
-
-                    <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
-                        &nbsp; &nbsp;{props.item.User.Username}
+        <Fade in={true}>
+            <Card className="Item">
+                <CardMedia
+                    className="CardMedia"
+                    image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/100x100/ffffff/4a4a4a.png&text=No+Image"}
+                    title="Generic placeholder"
+                />
+                <CardContent className="ItemBody">
+                    <Typography variant="h2">
+                        {props.item.Name}
                     </Typography>
-                        
-                    <Rating display="inline" value={rating} precision={0.5} readOnly />
-                </Box>
-            </CardContent>
-            <CardContent className="Pricing">
-                <Grid container className="Prices" spacing={1}>
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Current Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6} zeroMinWidth>
-                    <Typography className="Current Price" variant="h4">{props.item.Currently ? `EUR ${parseFloat(props.item.Currently).toFixed(2)}` : "-"}</Typography>
-                    </Grid>
 
-                    <Grid item xs={6}>
-                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Typography className="Buyout Price" variant="h4">{props.item.Buy_Price ? `EUR ${parseFloat(props.item.Buy_Price).toFixed(2)}` : "-"}</Typography>
-                    </Grid>
-                </Grid>
-            </CardContent>
+                    <Box mb={3}>
+                        <Typography display="inline"> Sold By:</Typography>
 
-            <CardContent className="Buttons">
-                <Container>
-                    <Button className="Bid Button" variant="contained">
-                        Bid
-                    </Button>
-                    <Button className="Buyout Button" variant="contained">
-                        Buyout
-                    </Button>
-                </Container>
-            </CardContent>
-        </Card>
+                        <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
+                            &nbsp; &nbsp;{props.item.User.Username}
+                        </Typography>
+                            
+                        <Rating display="inline" value={rating} precision={0.5} readOnly />
+                    </Box>
+                </CardContent>
+                <CardContent className="Pricing">
+                    <Grid container className="Prices" spacing={1}>
+                        <Grid item xs={6}>
+                            <Typography variant="h5" className="Title">Current Price:</Typography>
+                        </Grid>
+                        <Grid item xs={6} zeroMinWidth>
+                        <Typography className="Current Price" variant="h4">{props.item.Currently ? `EUR ${parseFloat(props.item.Currently).toFixed(2)}` : "-"}</Typography>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <Typography variant="h5" className="Title">Buyout Price:</Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Typography className="Buyout Price" variant="h4">{props.item.Buy_Price ? `EUR ${parseFloat(props.item.Buy_Price).toFixed(2)}` : "-"}</Typography>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+
+                <CardContent className="Buttons">
+                    <Container>
+                        <Button className="Bid Button" variant="contained">
+                            Bid
+                        </Button>
+                        <Button className="Buyout Button" variant="contained">
+                            Buyout
+                        </Button>
+                    </Container>
+                </CardContent>
+            </Card>
+        </Fade>
     )
 }
 
@@ -348,6 +344,7 @@ function SquareAuctionItem(props)
     return (
         <Card className="Item">
             <CardMedia
+                className="CardMedia"
                 image={props.item.Images && props.item.Images.length ? `/api/image?path=${props.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                 title={props.item.Name}
             />
@@ -394,4 +391,3 @@ function SquareAuctionItem(props)
 }
 
 export default withRouter(SearchResults);
-export {SquareAuctionItem};

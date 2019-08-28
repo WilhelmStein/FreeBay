@@ -21,9 +21,11 @@
 - [x] XML -> DB generation
   - [ ] Pass 1-2-3 Auction Ids
 - [x] Search sql queries
-- [ ] Bonus algorithm
-- [ ] Auction retrieval sql query
+- [ ] Bonus algorithm (Recommended items)
+- [x] Auction retrieval sql query
 - [ ] Auction post sql query
+- [x] Category Captions
+- [ ] Category Filling
 
 ## Front - End
 
@@ -32,9 +34,8 @@
 - [x] Create React app
 - [x] Setup Router
 - [x] Setup Sass
-- [x] Test Bootstrap
+- [x] Test Bootstrap (Scrapped)
 - [x] Integrate Material UI
-- [ ] Design UI - Adobe XD
 
 ### Components
 
@@ -43,11 +44,17 @@
     - [x] Search
       - [x] Implement Functionality
     - [x] Login
+      - [x] Redo Popup with Dialog
+    - [x] Account Snapshot
+      - [x] Redo with Material UI
     - [x] Styling
-- [ ] Home Page
-  - [ ] Carousel
-  - [ ] Featured Items Algorithm
-  - [ ] Popular Items Query
+- [x] Home Page
+  - [x] Carousel
+    - [x] Create custom carousel component
+    - [ ] Experiment with colouring
+  - [x] General Styling
+  - [x] Popular / Recommended Grid
+  - [x] Carousel Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
@@ -60,14 +67,20 @@
   - [x] Square Grid (Scrapped)
   - [x] Pagination
 - [ ] Account Page
-  - [ ] Profile
-  - [ ] Posted Auctions
-  - [ ] Active Auctions
-  - [ ] Messages
-  - [ ] Settings
+  * Everybody
+    - [ ] Profile
+    - [ ] Posted Auctions
+  * Logged User
+    - [ ] Post Auction
+    - [ ] Active Auctions
+    - [ ] Messages
+      - [ ] Notifications
+      - [ ] Received / Sent Sorting
+      - [ ] Delete Message
+    - [ ] Settings
 - [ ] Auction Page
-  - [ ] Post Auction
   - [ ] View - Bid Auction
+  - [x] Export to XML by admin
 - [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing
@@ -76,7 +89,11 @@
   - [x] Search users by usermame
   - [x] Validate User
   - [x] Reject User
-  - [ ] Support?
+  - [x] View Auctions (Search, Sort)
+    - [x] Select Auctions
+    - [x] Export Selected auctions
+      - [x] XMl
+      - [x] JSON
 - [ ] About Page
 - [ ] Help Page
 

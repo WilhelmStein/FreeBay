@@ -66,6 +66,8 @@
         background: $lesser-white;
     }
 
+    margin-bottom: 10px !important;
+
     h2
     {
         margin: 0 !important;
@@ -161,6 +163,12 @@
                 }
             }
         }
+    }
+
+    .CardMedia
+    {
+        background-color: white;
+        border-right: 0.3px solid $less-white;
     }
 
     .ListItem

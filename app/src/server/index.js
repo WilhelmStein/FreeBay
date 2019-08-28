@@ -31,11 +31,21 @@ app.post('/api/admin/validate', function(req, res) { controller.admin_validate(r
 
 app.post('/api/admin/reject', function(req, res) {controller.admin_reject(req.body.username, req.body.password, req.body.user, res); });
 
+app.post('/api/admin/auctions', function(req, res) {controller.admin_auctions(req.body.username, req.body.password, res); });
+
 app.post('/api/search', function(req, res) { controller.search(req.body.category, req.body.text, res); });
 
 app.get('/api/auction', function(req, res) { controller.auction(req.query.id, res); });
 
-app.post('/api/featured', function(req, res) { controller.featured(req.body.username, res); });
+app.get('/api/user', function(req, res) { controller.user(req.query.username, res); });
+
+app.post('/api/updateUser', function(req, res) { controller.updateUser(req.body, res); });
+
+app.get('/api/userAuctions', function(req, res) { controller.userAuctions(req.query.username, res); });
+
+app.get('/api/featured', function(req, res) { controller.featured(res); });
+
+app.post('/api/recommended', function(req, res) { controller.recommended(req.body.username, res); });
 
 app.get('/api/image', function(req, res) { controller.image(req.query.path, res); });
 

@@ -15,7 +15,9 @@ FreeBay is a clone of the well-known online auction service "E-Bay".
 ## Technologies
 
 * MySQL
-* ReactJS
-* Express.js
-* Node.js
-* Scss
+* [ReactJS](https://reactjs.org/)
+* [Express.js](https://expressjs.com/)
+* [Node.js](https://nodejs.org/en/)
+* [Sass](https://sass-lang.com/)
+* [React Material UI](https://material-ui.com/)
+* [Axios](https://www.npmjs.com/package/axios)
