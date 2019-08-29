@@ -91,7 +91,7 @@
 
                 .Description
                 {
-                    height: 100px;
+                    max-height: 100px;
                     font-size: $smaller-font-size;
                     color: $graphite;
                 }
@@ -99,7 +99,7 @@
 
             .Description
             {
-                height: 135px;
+                max-height: 135px;
                 overflow-y: scroll;
 
                 padding: 10px 0;
@@ -180,7 +180,7 @@
 
     .Item
     {
-        width: 97%;
+        width: 900px;
         margin-left: 10px;
 
         .ItemBody
@@ -189,11 +189,25 @@
         }
     }
 
-    .Seller
+    .SellerBox
     {
-        color: $blue;
-        cursor: pointer;
+        p, .Seller, .Rating
+        {
+            font-size: $small-font-size;
+        }
+
+        .Seller
+        {
+            color: $blue;
+            cursor: pointer;
+
+            &:hover
+            {
+                filter: brightness(130%);
+            }
+        }
     }
+    
 
     .Pricing, .Buttons
     {
@@ -208,12 +222,13 @@
 
         .Title
         {
+            font-size: $small-font-size;
             font-weight: 300;
         }
 
         .Price
         {
-            font-size: fit-width;
+            font-size: $normal-font-size;
             &.Starting
             {
                 color: $blue;
@@ -233,7 +248,10 @@
 
     .Dates
     {
-        font-size: $normal-font-size;
+        p
+        {
+            font-size: $smaller-font-size !important;
+        }
 
         .Date
         {

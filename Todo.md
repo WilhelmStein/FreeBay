@@ -35,6 +35,7 @@
 - [x] Setup Router
 - [x] Setup Sass
 - [x] Test Bootstrap (Scrapped)
+  - [x] Remove Bootstrap CDN and restyls
 - [x] Integrate Material UI
 
 ### Components

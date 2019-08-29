@@ -135,7 +135,7 @@ class SearchResults extends Component
         .slice(this.state.offset, this.state.offset + this.state.resultsPerPage)
         .map( (item) => {
             return (
-                <Grid item xs={gridDivision} key={item.Id} >
+                <Grid item key={item.Id} >
                     {type(item)}
                 </Grid>
             );
@@ -210,19 +210,19 @@ function DetailedAuctionItem(props)
                         {props.item.Name}
                     </Typography>
 
-                    <Box mb={2}>
+                    <Box mb={2} className="SellerBox">
                         <Typography display="inline"> Sold By:</Typography>
 
                         <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                             &nbsp; &nbsp;{props.item.User.Username}
                         </Typography>
                             
-                        <Rating display="inline" value={rating} precision={0.5} readOnly />
+                        <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
                     </Box>
                     
                     <Box className="Description">
                         {/* <Typography paragraph > */}
-                            {props.item.Description === null ? "No Description." : props.item.Description}
+                            {props.item.Description ? "No Description." : props.item.Description}
                         {/* </Typography> */}
                     </Box>
                     
@@ -230,24 +230,24 @@ function DetailedAuctionItem(props)
 
                 <CardContent className="Pricing">
                     <Grid container className="Prices" spacing={1}>
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography variant="h5" className="Title">Starting Price:</Typography>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography className="Starting Price" variant="h4">{props.item.First_Bid ? `EUR ${parseFloat(props.item.First_Bid).toFixed(2)}` : "-"}</Typography>
                         </Grid>
 
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography variant="h5" className="Title">Current Price:</Typography>
                         </Grid>
-                        <Grid item xs={6} zeroMinWidth>
+                        <Grid item  zeroMinWidth>
                             <Typography className="Current Price" variant="h4">{props.item.Currently ? `EUR ${parseFloat(props.item.Currently).toFixed(2)}` : "-"}</Typography>
                         </Grid>
 
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography variant="h5" className="Title">Buyout Price:</Typography>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography className="Buyout Price" variant="h4">{props.item.Buy_Price ? `EUR ${parseFloat(props.item.Buy_Price).toFixed(2)}` : "-"}</Typography>
                         </Grid>
                     </Grid>
@@ -294,29 +294,29 @@ function CollapsedAuctionItem(props)
                         {props.item.Name}
                     </Typography>
 
-                    <Box mb={3}>
+                    <Box mb={3} className="SellerBox">
                         <Typography display="inline"> Sold By:</Typography>
 
                         <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                             &nbsp; &nbsp;{props.item.User.Username}
                         </Typography>
                             
-                        <Rating display="inline" value={rating} precision={0.5} readOnly />
+                        <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
                     </Box>
                 </CardContent>
                 <CardContent className="Pricing">
                     <Grid container className="Prices" spacing={1}>
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography variant="h5" className="Title">Current Price:</Typography>
                         </Grid>
-                        <Grid item xs={6} zeroMinWidth>
+                        <Grid item  zeroMinWidth>
                         <Typography className="Current Price" variant="h4">{props.item.Currently ? `EUR ${parseFloat(props.item.Currently).toFixed(2)}` : "-"}</Typography>
                         </Grid>
 
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography variant="h5" className="Title">Buyout Price:</Typography>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item >
                             <Typography className="Buyout Price" variant="h4">{props.item.Buy_Price ? `EUR ${parseFloat(props.item.Buy_Price).toFixed(2)}` : "-"}</Typography>
                         </Grid>
                     </Grid>
@@ -353,27 +353,27 @@ function SquareAuctionItem(props)
                     {props.item.Name}
                 </Typography>
 
-                <Box mb={3}>
+                <Box mb={3} className="SellerBox">
                     <Typography display="inline"> Sold By:</Typography>
 
                     <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
                         &nbsp; &nbsp;{props.item.User.Username}
                     </Typography>
                         
-                    <Rating display="inline" value={rating} precision={0.5} readOnly />
+                    <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
                 </Box>
                 <Grid container className="Prices" spacing={1}>
-                    <Grid item xs={6}>
+                    <Grid item >
                         <Typography variant="h5" className="Title">Current Price:</Typography>
                     </Grid>
-                    <Grid item xs={6} zeroMinWidth>
+                    <Grid item  zeroMinWidth>
                         <Typography className="Current Price" variant="h4">{props.item.Currently ? `EUR ${parseFloat(props.item.Currently).toFixed(2)}` : "-"}</Typography>
                     </Grid>
 
-                    <Grid item xs={6}>
+                    <Grid item >
                         <Typography variant="h5" className="Title">Buyout Price:</Typography>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item >
                         <Typography className="Buyout Price" variant="h4">{props.item.Buy_Price ? `EUR ${parseFloat(props.item.Buy_Price).toFixed(2)}` : "-"}</Typography>
                     </Grid>
                 </Grid>

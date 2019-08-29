@@ -118,7 +118,7 @@ class SearchBar extends Component
                 </select>
                 <input placeholder="Search..." value={this.state.text} onChange={this.inputChange}/>
                 <Button color="secondary"  variant="contained" type="submit" aria-label="search" onClick={this.submit}>
-                    <SearchIcon fontSize="large"/>
+                    <SearchIcon fontSize="medium"/>
                 </Button>
             </div>
         )
@@ -234,7 +234,7 @@ class AccountSnapshot extends Component
         {
             return (
                 <div className="AccountSnapshot Full">
-                        <Avatar style={{backgroundColor: this.getRandomColor()}} className="Avatar">{this.props.user.Username[0]}</Avatar>
+                        <Avatar style={{backgroundColor: this.getRandomColor()}} className="Avatar" onClick={this.props.userClick}>{this.props.user.Username[0]}</Avatar>
                         <Box>
                             <Typography className="Username" onClick={this.props.userClick}>
                                 {this.props.user.Username}

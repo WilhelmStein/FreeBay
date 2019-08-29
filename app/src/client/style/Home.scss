@@ -69,6 +69,8 @@
 
             .Title
             {
+                font-size: $header-font-size;
+                
                 &:hover
                 {
                     color: $graphite;
@@ -76,14 +78,22 @@
             }
         }
 
-        .Seller
+        .SellerBox
         {
-            color: $blue;
-            cursor: pointer;
-
-            &:hover
+            p, .Seller, .Rating
             {
-                filter: brightness(130%);
+                font-size: $small-font-size;
+            }
+    
+            .Seller
+            {
+                color: $blue;
+                cursor: pointer;
+
+                &:hover
+                {
+                    filter: brightness(130%);
+                }
             }
         }
     }
