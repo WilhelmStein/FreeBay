@@ -380,7 +380,7 @@ class Users extends Component
                         />
                     </Toolbar>
                 </AppBar>
-                <Table size='medium' className="Table">
+                <Table className="Table">
                     <TableHead className="TableHead">
                         <TableRow>
                             {__cell('Username', 'left')}
@@ -690,7 +690,7 @@ class Auctions extends Component
                         />
                     </Toolbar>
                 </AppBar>
-                <Table size='medium' className="Table">
+                <Table className="Table">
                     <TableHead className="TableHead">
                         <TableRow>
 

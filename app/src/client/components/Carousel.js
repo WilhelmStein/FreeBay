@@ -28,6 +28,11 @@ export default class Carousel extends Component
         this.start();
     }
 
+    componentWillUnmount()
+    {
+        this.stop();
+    }
+
     stop()
     {
         if (this.autoPlay)
@@ -88,7 +93,7 @@ export default class Carousel extends Component
     render()
     {
         return (
-            <div className="Carousel" onMouseEnter={this.stop} onMouseOut={this.reset}>
+            <div className={`Carousel ${this.props.className}`} onMouseEnter={this.stop} onMouseOut={this.reset}>
                 {
                     this.props.children.map( (child, index) => {
                         return (

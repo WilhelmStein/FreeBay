@@ -76,8 +76,8 @@ class CarouselWrapper extends Component {
     render() {
 
         return (
-            <div style={{padding: "20px 100px", backgroundColor: "rgb(235, 235, 235)"}}>
-                <Carousel autoPlay={false}>
+            // <div style={{padding: "20px 100px", backgroundColor: "rgb(235, 235, 235)"}}>
+                <Carousel className="Carousel">
                 {
                     this.state.categories.map((category, index) => {
                         const props = this.getProps(index)
@@ -95,7 +95,7 @@ class CarouselWrapper extends Component {
                     })
                 }
                 </Carousel>
-            </div>
+            // </div>
         )
     }
 }

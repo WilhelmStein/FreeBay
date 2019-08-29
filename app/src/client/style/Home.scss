@@ -6,6 +6,12 @@
     border-top: 0.3px solid rgb(182, 182, 182);
 
     padding-left: 50px;
+
+    h2
+    {
+        font-weight: 400;
+        color: $graphite;
+    }
 }
 
 
@@ -69,7 +75,8 @@
 
             .Title
             {
-                font-size: $header-font-size;
+                font-size: $bigger-font-size;
+                font-weight: 400;
                 
                 &:hover
                 {

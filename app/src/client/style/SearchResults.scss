@@ -84,16 +84,11 @@
             display: grid;
             grid-template-columns: 250px auto 270px;
 
-            &.Grid
+            .SellerBox
             {
-                grid-template-columns: 250px auto 270px;
-                height: 250px;
-
-                .Description
+                p, .Seller, .Rating
                 {
-                    max-height: 100px;
-                    font-size: $smaller-font-size;
-                    color: $graphite;
+                    font-size: $small-font-size;
                 }
             }
 
@@ -106,7 +101,37 @@
 
                 font-size: $small-font-size;
                 color: $graphite;
+            }
 
+            .Pricing
+            {
+                position: relative;
+                padding: 0;
+
+                .Prices, .Dates
+                {
+                    padding: 10px;
+                    margin: 0;
+                }
+
+
+                .Buttons
+                {
+                    position: absolute;
+                    width: 100%;
+
+                    bottom: 0;
+
+                    .Button
+                    {
+                        width: 100%;
+                        height: 50px;
+                        border-top-right-radius: 0px;
+                        border-top-left-radius: 0px;
+                        border-bottom-left-radius: 0px;
+                    }
+                    
+                }
             }
         }
     }
@@ -117,50 +142,45 @@
         {
             display: grid;
 
-            grid-template-columns: 100px auto 270px 200px;
+            grid-template-columns: 100px auto 270px 100px;
     
             .ItemBody
             {
-                height: 100px;
                 margin-left: 30px;
                 overflow: hidden;
+
+                .Title
+                {
+                    font-size: $bigger-font-size;
+                }
+            }
+            
+
+            .SellerBox
+            {
+                p, .Seller, .Rating
+                {
+                    font-size: $smaller-font-size;
+                }
             }
 
             .Buttons
             {
-                height: 100px;
+                padding: 0;
 
                 .Button
                 {
-                    margin-bottom: 2px;
-                    width: 90px;
-                    padding: 5px;
-                    font-size: $small-font-size;
+                    height: 100%;
+                    width: 100%;
+
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
                 }
             }
 
             &.Grid
             {
                 overflow-y: auto;
-            }
-        }
-    }
-
-    &.Square
-    {
-        .Item
-        {
-            height: 250px;
-
-            display: grid;
-            grid-template-columns: 250px 300px;
-
-            .Buttons
-            {
-                .Button
-                {
-                    margin-right: 15px;
-                }
             }
         }
     }
@@ -186,24 +206,33 @@
         .ItemBody
         {
             overflow: auto;
-        }
-    }
 
-    .SellerBox
-    {
-        p, .Seller, .Rating
-        {
-            font-size: $small-font-size;
-        }
-
-        .Seller
-        {
-            color: $blue;
-            cursor: pointer;
-
-            &:hover
+            >.Title
             {
-                filter: brightness(130%);
+                transition: 200ms;
+
+                cursor: pointer;
+
+                &:hover
+                {
+                    color: $graphite-hover;
+                }
+            }
+            
+            .SellerBox
+            {
+                .Seller
+                {
+                    color: $blue;
+                    cursor: pointer;
+        
+                    transition: 200ms;
+        
+                    &:hover
+                    {
+                        filter: brightness(130%);
+                    }
+                }
             }
         }
     }
@@ -251,10 +280,12 @@
         p
         {
             font-size: $smaller-font-size !important;
+            font-weight: 300;
         }
 
         .Date
         {
+            font-weight: 400;
             &.Started
             {
                 color: $green;
@@ -269,23 +300,14 @@
 
     .Button
     {
-        margin-right: 5px;
-        width: 100px;
-        border-radius: 5px;
         color: white;
 
-        padding: 5px 15px;
+        background-color: $blue;
+        font-size: $small-font-size;
 
-        font-size: $normal-font-size;
-        
-        &.Bid
+        &:hover, &:active
         {
-            background-color: $green;
-        }
-
-        &.Buyout
-        {
-            background-color: $red;
+            background-color: $blue-hover;
         }
     }
 }

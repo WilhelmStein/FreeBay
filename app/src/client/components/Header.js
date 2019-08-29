@@ -26,6 +26,12 @@ class Header extends Component
 
     userClick()
     {
+        if (this.props.user.admin)
+        {
+            this.props.history.push('/admin');
+            return;
+        }
+
         this.props.history.push(`/user/${this.props.user.Username}`);
     }
 
@@ -118,7 +124,7 @@ class SearchBar extends Component
                 </select>
                 <input placeholder="Search..." value={this.state.text} onChange={this.inputChange}/>
                 <Button color="secondary"  variant="contained" type="submit" aria-label="search" onClick={this.submit}>
-                    <SearchIcon fontSize="medium"/>
+                    <SearchIcon/>
                 </Button>
             </div>
         )
