@@ -8,8 +8,14 @@ import { GridList, GridListTile } from '@material-ui/core'
 import { Avatar } from '@material-ui/core';
 import { Paper } from '@material-ui/core';
 import { Card, CardHeader, CardMedia, CardContent, CardActions } from '@material-ui/core';
-import { ExpandMore } from '@material-ui/icons'
 import { Typography, Collapse } from '@material-ui/core'
+import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
+import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core'
+import { ExpandMore } from '@material-ui/icons'
+
+import { Container } from '@material-ui/core'
+import AwesomeSlider from 'react-awesome-slider';
+import AwsSliderStyles from 'react-awesome-slider/src/styles';
 
 class AuctionPage extends Component
 {
@@ -19,7 +25,6 @@ class AuctionPage extends Component
 
         this.state = {
             id: props.match.params.id,
-            expanded: false,
             auction: null
         };
 
@@ -55,34 +60,11 @@ class AuctionPage extends Component
             <Paper>
                 <Card className="auction-page">
                     <CardHeader
-                        avatar={
-                            <Avatar
-                                aria-label="auction-avatar"
-                                className="auction-avatar"
-                                src={this.state.auction.Images.length !== 0 ? `/api/image?path=${this.state.auction.Images[0]}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                            >
-                            </Avatar>
-                        }
                         title={this.state.auction.Name}
                         subheader={`${this.state.auction.User.Username} - ${this.state.auction.User.Rating}`}
                     >
                     </CardHeader>
-                    <CardMedia
-                        className="auction-first-image"
-                        image={this.state.auction.Images.length !== 0 ? `/api/image?path=${this.state.auction.Images[0]}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                        title={this.state.auction.Name}
-                    />
-                    <GridList
-                        className="auction-images"
-                        cellHeight={160}
-                        cols={3}
-                    >
-                        {this.state.auction.Images.map(image =>
-                            <GridListTile key={image.Path}>
-                                <img src={image.Path}/>
-                            </GridListTile>
-                        )}
-                    </GridList>
+                    <Images images={this.state.auction.Images}></Images>
                     <CardContent className="auction-money">
                         <Typography variant="body1" color="textPrimary" component="p">
                             {this.state.auction.Buy_Price != null ? "Buy Price: " + this.state.auction.Buy_Price : null}
@@ -107,61 +89,116 @@ class AuctionPage extends Component
                             Ends: {this.state.auction.Ends}
                         </Typography>
                     </CardContent>
-                    <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
-                        <Typography variant="body2" color="textSecondary" component="p">
-                            {this.state.auction.Description}
-                        </Typography>
-                    </Collapse>
-                    <CardActions disableSpacing>
-                        <IconButton className='auction-description-expand'
-                            onClick={() => { this.setState({expanded: !this.state.expanded})}}
-                            aria-expanded={this.state.expanded}
-                            aria-label={"Show More"}
-                        >
-                            <ExpandMore/>
-                        </IconButton>
-                    </CardActions>
-                    <CardContent className="auction-bids">
-                    {(this.state.auction.Bids.length !== 0
-                    ?
-                    (
-                        <List component="div">
-                            {this.state.auction.Bids.map(bid =>
-                                <Bid
-                                    Id={bid.Id}
-                                    Username={bid.User.Username}
-                                    Rating={bid.User.Rating}
-                                    Amount={bid.Amount}
-                                    Time={bid.Time}
-                                >
-                                </Bid>
-                            )}
-                        </List>
-                    )
-                    :
-                    null
-                    )}
-                    </CardContent>
+                    <Typography variant="body2" color="textSecondary" component="p">
+                        {this.state.auction.Description}
+                    </Typography>
+                    <Bids
+                        content={this.state.auction.Bids}
+                        expanded={false}
+                    >
+                    </Bids>
                 </Card>
             </Paper>
-            //     <div className="auction-description">
-            //         <h4>{this.state.auction.Description}</h4>
-            //     </div>
         );
     }
 }
 
-function Bid(props)
+class Bids extends Component
 {
-    return (
-        <ListItem key={props.Id}>
-            <Avatar className="auction-avatar">{props.Username[0]}</Avatar>
-            <ListItemText
-                primary={`${props.Username} ${props.Rating}`}
-                secondary={`Amount: ${props.Amount} Time: ${props.Time}`}>
-            </ListItemText>
-        </ListItem>
-    )
+    constructor(props)
+    {
+        super(props)
+
+        this.state = {
+            content: props.content,
+            expanded: props.expanded
+        }
+
+        autoBind(this)
+    }
+
+    render()
+    {
+        const content = this.state.content.map((bid, index) =>
+            <TableRow className={`bid-${index % 2 ? "even" : "odd"}`} key={bid.Id}>
+                <TableCell>{bid.User.Username}></TableCell>
+                <TableCell>{bid.User.Rating}></TableCell>
+                <TableCell>{bid.Amount}></TableCell>
+                <TableCell>{bid.Time}></TableCell>
+            </TableRow>
+        )
+
+        return (
+            <Table size="large" className="bids">
+                <ExpansionPanel
+                    expanded={this.state.expanded}
+                    onChange={() => this.setState({expanded: !this.state.expanded})}
+                >
+                    <ExpansionPanelSummary
+                        id={"bids-expandable-header"}
+                        expandIcon={<ExpandMore/>}
+                    >
+                        <TableHead className="bids-head">
+                            <TableRow>
+                                <TableCell>{"Username"}></TableCell>
+                                <TableCell>{"Rating"}></TableCell>
+                                <TableCell>{"Amount"}></TableCell>
+                                <TableCell>{"Time"}></TableCell>
+                            </TableRow>
+                        </TableHead>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <TableBody className="bids-body">
+                            {content}
+                        </TableBody>
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+            </Table>
+        )
+    }
+}
+
+class Images extends Component
+{
+    constructor(props)
+    {
+        super(props)
+
+        this.state = {
+            images: props.images
+        }
+    }
+
+    render()
+    {
+        // const images = this.state.images.map(
+        //     image => <div data-src={`/api/image?path=${image.Path}`}/>
+        // )
+
+        const images = [
+            "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image",
+            "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image",
+            "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image",
+            "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"
+        ].map(image => <div data-src={image}/>)
+
+        return (
+            <Container maxWidth={"ms"}>
+                {(images.length !== 0
+                ?
+                <AwesomeSlider cssModule={AwsSliderStyles}>
+                    {images}
+                </AwesomeSlider>
+                :
+                <Card>
+                    <CardMedia
+                        className="no-image-card"
+                        image={"https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                    />
+                </Card>)}
+            </Container>
+        )
+    }
 }
 
 export default withRouter(AuctionPage);
