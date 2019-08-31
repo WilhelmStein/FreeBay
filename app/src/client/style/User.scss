@@ -77,15 +77,26 @@
                 background: $blue;
             }
         }
+    }
 
-        .UserMenu
+    .UserMenu
+    {
+        .UserTabs
         {
-            .UserTabs
+            .Tab
             {
-                .Tab
-                {
-                    font-size: $header-font-size !important;
-                }
+                font-size: $normal-font-size;
+            }
+        }
+
+        .AuctionCard
+        {
+            font-size: $normal-font-size;
+
+            .Media
+            {
+                height: 200px;
+                // object-fit: scale-down;
             }
         }
     }

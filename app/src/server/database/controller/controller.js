@@ -314,7 +314,7 @@ class DBController
         });
     }
 
-    getPublicUserDetails(username, res)
+    publicUserDetails(username, res)
     {
         const query = {
             string: `SELECT u.Id, u.Username, gu.Seller_Rating
@@ -343,8 +343,9 @@ class DBController
 
         this.query(query, res, (rows) => {
 
-            
-            if(rows.length === 0)
+            // console.log(rows)
+            // console.log(username + " : " + password)
+            if(rows.length !== 1)
             {
                 res.send({
                     error: true,
@@ -375,11 +376,9 @@ class DBController
         });
     }
 
-
-
     updateUser(body, res)
     {
-        //console.log(body)
+        // console.log(body)
 
         const query = {
             string: "SELECT 1 FROM User WHERE Username=? AND Password=?",
@@ -387,9 +386,10 @@ class DBController
         }
 
         this.query(query, res, (rows) => {
-
+            // console.log("Authentication Result:");
+            // console.log(rows);
             
-            if(rows.length === 0)
+            if(rows.length !== 1)
             {
                 res.send({
                     error: true,
@@ -401,42 +401,94 @@ class DBController
             }
 
 
-            const query = {
-                string: `UPDATE 
-                        (
+            let string = `UPDATE 
                             (
-                                User u 
-                                JOIN
-                                General_User gu ON u.Id = gu.User_Id
+                                (
+                                    User u 
+                                    JOIN
+                                    General_User gu ON u.Username = ? AND u.Id = gu.User_Id
+                                )
+                                LEFT JOIN 
+                                Address a ON a.Id = gu.Address_Id
                             )
-                            LEFT JOIN 
-                            Address a ON a.Id = gu.Address_Id
-                        )
-                         SET u.Username = ?,
-                             u.Email = ?,
-                             u.Password = ?,
-                             gu.Name = ?,
-                             gu.Surname = ?,
-                             gu.Phone = ?,
-                             a.Street = ?,
-                             a.Number = ?,
-                             a.ZipCode = ?,
-                             a.Country = ?,
-                             a.City = ?
-                         WHERE u.Username = ?`,
-                escape: [body.username, body.email, body.password, body.name, body.surname, body.phone, body.street, body.number, body.zipcode, body.country, body.city, body.oldUsername]
+                            SET `;
+            let escape = [body.oldUsername];
+            
+            if(body.username)
+            {
+                string += `u.Username = ?,`
+                escape.push(body.username);
+            }
+            
+            if(body.email)
+            {
+                string += `u.Email = ?,`;
+                escape.push(body.email);
+            }
+
+            if(body.password)
+            {
+                string += `u.Password = ?,`;
+                escape.push(body.password);
+            }
+
+            if(body.name)
+            {
+                string += `gu.Name = ?,`;
+                escape.push(body.name);
+            }
+
+            if(body.surname)
+            {
+                string += `gu.Surname = ?,`;
+                escape.push(body.surname);
+            }
+
+            if(body.phone)
+            {
+                string += `gu.Phone = ?,`;
+                escape.push(body.phone);
+            }
+
+            if(body.street)
+            {
+                string += `a.Street = ?,`;
+                escape.push(body.street);
+            }
+
+            if(body.number)
+            {
+                string += `a.Number = ?,`;
+                escape.push(body.number);
+            }
+
+            if(body.zipcode)
+            {
+                string += `a.ZipCode = ?,`;
+                escape.push(body.zipcode);
+            }
+
+            if(body.country)
+            {
+                string += `a.Country = ?,`;
+                escape.push(body.country);
+            }
+            
+            if(body.city)
+            {
+                string += `a.City = ?,`;
+                escape.push(body.city);
+            }
+
+            string = string.slice(0, -1);
+            // console.log(string);
+
+            const query = {
+                string: string,
+                escape: escape
             }
     
             this.query(query, res, (err, rows) => {
-                if (err)
-                {
-                    console.error(err);
-                    res.send({
-                        error: true,
-                        message: "Something went wrong in database update. Please try again."
-                    });
-                    return;
-                }
 
                 res.send({
                     error: false,
@@ -451,21 +503,73 @@ class DBController
     userAuctions(username, res)
     {
         const query = {
-            string: `SELECT a.Id
+            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
+                            a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                      FROM 
                         (
                             SELECT u.Id
                             FROM User u
                             WHERE u.Username = ?
-                        ) as u,
-                        Auction a
-                     WHERE a.Seller_Id = u.Id`,
+                        ) as u
+                        LEFT JOIN
+                        Auction a ON a.Seller_Id = u.Id
+                        LEFT JOIN
+                        Image i ON i.Auction_Id = a.Id
+                     GROUP BY a.Id
+                     ORDER BY Ends DESC`,
             escape: [username]
         };
 
         this.query(query, res, (rows) => {
-            console.log(rows)
+            // console.log(rows)
+
+            if(rows.length !== 0 && rows[0].Id === null)
+                rows = [];
             
+            rows = rows.map((item) => {
+                item.Images = item.Images === null ? [] : JSON.parse(item.Images)
+                return item;
+            });
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows
+            });
+        });
+    }
+
+    userWatchedAuctions(username, password)
+    {
+        const query = {
+            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
+                            a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+                     FROM 
+                        (
+                            SELECT u.Id
+                            FROM User u
+                            WHERE u.Username = ?
+                        ) as u
+                        LEFT JOIN
+                        Auction a ON a.Seller_Id = u.Id
+                        LEFT JOIN
+                        Image i ON i.Auction_Id = a.Id
+                     GROUP BY a.Id
+                     ORDER BY Ends DESC`,
+            escape: [username]
+        };
+
+        this.query(query, res, (rows) => {
+            // console.log(rows)
+
+            if(rows.length !== 0 && rows[0].Id === null)
+                rows = [];
+            
+            rows = rows.map((item) => {
+                item.Images = item.Images === null ? [] : JSON.parse(item.Images)
+                return item;
+            });
+
             res.send({
                 error: false,
                 message: "OK",

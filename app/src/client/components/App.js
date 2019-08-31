@@ -20,6 +20,7 @@ class App extends React.Component {
         super(props);
 
         const user_s = sessionStorage.getItem('LoggedUser');
+        //console.log(user_s)
         const user = user_s ? JSON.parse(user_s) : null;
 
         this.state = {
@@ -44,10 +45,20 @@ class App extends React.Component {
         });
     }
 
-    updateHandler()
+    async updateHandler(username, password)
     {
-        //Axios.post()
-        //sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
+        Axios.post('/api/login', {
+            username: username,
+            password: password
+        })
+        .then(res => {
+            if (res.data.error)
+                console.error(res.data.message);
+                
+            this.setState({user: res.data.data});
+            sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
+        })
+        .catch(err => console.log(err));
     }
 
     render()
@@ -63,7 +74,7 @@ class App extends React.Component {
                     <Route path='/auction/:id' component={AuctionPage} />
                     <Route path='/user/:username' render={(props) => <UserPage user={this.state.user}
                                                                                username={props.match.params.username}
-                                                                               updateHandler={this.updateHandler()}
+                                                                               updateHandler={(username, password) => this.updateHandler(username, password)}
                                                                      />
                                                          }
                     />

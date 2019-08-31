@@ -129,7 +129,7 @@ export class LoginForm extends Component
             else
             {
                 this.props.Close();
-
+                //console.log(res.data.data)
                 sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
 
                 if (this.props.loginHandler)
