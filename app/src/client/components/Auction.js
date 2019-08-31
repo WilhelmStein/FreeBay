@@ -17,6 +17,8 @@ import { Container } from '@material-ui/core'
 import AwesomeSlider from 'react-awesome-slider';
 import AwsSliderStyles from 'react-awesome-slider/src/styles';
 
+import '../style/Auction.scss';
+
 class AuctionPage extends Component
 {
     constructor(props)
@@ -103,6 +105,49 @@ class AuctionPage extends Component
     }
 }
 
+function Row(props)
+{
+    return (
+        <TableRow className={props.className} key={props.key}>
+            <TableCell className={`bid-cell-username`}>{props.username}></TableCell>
+            <TableCell className={`bid-cell-rating`}>{props.rating}></TableCell>
+            <TableCell className={`bid-cell-amount`}>{props.amount}></TableCell>
+            <TableCell className={`bid-cell-time`}>{props.time}></TableCell>
+        </TableRow>
+    )
+}
+
+function Head(props)
+{
+    return (
+        <TableHead className={`table-head-${props.className}`}>
+            <Row
+                className={props.className}
+                username={"Username"}
+                rating={"Rating"}
+                amout={"Amount"}
+                time={"Time"}
+            >
+            </Row>
+        </TableHead>
+    )
+}
+
+function Bid(props)
+{
+    return (
+        <Row
+            className={`bid-${props.index % 2 ? "even" : "odd"}`}
+            key={props.index}
+            username={props.bidder.Username}
+            rating={props.bidder.Rating}
+            amout={props.Amount}
+            time={props.Time}
+        >
+        </Row>
+    )
+}
+
 class Bids extends Component
 {
     constructor(props)
@@ -119,37 +164,28 @@ class Bids extends Component
 
     render()
     {
-        const content = this.state.content.map((bid, index) =>
-            <TableRow className={`bid-${index % 2 ? "even" : "odd"}`} key={bid.Id}>
-                <TableCell>{bid.User.Username}></TableCell>
-                <TableCell>{bid.User.Rating}></TableCell>
-                <TableCell>{bid.Amount}></TableCell>
-                <TableCell>{bid.Time}></TableCell>
-            </TableRow>
-        )
-
         return (
             <Table size="large" className="bids">
                 <ExpansionPanel
                     expanded={this.state.expanded}
                     onChange={() => this.setState({expanded: !this.state.expanded})}
                 >
-                    <ExpansionPanelSummary
-                        id={"bids-expandable-header"}
-                        expandIcon={<ExpandMore/>}
-                    >
-                        <TableHead className="bids-head">
-                            <TableRow>
-                                <TableCell>{"Username"}></TableCell>
-                                <TableCell>{"Rating"}></TableCell>
-                                <TableCell>{"Amount"}></TableCell>
-                                <TableCell>{"Time"}></TableCell>
-                            </TableRow>
-                        </TableHead>
+                    <ExpansionPanelSummary id={"panel"} expandIcon={<ExpandMore/>}>
+                        <Head className={"bids-head"}></Head>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
                         <TableBody className="bids-body">
-                            {content}
+                        {
+                            this.state.content.map((bid, index) =>
+                                <Bid
+                                    index={index}
+                                    bidder={bid.User}
+                                    amout={bid.Amount}
+                                    time={bid.Time}
+                                >
+                                </Bid>
+                            )
+                        }
                         </TableBody>
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
