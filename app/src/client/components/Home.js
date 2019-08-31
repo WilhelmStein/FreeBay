@@ -120,14 +120,14 @@ class RecommendedItem extends Component
                                 {this.state.item.Name}
                             </Typography>
 
-                            <Box>
+                            <Box className="SellerBox">
                                 <Typography display="inline" noWrap> Sold By:</Typography>
 
                                 <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick} noWrap>
                                     &nbsp; &nbsp;{this.state.item.User.Username}
                                 </Typography>
                                     
-                                <Rating display="inline" value={rating} precision={0.5} readOnly />
+                                <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
                             </Box>
 
                         </CardContent>

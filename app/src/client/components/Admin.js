@@ -380,7 +380,7 @@ class Users extends Component
                         />
                     </Toolbar>
                 </AppBar>
-                <Table size='medium' className="Table">
+                <Table className="Table">
                     <TableHead className="TableHead">
                         <TableRow>
                             {__cell('Username', 'left')}
@@ -492,25 +492,27 @@ class Auctions extends Component
 
     select(event, index)
     {
-        let display = this.state.display;
-        const selected = !(display[index].selected);
+        const realIndex = this.state.page * this.state.rowsPerPage + index;
 
-        display[index].selected = selected;
+        let display = this.state.display;
+        const selected = !(display[realIndex].selected);
+
+        display[realIndex].selected = selected;
 
         let auctions = this.state.auctions;
-        auctions[display[index].index].selected = selected;
+        auctions[display[realIndex].index].selected = selected;
 
         let newSelected = this.state.selected;
 
         if (selected)
         {
-            newSelected.push(display[index])
+            newSelected.push(display[realIndex])
         }
         else
         {
             for (let i = 0; i < newSelected.length; i++)
             {
-                if (newSelected[i].Id === display[index].Id)
+                if (newSelected[i].Id === display[realIndex].Id)
                 {
                     newSelected.splice(i, 1);
                 }
@@ -688,7 +690,7 @@ class Auctions extends Component
                         />
                     </Toolbar>
                 </AppBar>
-                <Table size='medium' className="Table">
+                <Table className="Table">
                     <TableHead className="TableHead">
                         <TableRow>
 

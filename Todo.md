@@ -19,13 +19,13 @@
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
 - [x] XML -> DB generation
-  - [ ] Pass 1-2-3 Auction Ids
+  - [x] Pass 1-2-3 Auction Ids
 - [x] Search sql queries
-- [ ] Bonus algorithm (Recommended items)
 - [x] Auction retrieval sql query
 - [ ] Auction post sql query
 - [x] Category Captions
 - [ ] Category Filling
+- [ ] Bonus algorithm (Recommended items)
 
 ## Front - End
 
@@ -35,6 +35,7 @@
 - [x] Setup Router
 - [x] Setup Sass
 - [x] Test Bootstrap (Scrapped)
+  - [x] Remove Bootstrap CDN and restyls
 - [x] Integrate Material UI
 
 ### Components
@@ -66,6 +67,7 @@
   - [x] Collapsed Grid
   - [x] Square Grid (Scrapped)
   - [x] Pagination
+  - [x] Redo with one button
 - [ ] Account Page
   * Everybody
     - [ ] Profile

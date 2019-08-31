@@ -139,6 +139,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
         button
         {
+            font-size: $small-font-size;
             background-color: $secondary-color;
 
             border:none;
@@ -149,6 +150,11 @@ $Search-height: calc(#{$Header-height} / 2.2);
             cursor: pointer;
 
             width: $Search-height;
+
+            &:hover, &:active
+            {
+                background-color: $secondary-hover;
+            }
         }
     }
 
@@ -186,8 +192,6 @@ $Search-height: calc(#{$Header-height} / 2.2);
             {
                 cursor: pointer;
 
-                height: 50px;
-                width: 50px;
                 padding: 10px;
 
                 text-transform: capitalize;
