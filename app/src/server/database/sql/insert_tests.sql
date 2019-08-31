@@ -40,6 +40,15 @@ Values  (5, "5.jpg", 501),
         (1, "1.jpg", 506),
         (6, "6.jpg", 502);
 
+Insert into Message_Header (Id, Subject)
+Values  (1, "You won 10000000 euro."),
+        (2, "Welcome to Olympus delivery services");
+
+Insert into Message (Id, Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status)
+Values  (1, 1, "Congratulations! You won 100000 euro by doing absoluteley nothing. In order to claim your prize please give us your personal life and credit card info! Thanks in advance", NOW(), 1, 1010, 'Read'),
+        (2, 1, "Perhaps you did not quite understand what's going on here... Please reply with your credit card information at once!", NOW(), 1010, 1, 'Unread'),
+        (3, 2, "Olymnpu1 101", NOW(), 1, 1010, 'Unread');
+
 -- Category --
 
 -- INSERT INTO Category VALUES (1, "Health & Fitness"), (2, "Electronics & Computers"), (3, "Home & Garden");

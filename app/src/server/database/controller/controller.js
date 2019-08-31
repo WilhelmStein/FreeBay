@@ -44,26 +44,6 @@ class DBController
         )
     }
 
-    admin_users(username, password, res)
-    {
-        this.admin_permission(username, password, res, () => {
-            const query = {
-                string: `Select Concat(gu.Name, ' ', gu.Surname) as Name,
-                                gu.Phone, 
-                                u.Username, 
-                                u.Email, 
-                                gu.Validated,
-                                Concat(a.Street, ' ', a.Number, ', ', a.ZipCode, ' ', a.City) as Address,
-                                a.Country
-                            From General_User as gu, User as u, Address as a 
-                            Where u.Id = gu.User_Id and gu.Address_Id = a.Id Order By gu.Validated`,
-                escape: []
-            }
-
-            this.query(query, res)
-        })
-    }
-
     signup(data, res)
     {
         let query = {
@@ -128,6 +108,26 @@ class DBController
             }
 
             if (callback) callback();
+        })
+    }
+
+    admin_users(username, password, res)
+    {
+        this.admin_permission(username, password, res, () => {
+            const query = {
+                string: `Select Concat(gu.Name, ' ', gu.Surname) as Name,
+                                gu.Phone, 
+                                u.Username, 
+                                u.Email, 
+                                gu.Validated,
+                                Concat(a.Street, ' ', a.Number, ', ', a.ZipCode, ' ', a.City) as Address,
+                                a.Country
+                            From General_User as gu, User as u, Address as a 
+                            Where u.Id = gu.User_Id and gu.Address_Id = a.Id Order By gu.Validated`,
+                escape: []
+            }
+
+            this.query(query, res)
         })
     }
 
@@ -690,6 +690,59 @@ class DBController
                 message: "Image Not Found"
             });
         }
+    }
+
+    messages(username, password, res)
+    {
+        const query = {
+            string: `   SELECT mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username)) as Messages
+                        FROM User as su, User as ru, Message as m, Message_Header as mh
+                        WHERE   mh.Id = m.Message_Header_Id AND
+                                su.Id = m.Sender_Id AND
+                                ru.Id = m.Receiver_Id AND
+                                EXISTS ( SELECT im.Id FROM Message as im, User as iu Where im.Receiver_Id = iu.Id AND iu.Username = ? AND iu.Password = ? AND im.Message_Header_Id = mh.Id )
+                        GROUP BY mh.Id
+                    `,
+            escape: [username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            const Received = rows.map( (row) => {
+                row.Messages = JSON.parse(row.Messages);
+
+                return row;
+            })
+
+            const query = {
+                string: `   SELECT mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username)) as Messages
+                            FROM User as su, User as ru, Message as m, Message_Header as mh
+                            WHERE   mh.Id = m.Message_Header_Id AND
+                                    su.Id = m.Sender_Id AND
+                                    ru.Id = m.Receiver_Id AND
+                                    EXISTS ( SELECT im.Id FROM Message as im, User as iu Where im.Sender_Id = iu.Id AND iu.Username = ? AND iu.Password = ? AND im.Message_Header_Id = mh.Id )
+                            GROUP BY mh.Id
+                        `,
+                escape: [username, password]
+            }
+
+            this.query(query, res, (rows) => {
+                const Sent = rows.map( (row) => {
+                    row.Messages = JSON.parse(row.Messages);
+    
+                    return row;
+                })
+
+                res.send({
+                    error: false,
+                    message: "OK",
+                    data: {
+                        Received: Received,
+                        Sent: Sent
+                    }
+                })
+            })
+            
+        })
     }
 
     query(query, res, callback = null, check = null)

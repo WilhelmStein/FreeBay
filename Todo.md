@@ -76,7 +76,10 @@
     - [ ] Post Auction
     - [ ] Active Auctions
     - [ ] Messages
+      - [x] DB redo -header -body
+      - [ ] Backend queries
       - [ ] Notifications
+      - [ ] Reply
       - [ ] Received / Sent Sorting
       - [ ] Delete Message
     - [ ] Settings

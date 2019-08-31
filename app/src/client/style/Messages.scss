@@ -1,0 +1,34 @@
+@import 'global';
+
+.Messages
+{
+    .Toolbar
+    {
+        background-color: $blue !important;
+
+        .Search, .Select
+        {
+            transition: 200ms;
+
+            color: white;
+            font-size: $small-font-size;
+            background-color: $white-blue;
+            border-radius: 5px;
+
+            margin-right: 10px;
+            
+            padding: 4px;
+            padding-left: 10px;
+            
+            &:hover, &:focus, &:active
+            {
+                background-color: $whiter-blue;
+            }
+        }
+    }
+
+    .MessageList
+    {
+        background-color: $less-white;
+    }
+}

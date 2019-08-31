@@ -49,6 +49,8 @@ app.post('/api/recommended', function(req, res) { controller.recommended(req.bod
 
 app.get('/api/image', function(req, res) { controller.image(req.query.path, res); });
 
+app.post('/api/messages', function(req, res) { controller.messages(req.body.username, req.body.password, res); });
+
 
 const options = {
     key: fs.readFileSync(path.join(__dirname, 'encryption/server.key'), 'utf8'),
