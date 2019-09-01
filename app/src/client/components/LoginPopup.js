@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
-import Popup from 'reactjs-popup';
 import axios from "axios";
 import autoBind from 'auto-bind';
 
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-
-import TextField from '@material-ui/core/TextField'
-import MenuItem from '@material-ui/core/MenuItem'
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid';
+import { TextField, MenuItem, Button, Grid, Tabs, Tab, Dialog } from '@material-ui/core'
 
 import "../style/LoginPopup.scss"
 
@@ -22,7 +15,8 @@ export default class LoginPopup extends Component
         super(props);
 
         this.state = {
-            tab: props.text === "Log In" ? 0 : 1
+            tab: props.tab === "Log In" ? 0 : 1,
+            tabText: props.tab
         };
 
         this.tabs = {
@@ -36,46 +30,42 @@ export default class LoginPopup extends Component
     tabChange(event, newValue)
     {
         this.setState({
-            tab: newValue
+            tab: newValue,
+            tabText: newValue === 0 ? "Log In" : "Sign Up"
         });
+    }
+
+    onEnter()
+    {
+        if (this.props.tab !== this.state.tabText)
+        this.setState({
+            tab: this.props.tab === "Log In" ? 0 : 1,
+            tabText: this.props.tab
+        })
     }
 
     render()
     {
         return (
-            <Popup  
-                className="LoginPopup"
-                modal
-                trigger={
-                    <button className='link Login'>{this.props.text}</button>
-                }
-            >
-                {
-                    close => (
-                        <div className="LoginPopupWrapper">
-                            <div className="Tabs">
-                                <Tabs
-                                    value={this.state.tab}
-                                    onChange={this.tabChange}
-                                    indicatorColor="primary"
-                                    textColor="primary"
-                                    centered
-                                >
-                                    <Tab className="Tab" label="Log In"/>
-                                    <Tab className="Tab" label="Sign Up"/>
-                                </Tabs>
-                            </div>
-                            {
-                                this.state.tab === this.tabs["Log In"] ? 
-                                    <LoginForm Close={close} loginHandler={this.props.loginHandler}/>
-                                    :
-                                    <SignupForm Close={close} loginHandler={this.props.loginHandler}/>
-                            }
-                        </div>
-                        
-                    )
-                }
-            </Popup>
+            <Dialog open={this.props.open} onClose={this.props.close} onEnter={this.onEnter} className="LoginPopup">
+                <div className="LoginPopupWrapper">
+                    <div className="Tabs">
+                        <Tabs
+                            value={this.state.tab}
+                            onChange={this.tabChange}
+                            indicatorColor="primary"
+                            textColor="primary"
+                            centered
+                        >
+                            <Tab className="Tab" label="Log In"/>
+                            <Tab className="Tab" label="Sign Up"/>
+                        </Tabs>
+                    </div>
+
+                    <LoginForm hidden={this.state.tab !== this.tabs["Log In"]} loginHandler={this.props.loginHandler} Close={this.props.close}/>
+                    <SignupForm hidden={this.state.tab !== this.tabs["Sign Up"]} loginHandler={this.props.loginHandler} Close={this.props.close}/>
+                </div>
+            </Dialog>
         )
     }
 }
@@ -115,8 +105,6 @@ export class LoginForm extends Component
             password: this.state.password
         })
         .then(res => {
-            
-            // console.log(res.data);
 
             if (res.data.error)
             {
@@ -129,7 +117,7 @@ export class LoginForm extends Component
             else
             {
                 this.props.Close();
-
+                //console.log(res.data.data)
                 sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
 
                 if (this.props.loginHandler)
@@ -147,7 +135,7 @@ export class LoginForm extends Component
     render()
     {
         return (
-            <form className='LoginForm' onSubmit={this.submit}>
+            <form hidden={this.props.hidden} className='LoginForm' onSubmit={this.submit}>
                 <header>Log in</header>
                     <TextField
                         className="TextField"
@@ -459,7 +447,7 @@ export class SignupForm extends Component
         }
 
         return (
-            <form className='SignupForm' onSubmit={this.submit}>
+            <form hidden={this.props.hidden} className='SignupForm' onSubmit={this.submit}>
                 <header>Sign up</header>
                 <Grid container spacing={3} className="Labels">
                     {options}

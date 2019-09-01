@@ -8,38 +8,23 @@
     margin: 0;
 }
 
-.LoginPopup-content
+.LoginPopup
 {
-    min-width: 400px !important;
-    width: 500px !important;
-
     border-radius: 5px;
-
-    box-shadow: 1px 1px 10px grey !important;
-
-    padding: 20px !important;
-
-    text-align: center !important;
-
+    padding: 20px;
+    text-align: center;
     transition: 200ms;
 }
 
 .LoginPopupWrapper
 {
-    display: grid;
-    grid-template-rows: 70px 5fr;
-
     .Tabs
     {
+        margin-bottom: 20px;
+
         .Tab
         {
             font-size: $small-font-size;
-        }
-
-        .active
-        {
-            color: $main-color !important;
-            border-bottom: 1px solid $main-color !important;
         }
     }
 }
@@ -78,10 +63,13 @@
             font-size: $normal-font-size;
         }
 
-        &.Select
-        {
-            font-size: $normal-font-size;
-        }
+        
+    }
+
+    .MuiInputBase-input
+    {
+        font-size: $normal-font-size !important;
+        text-align: left;
     }
 
     button

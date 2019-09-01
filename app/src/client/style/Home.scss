@@ -1,7 +1,24 @@
 @import 'global';
 
+
+.Recommended
+{
+    border-top: 0.3px solid rgb(182, 182, 182);
+
+    padding-left: 50px;
+
+    h2
+    {
+        font-weight: 400;
+        color: $graphite;
+    }
+}
+
+
 .RecommendedGrid
 {
+    margin-top: 20px !important;
+
     ::-webkit-scrollbar 
     {
         width: 0.4em;
@@ -25,34 +42,30 @@
         background: $lesser-white;
     }
 
-    h2
-    {
-        margin: 0;
-    }
-
     .Wrapper
     {
-        margin-left: 10px;
-        margin-right: 10px;
+        width: 250px;
 
         .Item
         {
+            transition: 200ms;
             overflow: auto;
-            &:hover {
-                transition: 200ms;
-                background: $less-white;
+
+            cursor: pointer;
+
+            background-color: $almost-white;
+
+            &:hover
+            {
+                background-color: $less-white;
             }
         }
 
-        .Media {
+        .Media
+        {
             height: 250px;
-            width: 250px;
-            display: block;
-            margin: auto;
 
-            &:hover {
-                cursor: pointer;
-            }
+            background-color: white;
         }
 
 
@@ -62,51 +75,31 @@
 
             .Title
             {
+                font-size: $bigger-font-size;
+                font-weight: 400;
+                
                 &:hover
                 {
-                    cursor: pointer;
-                    transition: 200ms;
-                    color: red;
+                    color: $graphite;
                 }
             }
         }
 
-        .Seller
+        .SellerBox
         {
-            color: $blue;
-            cursor: pointer;
-        }
-
-        .Pricing
-        {
-            margin-top: 10px;
-        }
-
-
-        .Prices
-        {
-            color: $graphite;
-
-            .Title
+            p, .Seller, .Rating
             {
-                font-weight: 300;
+                font-size: $small-font-size;
             }
-
-            .Price
+    
+            .Seller
             {
-                &.Starting
-                {
-                    color: $blue;
-                }
+                color: $blue;
+                cursor: pointer;
 
-                &.Current
+                &:hover
                 {
-                    color: $green;
-                }
-
-                &.Buyout
-                {
-                    color: $red;
+                    filter: brightness(130%);
                 }
             }
         }

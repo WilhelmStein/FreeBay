@@ -19,11 +19,13 @@
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
 - [x] XML -> DB generation
-  - [ ] Pass 1-2-3 Auction Ids
+  - [x] Pass 1-2-3 Auction Ids
 - [x] Search sql queries
-- [ ] Bonus algorithm
-- [ ] Auction retrieval sql query
+- [x] Auction retrieval sql query
 - [ ] Auction post sql query
+- [x] Category Captions
+- [ ] Category Filling
+- [ ] Bonus algorithm (Recommended items)
 
 ## Front - End
 
@@ -32,9 +34,9 @@
 - [x] Create React app
 - [x] Setup Router
 - [x] Setup Sass
-- [x] Test Bootstrap
+- [x] Test Bootstrap (Scrapped)
+  - [x] Remove Bootstrap CDN and restyls
 - [x] Integrate Material UI
-- [ ] Design UI - Adobe XD
 
 ### Components
 
@@ -43,11 +45,17 @@
     - [x] Search
       - [x] Implement Functionality
     - [x] Login
+      - [x] Redo Popup with Dialog
+    - [x] Account Snapshot
+      - [x] Redo with Material UI
     - [x] Styling
-- [ ] Home Page
-  - [ ] Carousel
-  - [ ] Featured Items Algorithm
-  - [ ] Popular Items Query
+- [x] Home Page
+  - [x] Carousel
+    - [x] Create custom carousel component
+    - [ ] Experiment with colouring
+  - [x] General Styling
+  - [x] Popular / Recommended Grid
+  - [x] Carousel Items Query
 - [x] Signup
   - [x] [Countries](https://restcountries.eu/rest/v2/all)
   - [x] Styling
@@ -59,15 +67,22 @@
   - [x] Collapsed Grid
   - [x] Square Grid (Scrapped)
   - [x] Pagination
+  - [x] Redo with one button
 - [ ] Account Page
-  - [ ] Profile
-  - [ ] Posted Auctions
-  - [ ] Active Auctions
-  - [ ] Messages
-  - [ ] Settings
+  * Everybody
+    - [ ] Profile
+    - [ ] Posted Auctions
+  * Logged User
+    - [ ] Post Auction
+    - [ ] Active Auctions
+    - [ ] Messages
+      - [ ] Notifications
+      - [ ] Received / Sent Sorting
+      - [ ] Delete Message
+    - [ ] Settings
 - [ ] Auction Page
-  - [ ] Post Auction
   - [ ] View - Bid Auction
+  - [x] Export to XML by admin
 - [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing
@@ -76,7 +91,11 @@
   - [x] Search users by usermame
   - [x] Validate User
   - [x] Reject User
-  - [ ] Support?
+  - [x] View Auctions (Search, Sort)
+    - [x] Select Auctions
+    - [x] Export Selected auctions
+      - [x] XMl
+      - [x] JSON
 - [ ] About Page
 - [ ] Help Page
 

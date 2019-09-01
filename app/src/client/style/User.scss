@@ -1,0 +1,135 @@
+@import 'global';
+
+h1
+{
+    font-weight: 400;
+    color: $red;
+
+    padding: 50px;
+}
+
+.UserForm
+{
+    .DialogText
+    {
+        label
+        {
+            font-size: $small-font-size;
+        }
+
+        input
+        {
+            font-size: $normal-font-size;
+        }
+    }
+
+    h6
+    {
+        margin-top: 35px;
+    }
+
+    .DialogButton
+    {
+        font-size: $small-font-size;
+    }
+}  
+
+
+.UserGrid
+{
+    padding-left: 3%;
+    padding-right: 3%;
+
+    padding-top: 2%; 
+
+    .UserData
+    {
+        width: 320px;
+
+        .UserMedia
+        {
+            height: 320px;
+            object-fit: contain;
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        .UserDetails
+        {
+            .Title
+            {
+                color: $graphite;
+                font-size: 1em;
+            }
+
+            .Data
+            {
+                color: $blue;
+                font-size: 1.2em;
+            }
+
+            .Validated
+            {
+                color: green;
+            }
+
+            .Invalidated
+            {
+                color: red;
+            }
+
+            .Submit
+            {
+                color: white;
+                background: $blue;
+            }
+        }
+    }
+
+    .UserMenu
+    {
+        .UserTabs
+        {
+            .Tab
+            {
+                font-size: $normal-font-size;
+            }
+        }
+
+        .AuctionGrid
+        {
+            margin-top: 10px;
+
+            .AuctionCard
+            {
+                transition: 200ms;
+                overflow: auto;
+
+                cursor: pointer;
+
+                background-color: $almost-white;
+
+                &:hover
+                {
+                    background-color: $less-white;
+                }
+
+                .Media
+                {
+                    height: 250px;
+                }
+
+                .Title
+                {
+                    font-size: 1.6em;
+                    
+                    &:hover
+                    {
+                        color: $graphite;
+                    }
+                }
+            }
+        }
+    }
+}

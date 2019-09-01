@@ -7,9 +7,11 @@ import Home from './Home';
 import SearchResults from './SearchResults';
 import AdminPage from './Admin';
 import AuctionPage from './Auction';
+import UserPage from './User';
 import NotFound from './NotFound';
 
 import '../style/App.scss';
+import Axios from 'axios';
 
 class App extends React.Component {
 
@@ -18,6 +20,7 @@ class App extends React.Component {
         super(props);
 
         const user_s = sessionStorage.getItem('LoggedUser');
+        //console.log(user_s)
         const user = user_s ? JSON.parse(user_s) : null;
 
         this.state = {
@@ -38,26 +41,49 @@ class App extends React.Component {
                 {
                     this.props.history.push("/admin");
                 }
+
             }
             else
             {
-                this.props.history.push("/");
+                if (this.props.location.pathname === "/admin")
+                    this.props.history.push("/");
             }
         });
     }
 
+    async updateHandler(username, password)
+    {
+        Axios.post('/api/login', {
+            username: username,
+            password: password
+        })
+        .then(res => {
+            if (res.data.error)
+                console.error(res.data.message);
+                
+            this.setState({user: res.data.data});
+            sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
+        })
+        .catch(err => console.log(err));
+    }
+
     render()
     {
-
         return (
             <div className="App">
                 {/* Header is here because it will always render in the website. It also gives login status to every other page */}
                 <Header user={this.state.user} loginHandler={this.loginHandler}/>
                 <Menu active={this.props.location.pathname}/>
                 <Switch>
-                    <Route exact path='/' render={(props) => <Home user={this.state.user} loginHandler={this.loginHandler} />} />
+                    <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
                     <Route path='/auction/:id' component={AuctionPage} />
+                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user}
+                                                                               username={props.match.params.username}
+                                                                               updateHandler={(username, password) => this.updateHandler(username, password)}
+                                                                     />
+                                                         }
+                    />
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
                     <Route path='*' component={NotFound} />
                 </Switch>
