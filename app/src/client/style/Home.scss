@@ -6,6 +6,12 @@
     border-top: 0.3px solid rgb(182, 182, 182);
 
     padding-left: 50px;
+
+    h2
+    {
+        font-weight: 400;
+        color: $graphite;
+    }
 }
 
 
@@ -69,6 +75,9 @@
 
             .Title
             {
+                font-size: $bigger-font-size;
+                font-weight: 400;
+                
                 &:hover
                 {
                     color: $graphite;
@@ -76,14 +85,22 @@
             }
         }
 
-        .Seller
+        .SellerBox
         {
-            color: $blue;
-            cursor: pointer;
-
-            &:hover
+            p, .Seller, .Rating
             {
-                filter: brightness(130%);
+                font-size: $small-font-size;
+            }
+    
+            .Seller
+            {
+                color: $blue;
+                cursor: pointer;
+
+                &:hover
+                {
+                    filter: brightness(130%);
+                }
             }
         }
     }

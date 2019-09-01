@@ -1,5 +1,11 @@
 @import 'global';
 
+.Carousel
+{
+    padding: 20px 100px;
+    background-color: rgb(235, 235, 235);
+}
+
 .FeaturedItemWrapper
 {
     ::-webkit-scrollbar 
@@ -52,7 +58,7 @@
                 opacity: 0.6;
 
                 width: 100%;
-                height: 18%;
+                height: 10%;
 
                 font:
                 {
@@ -86,7 +92,7 @@
         {
             color: white;
             background-color: $dark-red;
-            height: 100%;
+            height: calc(100% - (2 * 30px));
 
             cursor: pointer;
 

@@ -17,8 +17,8 @@ export default class Carousel extends Component
         }
 
         this.timer = null;
-        this.interval = this.props.interval ? this.props.interval : 4000;
-        this.autoPlay = this.props.autoPlay ? this.props.autoPlay : true;
+        this.interval = this.props.interval !== undefined ? this.props.interval : 4000;
+        this.autoPlay = this.props.autoPlay !== undefined ? this.props.autoPlay : true;
 
         autoBind(this);
     }
@@ -26,6 +26,11 @@ export default class Carousel extends Component
     componentDidMount()
     {
         this.start();
+    }
+
+    componentWillUnmount()
+    {
+        this.stop();
     }
 
     stop()
@@ -88,7 +93,7 @@ export default class Carousel extends Component
     render()
     {
         return (
-            <div className="Carousel" onMouseEnter={this.stop} onMouseOut={this.reset}>
+            <div className={`Carousel ${this.props.className}`} onMouseEnter={this.stop} onMouseOut={this.reset}>
                 {
                     this.props.children.map( (child, index) => {
                         return (

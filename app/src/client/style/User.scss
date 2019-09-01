@@ -1,4 +1,12 @@
-@import 'global'; 
+@import 'global';
+
+h1
+{
+    font-weight: 400;
+    color: $red;
+
+    padding: 50px;
+}
 
 .UserForm
 {

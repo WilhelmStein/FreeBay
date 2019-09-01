@@ -31,6 +31,8 @@ app.post('/api/admin/validate', function(req, res) { controller.admin_validate(r
 
 app.post('/api/admin/reject', function(req, res) {controller.admin_reject(req.body.username, req.body.password, req.body.user, res); });
 
+app.post('/api/admin/auctions', function(req, res) {controller.admin_auctions(req.body.username, req.body.password, res); });
+
 app.post('/api/search', function(req, res) { controller.search(req.body.category, req.body.text, res); });
 
 app.get('/api/auction', function(req, res) { controller.auction(req.query.id, res); });

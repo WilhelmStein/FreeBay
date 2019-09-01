@@ -19,13 +19,13 @@
   * [Article 1](https://hackernoon.com/set-up-ssl-in-nodejs-and-express-using-openssl-f2529eab5bb)
   * [Download SSL](https://www.openssl.org/source/)
 - [x] XML -> DB generation
-  - [ ] Pass 1-2-3 Auction Ids
+  - [x] Pass 1-2-3 Auction Ids
 - [x] Search sql queries
-- [ ] Bonus algorithm (Recommended items)
 - [x] Auction retrieval sql query
 - [ ] Auction post sql query
 - [x] Category Captions
 - [ ] Category Filling
+- [ ] Bonus algorithm (Recommended items)
 
 ## Front - End
 
@@ -35,6 +35,7 @@
 - [x] Setup Router
 - [x] Setup Sass
 - [x] Test Bootstrap (Scrapped)
+  - [x] Remove Bootstrap CDN and restyls
 - [x] Integrate Material UI
 
 ### Components
@@ -44,6 +45,9 @@
     - [x] Search
       - [x] Implement Functionality
     - [x] Login
+      - [x] Redo Popup with Dialog
+    - [x] Account Snapshot
+      - [x] Redo with Material UI
     - [x] Styling
 - [x] Home Page
   - [x] Carousel
@@ -63,6 +67,7 @@
   - [x] Collapsed Grid
   - [x] Square Grid (Scrapped)
   - [x] Pagination
+  - [x] Redo with one button
 - [ ] Account Page
   * Everybody
     - [ ] Profile
@@ -71,9 +76,13 @@
     - [ ] Post Auction
     - [ ] Active Auctions
     - [ ] Messages
+      - [ ] Notifications
+      - [ ] Received / Sent Sorting
+      - [ ] Delete Message
     - [ ] Settings
 - [ ] Auction Page
   - [ ] View - Bid Auction
+  - [x] Export to XML by admin
 - [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing
@@ -82,7 +91,11 @@
   - [x] Search users by usermame
   - [x] Validate User
   - [x] Reject User
-  - [ ] Support?
+  - [x] View Auctions (Search, Sort)
+    - [x] Select Auctions
+    - [x] Export Selected auctions
+      - [x] XMl
+      - [x] JSON
 - [ ] About Page
 - [ ] Help Page
 

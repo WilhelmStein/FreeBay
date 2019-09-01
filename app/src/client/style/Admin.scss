@@ -72,13 +72,11 @@
         }
     }
 
-    .Users
+    .Paper
     {
         overflow-y: scroll;
 
         height: 82vh;
-
-        // margin-right: 50px;
 
         .TableToolbar
         {
@@ -116,7 +114,7 @@
             .MuiTablePagination-select, .Select, .TableSearch
             {
                 transition: 200ms;
-                
+
                 color: white;
                 font-size: $small-font-size;
                 background-color: $white-blue;
@@ -124,7 +122,21 @@
 
                 margin-left: 10px;
                 
-                &:hover, &:focus
+                &:hover, &:focus, &:active
+                {
+                    background-color: $whiter-blue;
+                }
+            }
+
+            .Export.Button
+            {
+                margin-right: 20px;
+                color: white;
+                font-size: $small-font-size;
+                background-color: $white-blue;
+                border-radius: 5px;
+
+                &:hover
                 {
                     background-color: $whiter-blue;
                 }
@@ -135,7 +147,7 @@
         {
             font-size: $bigger-font-size;
 
-            margin-right: 20px;
+            margin-right: 10px;
         }
 
         .Table
@@ -216,4 +228,46 @@
         }
     }
 
+    .AuctionUsername
+    {
+        color: $blue;
+    }
+
+}
+
+.ExportDialog
+{
+    .DialogTitle
+    {
+        .MuiTypography-h6
+        {
+            font-size: $normal-font-size !important;
+        }
+    }
+
+    .Select
+    {
+        margin-left: 10px;
+    }
+
+    .MuiInputBase-input
+    {
+        font-size: $small-font-size !important;
+        text-align: left;
+    }
+
+    .ListItemText
+    {
+        .MuiTypography-body1
+        {
+            font-size: $smaller-font-size;
+        }
+        
+    }
+
+    .Button
+    {
+        font-size: $smaller-font-size;
+    }
+    font-size: $small-font-size;
 }

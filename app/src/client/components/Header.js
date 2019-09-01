@@ -4,11 +4,10 @@ import autoBind from 'auto-bind';
 import axios from "axios"
 
 import LoginPopup from './LoginPopup';
-import Popup from 'reactjs-popup';
 import Logo from '../images/Logo2.png';
 
 import SearchIcon from '@material-ui/icons/Search'
-import Button from '@material-ui/core/Button'
+import {Button, Box, Avatar, Typography} from '@material-ui/core'
 
 import "../style/Header.scss"
 
@@ -25,6 +24,17 @@ class Header extends Component
         autoBind(this);
     }
 
+    userClick()
+    {
+        if (this.props.user.admin)
+        {
+            this.props.history.push('/admin');
+            return;
+        }
+
+        this.props.history.push(`/user/${this.props.user.Username}`);
+    }
+
 
     render()
     {
@@ -35,7 +45,7 @@ class Header extends Component
                     <p>FreeBay</p>
                 </Link>
                 <SearchBar history={this.props.history}/>
-                <AccountSnapshot user={this.props.user} history={this.props.history} loginHandler={this.props.loginHandler}/>
+                <AccountSnapshot user={this.props.user} loginHandler={this.props.loginHandler} userClick={this.userClick}/>
             </div>
         );
     }
@@ -95,13 +105,7 @@ class SearchBar extends Component
     }
 
     submit(event)
-    {
-        // if (!this.state.text)
-        // {
-        //     alert("Please search something...");
-        //     return;
-        // }
-        
+    {  
         this.props.history.push(`/search?category={${this.state.categories[this.state.category].Id}}&text={${this.state.text}}`);
 
         event.preventDefault();
@@ -120,7 +124,7 @@ class SearchBar extends Component
                 </select>
                 <input placeholder="Search..." value={this.state.text} onChange={this.inputChange}/>
                 <Button color="secondary"  variant="contained" type="submit" aria-label="search" onClick={this.submit}>
-                    <SearchIcon fontSize="large"/>
+                    <SearchIcon/>
                 </Button>
             </div>
         )
@@ -176,50 +180,81 @@ export class Menu extends Component
     }
 }
 
-function AccountSnapshot(props)
+class AccountSnapshot extends Component
 {
-    if (props.user === null)
+    constructor(props)
     {
-        return (
-            <div className="AccountSnapshot AccountSnapshotEmpty">
-                <LoginPopup loginHandler={props.loginHandler} text="Log In"/>
-                &nbsp;
-                |
-                &nbsp;
-                <LoginPopup loginHandler={props.loginHandler} text="Sign Up"/>
-            </div>
-        )
+        super(props);
+        
+        this.state = {
+            open: false,
+            tab: null
+        }
+
+        autoBind(this);
     }
-    else
+
+    open(event)
     {
-        return (
-            <div className="AccountSnapshot AccountSnapshotFull">
-                <Popup
-                    className='AccountPopup'
-                    trigger = {open => (
-                        <div className="AccountPopupText">
-                            Welcome, {props.user.Username} !
-                            {
-                                open ?
-                                <span className="account_button"/>
-                                :
-                                <span className="account_button_downward"/>
-                            }
-                        </div>
-                    )}
-                    position="bottom right"
-                >
-                    <div className = "AccountMenu">
-                        <button onClick={() => { props.history.push(`/user/${props.user.Username}`); }}>
-                            Account
-                        </button>
-                        <button onClick={() => { sessionStorage.removeItem("LoggedUser"); props.loginHandler(null); }}>
-                            Log out
-                        </button>
-                    </div>
-                </Popup>
-            </div>
-        )
+        this.setState({
+            open: true,
+            tab: event.target.innerHTML
+        })
+    }
+
+    close(event)
+    {
+        this.setState({
+            open: false,
+            tab: null
+        })
+    }
+
+    getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+      
+
+    render()
+    {
+        if (this.props.user === null)
+        {
+            return (
+                <div className="AccountSnapshot Empty">
+                    <button className='link Login' onClick={this.open}>Log In</button>
+                    &nbsp;
+                    |
+                    &nbsp;
+                    <button className='link Login' onClick={this.open}>Sign Up</button>
+
+                    <LoginPopup open={this.state.open} close={this.close} tab={this.state.tab} loginHandler={this.props.loginHandler}/>
+                </div>
+            )
+        }
+        else
+        {
+            return (
+                <div className="AccountSnapshot Full">
+                        <Avatar style={{backgroundColor: this.getRandomColor()}} className="Avatar" onClick={this.props.userClick}>{this.props.user.Username[0]}</Avatar>
+                        <Box>
+                            <Typography className="Username" onClick={this.props.userClick}>
+                                {this.props.user.Username}
+                            </Typography>
+                            <Typography
+                                className="Logout"
+                                onClick={() => { sessionStorage.removeItem("LoggedUser"); this.props.loginHandler(null); }}
+                            >
+                                Log Out
+                            </Typography>
+                        </Box>
+                </div>
+            )
+        }
     }
 }
 

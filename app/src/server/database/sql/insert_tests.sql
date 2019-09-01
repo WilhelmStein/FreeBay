@@ -19,7 +19,8 @@ Values  (501, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical
         (506, 4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
         (507, 1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "");
 
-Insert into Auction_has_Category
+
+Insert into Auction_has_Category(Auction_Id, Category_Id)
 Values (501, 1), (502, 1), (503, 2), (504, 2), (505, 3), (506, 3), (507, 3);
 
 -- Views --
@@ -40,6 +41,7 @@ Values  (5, "5.jpg", 501),
         (1, "1.jpg", 506),
         (6, "6.jpg", 502),
         (7, "7.gif", 504);
+
 
 -- Category --
 
