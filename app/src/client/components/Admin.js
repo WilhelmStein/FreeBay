@@ -610,9 +610,9 @@ class Auctions extends Component
                         <p className="AuctionUsername" onClick={(e) => {this.props.userClick(e, auction.User.Username);}}>{auction.User.Username}</p>
                     </TableCell>
 
-                    {__cell(`\u20AC${parseFloat(auction.First_Bid).toFixed(2)}`, 'left')}
-                    {__cell(`\u20AC${parseFloat(auction.Currently).toFixed(2)}`, 'left')}
-                    {__cell(`\u20AC${parseFloat(auction.Buy_Price).toFixed(2)}`, 'left')}
+                    {__cell(auction.First_Bid ? `\u20AC${parseFloat(auction.First_Bid).toFixed(2)}` : "-", 'left')}
+                    {__cell(auction.Currently ? `\u20AC${parseFloat(auction.Currently).toFixed(2)}` : "-", 'left')}
+                    {__cell(auction.Buy_Price ? `\u20AC${parseFloat(auction.Buy_Price).toFixed(2)}` : "-", 'left')}
                     {__cell(auction.Location, 'left')}
                     {__cell(new Date(auction.Started).toDateString(), 'left')}
                     {__cell(new Date(auction.Ends).toDateString(), 'left')}
