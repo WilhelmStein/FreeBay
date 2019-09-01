@@ -60,7 +60,7 @@ class AuctionPage extends Component
 
         return (
             <Paper>
-                <Card className="auction-page">
+                <Card className="AuctionPage">
                     <CardHeader
                         title={this.state.auction.Name}
                         subheader={`${this.state.auction.User.Username} - ${this.state.auction.User.Rating}`}
@@ -109,10 +109,10 @@ function Row(props)
 {
     return (
         <TableRow className={props.className} key={props.key}>
-            <TableCell className={`bid-cell-username`}>{props.username}></TableCell>
-            <TableCell className={`bid-cell-rating`}>{props.rating}></TableCell>
-            <TableCell className={`bid-cell-amount`}>{props.amount}></TableCell>
-            <TableCell className={`bid-cell-time`}>{props.time}></TableCell>
+            <TableCell className="bid-cell-username">{props.username}</TableCell>
+            <TableCell className="bid-cell-rating">{props.rating}</TableCell>
+            <TableCell className="bid-cell-amount">{props.amount}</TableCell>
+            <TableCell className="bid-cell-time">{props.time}</TableCell>
         </TableRow>
     )
 }
@@ -125,7 +125,7 @@ function Head(props)
                 className={props.className}
                 username={"Username"}
                 rating={"Rating"}
-                amout={"Amount"}
+                amount={"Amount"}
                 time={"Time"}
             >
             </Row>
@@ -138,11 +138,10 @@ function Bid(props)
     return (
         <Row
             className={`bid-${props.index % 2 ? "even" : "odd"}`}
-            key={props.index}
             username={props.bidder.Username}
             rating={props.bidder.Rating}
-            amout={props.Amount}
-            time={props.Time}
+            amount={props.amount}
+            time={props.time}
         >
         </Row>
     )
@@ -165,31 +164,38 @@ class Bids extends Component
     render()
     {
         return (
-            <Table size="large" className="bids">
-                <ExpansionPanel
-                    expanded={this.state.expanded}
-                    onChange={() => this.setState({expanded: !this.state.expanded})}
-                >
-                    <ExpansionPanelSummary id={"panel"} expandIcon={<ExpandMore/>}>
-                        <Head className={"bids-head"}></Head>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <TableBody className="bids-body">
-                        {
-                            this.state.content.map((bid, index) =>
-                                <Bid
-                                    index={index}
-                                    bidder={bid.User}
-                                    amout={bid.Amount}
-                                    time={bid.Time}
-                                >
-                                </Bid>
-                            )
-                        }
-                        </TableBody>
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-            </Table>
+            <ExpansionPanel
+                expanded={this.state.expanded}
+                onChange={() => this.setState({expanded: !this.state.expanded})}
+            >
+                <ExpansionPanelSummary id={"panel"} expandIcon={<ExpandMore/>}>
+                    <Table className="bids">
+                        <Head className={"bids-head"}/>
+                    </Table>
+                </ExpansionPanelSummary>
+
+                <ExpansionPanelDetails>
+                    <Table className="bids">
+                        <Head className={"bids-head"}/>
+                            <TableBody className="bids-body">
+                            {
+                                this.state.content.map((bid, index) => {
+                                    return (
+                                        <Bid
+                                            key={index}
+                                            index={index}
+                                            bidder={bid.User}
+                                            amount={bid.Amount}
+                                            time={bid.Time}
+                                        >
+                                        </Bid>
+                                    )
+                                })
+                            }
+                            </TableBody>
+                    </Table>
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
         )
     }
 }
@@ -216,10 +222,10 @@ class Images extends Component
             "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image",
             "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image",
             "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"
-        ].map(image => <div data-src={image}/>)
+        ].map( (image, index) => <div key={index} data-src={image}/>)
 
         return (
-            <Container maxWidth={"ms"}>
+            <Container maxWidth="sm">
                 {(images.length !== 0
                 ?
                 <AwesomeSlider cssModule={AwsSliderStyles}>
