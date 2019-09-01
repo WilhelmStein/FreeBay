@@ -11,8 +11,6 @@ import json
 
 import os
 
-from downloader import Downloader
-
 
 class Generator:
 
@@ -34,6 +32,11 @@ class Generator:
             "INSERT INTO General_User"
             "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated)"
             "VALUES (%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
+        ),
+        "Admin": (
+            "INSERT INTO Admin"
+            "(User_Id)"
+            "VALUES (%(User_Id)s)"
         ),
         "Address": (
             "INSERT INTO Address"
@@ -67,7 +70,32 @@ class Generator:
         )
     }
 
-    def __init__(self, seed=123456789, verbose=True, tables_to_drop=["Auction_has_Category", "Bid", "Image", "Auction", "General_User", "User", "Address", "Category"], rating_lower=0.0, rating_upper=58823.0, rating_digits=1, dollar_digits=2, validated_percentage=0.7, downloader=Downloader()):
+    def __init__(
+        self,
+        admin={
+            "Username": "admin",
+            "Password": "admin",
+            "Email": "admin@admin.admin"
+        },
+        downloader=None,
+        seed=123456789,
+        verbose=True,
+        tables_to_drop=[
+            "Auction_has_Category",
+            "Bid",
+            "Image",
+            "Views",
+            "Auction",
+            "General_User",
+            "Admin",
+            "User",
+            "Address",
+            "Category"
+            ],
+        views_to_drop=[],
+        rating_lower=0.0, rating_upper=58823.0, rating_digits=1,
+        dollar_digits=2,
+        validated_percentage=0.7):
 
         self.verbose = verbose
 
@@ -85,11 +113,19 @@ class Generator:
 
         self.cur = self.cnx.cursor()
 
+        if isinstance(views_to_drop, list) and views_to_drop:
+
+            for view in views_to_drop:
+
+                print("[Generator] Dropping view '%s'" % view)
+
+                self.cur.execute("DROP VIEW IF EXISTS {}".format(view))
+
         if isinstance(tables_to_drop, list) and tables_to_drop:
 
-            print("[Generator] Tables", ",".join(["'{}'".format(table) for table in tables_to_drop]), "were dropped")
-
             for table in tables_to_drop:
+
+                print("[Generator] Deleting all rows from table '%s'" % table)
 
                 self.cur.execute("DELETE FROM {}".format(table))
 
@@ -112,6 +148,16 @@ class Generator:
         self.bid_id = 0
 
         self.image_id = 0
+
+        self.__register__("User",
+            self.__generate_user__(
+                username=admin["Username"],
+                password=admin["Password"],
+                email=admin["Email"]
+            )
+        )
+
+        self.__register__("Admin", self.__generate_admin__(self.users[admin["Username"]]))
 
 
     def __del__(self):
@@ -159,6 +205,13 @@ class Generator:
             "Phone": phone if phone else self.generator.phone_number(),
             "Address_Id": self.address_id,
             "Validated": self.random.random() <= self.validated_percentage
+        }
+
+
+    def __generate_admin__(self, user_id):
+
+        return {
+            "User_Id": user_id
         }
 
 

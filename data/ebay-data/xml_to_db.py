@@ -5,6 +5,8 @@ from os import path
 
 from parser import Parser
 
+from downloader import Downloader
+
 from generator import Generator
 
 
@@ -16,7 +18,9 @@ if example_id in parser.auctions:
 
     print(parser.dumps(example_id), sep='\n')
 
-generator = Generator(downloader=None)
+# downloader = Downloader()
+
+generator = Generator()
 
 for auction in parser.auctions.values():
 
