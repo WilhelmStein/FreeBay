@@ -97,7 +97,7 @@ class User extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps)
+        //console.log(nextProps)
         if(nextProps.user && nextProps.user.Username === nextProps.username)
         {
             Axios.post(`/api/getUser`, {
@@ -822,14 +822,14 @@ class AccountMenu extends Component {
             tabValue: 0,
             tabs: [{ label: "Active Auctions" }],
             currentAuctions: [],
-            pastAuctions: [],
+            watchedAuctions: [],
             messages: []
         };
         //console.log(props.loggedAsTargetUser);
         autoBind(this);
     }
 
-    componentDidMount()
+    /*componentDidMount()
     {
         // let diff = (new Date(auction.Ends).getTime() - new Date().getTime()) / 1000;
         Axios.get(`/api/userAuctions?username=${this.props.userData.Username}`)
@@ -855,10 +855,37 @@ class AccountMenu extends Component {
 
             this.setState({ watchedAuctions: res.data.data });
         })
-    }
+    } */
 
     componentWillReceiveProps(nextProps) {
+
+        Axios.get(`/api/userAuctions?username=${this.props.userData.Username}`)
+        .then( (res) => {
+            
+            if(res.data.err)
+            {
+                console.error(res.data.message)
+                return;
+            }
+            
+            this.setState({ currentAuctions: res.data.data });
+        })
+        .catch((err) => console.log(err));
+
         if (nextProps.loggedAsTargetUser) {
+
+            Axios.post(`/api/userWatchedAuctions`, {username: this.props.userData.Username, password: this.props.userData.Password})
+            .then((res) => {
+                if(res.data.err)
+                {
+                    console.error(res.data.message)
+                    return;
+                }
+
+                this.setState({ watchedAuctions: res.data.data });
+            })
+            .catch((err) => console.log(err));
+
             this.setState({
                 tabs: [
                     { label: "Active Auctions" },
@@ -895,14 +922,21 @@ class AccountMenu extends Component {
         let content = target.map((auction, index) => (
             <Grid item key={index} xs={6}>
                 <Card className="AuctionCard">
-                    <CardMedia className="Media"
-                               image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                               title={auction.Name}
-                    />
-                        
-                    <CardContent>
-                        <Typography variant="h5">{auction.Name}</Typography>
-                    </CardContent>
+                    <Grid container>
+                        <Grid item xs={3}>
+                            <CardMedia className="Media"
+                                    //component="img"
+                                    image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                                    title={auction.Name}
+                            />
+                        </Grid>
+
+                        <Grid item xs={9}>
+                            <CardContent>
+                                <Typography className="Title">{auction.Name}</Typography>
+                            </CardContent>
+                        </Grid>
+                    </Grid>
                 </Card>
             </Grid>
         ));
@@ -921,7 +955,7 @@ class AccountMenu extends Component {
                         </AppBar>
                     </Grid>
 
-                    <Grid item className="" xs={12}>
+                    <Grid item className="AuctionGrid" xs={12}>
                         <Grid container spacing={1}>
                             {content}
                         </Grid>

@@ -89,14 +89,38 @@
             }
         }
 
-        .AuctionCard
+        .AuctionGrid
         {
-            font-size: $normal-font-size;
+            margin-top: 10px;
 
-            .Media
+            .AuctionCard
             {
-                height: 200px;
-                // object-fit: scale-down;
+                transition: 200ms;
+                overflow: auto;
+
+                cursor: pointer;
+
+                background-color: $almost-white;
+
+                &:hover
+                {
+                    background-color: $less-white;
+                }
+
+                .Media
+                {
+                    height: 250px;
+                }
+
+                .Title
+                {
+                    font-size: 1.6em;
+                    
+                    &:hover
+                    {
+                        color: $graphite;
+                    }
+                }
             }
         }
     }
