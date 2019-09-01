@@ -579,7 +579,8 @@ class DBController
                 rows = [];
             
             rows = rows.map((item) => {
-                item.Images = item.Images === null ? [] : JSON.parse(item.Images)
+                let parsedImages = JSON.parse(item.Images);
+                item.Images = parsedImages[0].Id === null ? [] : parsedImages
                 return item;
             });
 

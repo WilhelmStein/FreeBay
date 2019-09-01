@@ -119,14 +119,71 @@ h1
                 {
                     height: 250px;
                 }
-
-                .Title
+                
+                .Details
                 {
-                    font-size: 1.6em;
-                    
-                    &:hover
+                    .Title
                     {
-                        color: $graphite;
+                        font-size: 1.4em;
+                        
+                        &:hover
+                        {
+                            color: $graphite;
+                        }
+                    }
+                }
+
+                .Prices
+                {
+                    color: $graphite;
+                    background-color: $lesser-white;
+            
+                    .Title
+                    {
+                        font-size: $small-font-size;
+                        font-weight: 300;
+                    }
+            
+                    .Price
+                    {
+                        font-size: $normal-font-size;
+                        &.Starting
+                        {
+                            color: $blue;
+                        }
+            
+                        &.Current
+                        {
+                            color: $green;
+                        }
+            
+                        &.Buyout
+                        {
+                            color: $red;
+                        }
+                    }
+                }
+            
+                .Dates
+                {
+                    p
+                    {
+                        font-size: $smaller-font-size !important;
+                        font-weight: 300;
+                    }
+            
+                    .Date
+                    {
+                        font-weight: 400;
+                        &.Started
+                        {
+                            color: $green;
+                        }
+            
+                        &.Ends
+                        {
+                            color: $red;
+                        }
                     }
                 }
             }

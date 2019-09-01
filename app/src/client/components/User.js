@@ -931,9 +931,45 @@ class AccountMenu extends Component {
                             />
                         </Grid>
 
-                        <Grid item xs={9}>
+                        <Grid item xs={5} className="Details">
                             <CardContent>
                                 <Typography className="Title">{auction.Name}</Typography>
+                            </CardContent>
+                        </Grid>
+
+                        <Grid item xs={4} className="Prices">
+                            <CardContent>
+                                <Grid container className="Prices" spacing={1}>
+                                    <Grid item >
+                                        <Typography variant="h5" className="Title">Starting Price:</Typography>
+                                    </Grid>
+                                    <Grid item >
+                                        <Typography className="Starting Price" variant="h4">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
+                                    </Grid>
+
+                                    <Grid item >
+                                        <Typography variant="h5" className="Title">Current Price:</Typography>
+                                    </Grid>
+                                    <Grid item  zeroMinWidth>
+                                        <Typography className="Current Price" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
+                                    </Grid>
+
+                                    <Grid item >
+                                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
+                                    </Grid>
+                                    <Grid item >
+                                        <Typography className="Buyout Price" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
+                                    </Grid>
+                                </Grid>
+
+                                <Box className="Dates" mt={2}>
+                                    <Typography>
+                                        Started in: <span className="Started Date">{auction.Started}</span>
+                                    </Typography>
+                                    <Typography>
+                                        Ends in: <span className="Ends Date">{auction.Ends}</span>
+                                    </Typography>
+                                </Box>
                             </CardContent>
                         </Grid>
                     </Grid>
@@ -956,7 +992,7 @@ class AccountMenu extends Component {
                     </Grid>
 
                     <Grid item className="AuctionGrid" xs={12}>
-                        <Grid container spacing={1}>
+                        <Grid container spacing={2}>
                             {content}
                         </Grid>
                     </Grid>
