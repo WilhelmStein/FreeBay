@@ -85,14 +85,49 @@ h1
                 background: $blue;
             }
         }
+    }
 
-        .UserMenu
+    .UserMenu
+    {
+        .UserTabs
         {
-            .UserTabs
+            .Tab
             {
-                .Tab
+                font-size: $normal-font-size;
+            }
+        }
+
+        .AuctionGrid
+        {
+            margin-top: 10px;
+
+            .AuctionCard
+            {
+                transition: 200ms;
+                overflow: auto;
+
+                cursor: pointer;
+
+                background-color: $almost-white;
+
+                &:hover
                 {
-                    font-size: 500%;
+                    background-color: $less-white;
+                }
+
+                .Media
+                {
+                    height: 250px;
+                }
+
+                .Title
+                {
+                    font-size: 1.6em;
+                    
+                    &:hover
+                    {
+                        color: $graphite;
+                    }
                 }
             }
         }

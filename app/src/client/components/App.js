@@ -11,6 +11,7 @@ import UserPage from './User';
 import NotFound from './NotFound';
 
 import '../style/App.scss';
+import Axios from 'axios';
 
 class App extends React.Component {
     
@@ -19,6 +20,7 @@ class App extends React.Component {
         super(props);
 
         const user_s = sessionStorage.getItem('LoggedUser');
+        //console.log(user_s)
         const user = user_s ? JSON.parse(user_s) : null;
 
         this.state = {
@@ -49,6 +51,22 @@ class App extends React.Component {
         });
     }
 
+    async updateHandler(username, password)
+    {
+        Axios.post('/api/login', {
+            username: username,
+            password: password
+        })
+        .then(res => {
+            if (res.data.error)
+                console.error(res.data.message);
+                
+            this.setState({user: res.data.data});
+            sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
+        })
+        .catch(err => console.log(err));
+    }
+
     render()
     {
         return (
@@ -60,7 +78,12 @@ class App extends React.Component {
                     <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
                     <Route path='/auction/:id' component={AuctionPage} />
-                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user} username={props.match.params.username}/>}/>
+                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user}
+                                                                               username={props.match.params.username}
+                                                                               updateHandler={(username, password) => this.updateHandler(username, password)}
+                                                                     />
+                                                         }
+                    />
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
                     <Route path='*' component={NotFound} />
                 </Switch>
