@@ -694,54 +694,66 @@ class DBController
 
     messages(username, password, res)
     {
+        // Conversations query
         const query = {
-            string: `   SELECT mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username)) as Messages
+            string: `   SELECT mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Subject", mh.Subject, "Id", m.Id, "Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username)) as Messages
                         FROM User as su, User as ru, Message as m, Message_Header as mh
                         WHERE   mh.Id = m.Message_Header_Id AND
                                 su.Id = m.Sender_Id AND
                                 ru.Id = m.Receiver_Id AND
-                                EXISTS ( SELECT im.Id FROM Message as im, User as iu Where im.Receiver_Id = iu.Id AND iu.Username = ? AND iu.Password = ? AND im.Message_Header_Id = mh.Id )
-                        GROUP BY mh.Id
-                    `,
-            escape: [username, password]
+                                ( (su.Username = ? and su.Password = ?) OR (ru.Username = ? and ru.Password = ?))
+                        GROUP BY mh.Id`,
+            escape: [username, password, username, password]
         }
 
         this.query(query, res, (rows) => {
-            const Received = rows.map( (row) => {
+            
+            const Conversations = rows.map( (row) => {
                 row.Messages = JSON.parse(row.Messages);
-
                 return row;
             })
 
+            // Sent query
             const query = {
-                string: `   SELECT mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username)) as Messages
-                            FROM User as su, User as ru, Message as m, Message_Header as mh
+                string: `   SELECT  mh.Subject, m.Id, m.Body, m.Status, m.Time, su.Username as Sender, ru.Username as Receiver
+                            FROM User as ru, User as su, Message as m, Message_Header as mh
                             WHERE   mh.Id = m.Message_Header_Id AND
                                     su.Id = m.Sender_Id AND
                                     ru.Id = m.Receiver_Id AND
-                                    EXISTS ( SELECT im.Id FROM Message as im, User as iu Where im.Sender_Id = iu.Id AND iu.Username = ? AND iu.Password = ? AND im.Message_Header_Id = mh.Id )
-                            GROUP BY mh.Id
-                        `,
+                                    su.Username = ? AND su.Password = ?`,
                 escape: [username, password]
             }
 
             this.query(query, res, (rows) => {
-                const Sent = rows.map( (row) => {
-                    row.Messages = JSON.parse(row.Messages);
-    
-                    return row;
-                })
+                
+                const Sent = rows;
 
-                res.send({
-                    error: false,
-                    message: "OK",
-                    data: {
-                        Received: Received,
-                        Sent: Sent
-                    }
+                // Received query
+                const query = {
+                    string: `   SELECT  mh.Subject, m.Id, m.Body, m.Status, m.Time, su.Username as Sender, ru.Username as Receiver
+                                FROM User as ru, User as su, Message as m, Message_Header as mh
+                                WHERE   mh.Id = m.Message_Header_Id AND
+                                        su.Id = m.Sender_Id AND
+                                        ru.Id = m.Receiver_Id AND
+                                        ru.Username = ? AND ru.Password = ?`,
+                    escape: [username, password]
+                }
+
+                this.query(query, res, (rows) => {
+
+                    const Received = rows;
+
+                    res.send({
+                        error: false,
+                        message: "OK",
+                        data: {
+                            Sent: Sent,
+                            Received: Received,
+                            Conversations: Conversations
+                        }
+                    })
                 })
             })
-            
         })
     }
 

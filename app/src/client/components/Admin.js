@@ -237,7 +237,7 @@ class Users extends Component
             let user = this.state.users[i];
             user.index = i;
 
-            if (user.Username.includes(event.target.value)) 
+            if (user.Username.toLowerCase().includes(event.target.value.toLowerCase())) 
                 display.push(user)
         }
 
@@ -763,31 +763,36 @@ class ExportDialog extends Component
         
         if (this.state.type === "XML")
         {
-            let xmlstring = "";
+            let xmlstring = "<Items>";
             for (let i = 0; i < this.props.items.length; i++)
             {
                 const item = this.props.items[i];
 
-                xmlstring += `<Item ItemID="${item.Id}">\n\t<Name>${item.Name}</Name>\n\t<First_Bid>$7.00</First_Bid>\n\t<Number_of_Bids>${item.Bids.length}</Number_of_Bids>\n`
+                xmlstring += `<Item ItemID="${item.Id}"><Name>${item.Name}</Name><First_Bid>$7.00</First_Bid><Number_of_Bids>${item.Bids.length}</Number_of_Bids>`
 
                 if (item.Bids.length !== 0)
                 {
-                    xmlstring += `\t<Bids>\n`
+                    xmlstring += `<Bids>`
 
                     for (let j = 0; j < item.Bids.length; j++)
                     {
                         const bid = item.Bids[j];
-                        xmlstring +=`\t\t<Bid>\n\t\t\t<Bidder Rating="${bid.User.Bidder_Rating}" UserID="${bid.User.Username}">\n\t\t\t\t<Location>${bid.User.City}</Location>\n\t\t\t\t<Country>${bid.User.Country}</Country>\n`
-                        xmlstring += `\t\t\t</Bidder>\n\t\t\t<Time>${bid.Time}</Time>\n\t\t\t<Amount>${bid.Amount}</Amount>\n\t\t</Bid>\n`
+                        xmlstring +=`<Bid><Bidder Rating="${bid.User.Bidder_Rating}" UserID="${bid.User.Username}"><Location>${bid.User.City}</Location><Country>${bid.User.Country}</Country>`
+                        xmlstring += `</Bidder><Time>${bid.Time}</Time><Amount>${bid.Amount}</Amount></Bid>`
                     }
-                    xmlstring +=`\t</Bids>\t`
+                    xmlstring +=`</Bids>`
                 }
                 
-                xmlstring +=`\t<Location>J${item.Location}</Location>\n\t<Country>${item.User.Country}</Country>\n\t<Started>${item.Started}</Started>\n\t<Ends>${item.Ends}</Ends>\n`
-                xmlstring += `\t<Seller Rating="${item.User.Seller_Rating}" UserID="${item.User.Username}"/>\n\t<Description>${item.Description}</Description>\n\t</Item>\n`
+                xmlstring +=`<Location>J${item.Location}</Location><Country>${item.User.Country}</Country><Started>${item.Started}</Started><Ends>${item.Ends}</Ends>`
+                xmlstring += `<Seller Rating="${item.User.Seller_Rating}" UserID="${item.User.Username}"/><Description>${item.Description}</Description></Item>`
             }
 
-            download(filename, xmlstring);
+            xmlstring += "</Items>";
+
+            const format = require("xml-formatter");
+            const formatted = format(xmlstring);
+
+            download(filename, formatted);
         }
         else
         {
@@ -825,7 +830,7 @@ class ExportDialog extends Component
 
             console.log(jsonitems);
 
-            const toPrint = JSON.stringify(jsonitems);
+            const toPrint = JSON.stringify(jsonitems, null,  4);
 
             download(filename, toPrint);
         }

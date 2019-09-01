@@ -210,14 +210,7 @@ class AccountSnapshot extends Component
         })
     }
 
-    getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-          color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-      }
+    
       
 
     render()
@@ -240,7 +233,7 @@ class AccountSnapshot extends Component
         {
             return (
                 <div className="AccountSnapshot Full">
-                        <Avatar style={{backgroundColor: this.getRandomColor()}} className="Avatar" onClick={this.props.userClick}>{this.props.user.Username[0]}</Avatar>
+                        <Avatar style={{backgroundColor: getRandomColor()}} className="Avatar" onClick={this.props.userClick}>{this.props.user.Username[0]}</Avatar>
                         <Box>
                             <Typography className="Username" onClick={this.props.userClick}>
                                 {this.props.user.Username}
@@ -256,6 +249,15 @@ class AccountSnapshot extends Component
             )
         }
     }
+}
+
+export function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
 }
 
 export default withRouter(Header);

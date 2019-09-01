@@ -77,10 +77,12 @@
     - [ ] Active Auctions
     - [ ] Messages
       - [x] DB redo -header -body
-      - [ ] Backend queries
+      - [x] Backend queries
+      - [x] Received / Sent Sorting
+      - [ ] Conversations Sorting
       - [ ] Notifications
+      - [ ] Send
       - [ ] Reply
-      - [ ] Received / Sent Sorting
       - [ ] Delete Message
     - [ ] Settings
 - [ ] Auction Page
