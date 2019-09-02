@@ -79,10 +79,10 @@
       - [x] DB redo -header -body
       - [x] Backend queries
       - [x] Received / Sent Sorting
-      - [ ] Conversations Sorting
+      - [x] Conversations Sorting
       - [ ] Notifications
       - [ ] Send
-      - [ ] Reply
+      - [x] Reply
       - [ ] Delete Message
     - [ ] Settings
 - [ ] Auction Page

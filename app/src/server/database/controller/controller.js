@@ -260,6 +260,28 @@ class DBController
         })
     }
 
+    user_permission(username, password, res, callback)
+    {
+        const query = {
+            string: "Select 1 From User Where Username = ? And Password = ?",
+            escape: [username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            if (rows.length !== 1)
+            {
+                res.send({
+                    error: true,
+                    message: "Permission Denied",
+                })
+
+                return;
+            }
+
+            if (callback) callback();
+        })
+    }
+
     categories(res)
     {
         const query = {
@@ -279,6 +301,18 @@ class DBController
         }
 
         this.query(query, res);
+    }
+
+    usernames(username, password, res)
+    {
+        this.user_permission(username, password, res, () => {
+            const query = {
+                string: "Select u.Username From User as u, General_User as gu Where u.Id = gu.User_Id",
+                escape: []
+            }
+
+            this.query(query, res);
+        });
     }
 
     email(email, res)
@@ -694,67 +728,41 @@ class DBController
 
     messages(username, password, res)
     {
-        // Conversations query
         const query = {
-            string: `   SELECT mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Subject", mh.Subject, "Id", m.Id, "Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username)) as Messages
-                        FROM User as su, User as ru, Message as m, Message_Header as mh
-                        WHERE   mh.Id = m.Message_Header_Id AND
-                                su.Id = m.Sender_Id AND
-                                ru.Id = m.Receiver_Id AND
-                                ( (su.Username = ? and su.Password = ?) OR (ru.Username = ? and ru.Password = ?))
-                        GROUP BY mh.Id`,
-            escape: [username, password, username, password]
+            string: `SELECT mh.Id as Header_Id, mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Subject", mh.Subject, "Header_Id", mh.Id, "Id", m.Id, "Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver" ,ru.Username)) as Messages
+                    FROM 
+                        (
+                            SELECT * FROM Message Where Time ORDER BY Time Asc
+                        ) as m, 
+                        User as ru, 
+                        User as su, 
+                        Message_Header as mh
+                    WHERE   mh.Id = m.Message_Header_Id AND
+                            su.Id = m.Sender_Id AND
+                            ru.Id = m.Receiver_Id AND
+                            ((ru.Username = 'user' AND ru.Password = 'password') OR (su.Username = 'user' AND su.Password = 'password'))
+                    GROUP BY mh.Id`,
+            escape: []
         }
 
         this.query(query, res, (rows) => {
             
-            const Conversations = rows.map( (row) => {
+            const Messages = rows.map( (row) => {
                 row.Messages = JSON.parse(row.Messages);
                 return row;
             })
 
-            // Sent query
-            const query = {
-                string: `   SELECT  mh.Subject, m.Id, m.Body, m.Status, m.Time, su.Username as Sender, ru.Username as Receiver
-                            FROM User as ru, User as su, Message as m, Message_Header as mh
-                            WHERE   mh.Id = m.Message_Header_Id AND
-                                    su.Id = m.Sender_Id AND
-                                    ru.Id = m.Receiver_Id AND
-                                    su.Username = ? AND su.Password = ?`,
-                escape: [username, password]
-            }
+            res.send({
+                error: false,
+                message: "OK",
+                data: Messages
+            });
+        });
+    }
 
-            this.query(query, res, (rows) => {
-                
-                const Sent = rows;
+    sendMessage(username, password, recipient, subject, text, time, reply, res)
+    {
 
-                // Received query
-                const query = {
-                    string: `   SELECT  mh.Subject, m.Id, m.Body, m.Status, m.Time, su.Username as Sender, ru.Username as Receiver
-                                FROM User as ru, User as su, Message as m, Message_Header as mh
-                                WHERE   mh.Id = m.Message_Header_Id AND
-                                        su.Id = m.Sender_Id AND
-                                        ru.Id = m.Receiver_Id AND
-                                        ru.Username = ? AND ru.Password = ?`,
-                    escape: [username, password]
-                }
-
-                this.query(query, res, (rows) => {
-
-                    const Received = rows;
-
-                    res.send({
-                        error: false,
-                        message: "OK",
-                        data: {
-                            Sent: Sent,
-                            Received: Received,
-                            Conversations: Conversations
-                        }
-                    })
-                })
-            })
-        })
     }
 
     query(query, res, callback = null, check = null)

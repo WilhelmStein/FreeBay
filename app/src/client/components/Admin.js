@@ -161,11 +161,10 @@ class Users extends Component
                 console.error(res.data.message)
             }
 
-            let display = res.data.data
-            for (let i = 0; i < res.data.data.length; i++)
-            {
-                display[i].index = i;
-            }
+            const display = res.data.data.map( (user, index) => {
+                user.index = index;
+                return user;
+            })
 
             this.setState({
                 display: display,
@@ -231,15 +230,13 @@ class Users extends Component
 
     searchChange(event)
     {
-        let display = []
-        for (let i = 0 ; i < this.state.users.length; i++)
-        {
-            let user = this.state.users[i];
-            user.index = i;
+        const display = this.state.users.filter ( user => {
 
             if (user.Username.toLowerCase().includes(event.target.value.toLowerCase())) 
-                display.push(user)
-        }
+                return true;
+
+            return false;
+        })
 
         this.setState({
             display: display
@@ -441,12 +438,12 @@ class Auctions extends Component
                 console.error(res.data.message)
             }
 
-            let display = res.data.data
-            for (let i = 0; i < res.data.data.length; i++)
-            {
-                display[i].index = i;
-                display[i].selected = false;
-            }
+            const display = res.data.data.map( (auction, index) => {
+                auction.index = index;
+                auction.selected = false;
+
+                return auction;
+            })
 
             this.setState({
                 display: display,
@@ -480,8 +477,6 @@ class Auctions extends Component
             display[i].selected = event.target.checked;
             auctions[display[i].index].selected = event.target.checked;
         }
-
-        console.log(display.map(i => i.selected))
 
         this.setState({
             display: display,
@@ -530,14 +525,10 @@ class Auctions extends Component
 
     search(event)
     {
-        let display = [];
-        for (let i = 0 ; i < this.state.auctions.length; i++)
-        {
-            let auction = this.state.auctions[i];
-            auction.index = i;
-
-            if (this.searchIndex[this.state.search](auction, event.target.value)) display.push(auction);
-        }
+        const display = this.state.auctions.filter( (auction) => {
+            if (this.searchIndex[this.state.search](auction, event.target.value)) return true;
+            return false;
+        })
 
         this.setState({
             display: display

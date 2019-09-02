@@ -6,21 +6,26 @@
     {
         background-color: $blue !important;
 
+        .Search
+        {
+            margin-right: 10px;
+        }
+
         .Search, .Select
         {
-            transition: 200ms;
-
-            color: white;
             font-size: $small-font-size;
-            background-color: $white-blue;
             border-radius: 5px;
-
-            margin-right: 10px;
             
             padding: 4px;
             padding-left: 10px;
-            
-            &:hover, &:focus, &:active
+        }
+
+        .Search, .Select, .Button
+        {
+            color: white;
+            transition: 200ms;
+            background-color: $white-blue;
+            &:hover, &:active, &:focus
             {
                 background-color: $whiter-blue;
             }
@@ -91,24 +96,10 @@
                 border-radius: 0;
                 padding-left: 10px;
 
-                .CardHeader
-                {
-                    .Avatar
-                    {
-                        transition: 200ms;
-                        
-                        &:hover, &:active
-                        {
-                            filter: brightness(110%);
-                        }
-                    }
-                }
-
                 .CardContent
                 {
                     padding:
                     {
-                        bottom: 20px;
                         top: 0;
                         left: 50px;
                     }
@@ -116,5 +107,89 @@
             }
         }
         
+    }
+
+    .CardHeader
+    {
+        .Avatar
+        {
+            cursor: pointer;
+            transition: 200ms;
+            
+            &:hover, &:active
+            {
+                filter: brightness(110%);
+            }
+        }
+    }
+
+    .MessageRenderer
+    {
+        .Toolbar
+        {
+            .Button
+            {
+                color: white;
+
+                margin-right: 10px;
+                transition: 200ms;
+
+                &.Delete
+                {
+                    background-color: $red;
+                    &:hover, &:active
+                    {
+                        background-color: $red-hover;
+                    }
+                }
+
+                &.Reply
+                {
+                    background-color: $white-blue;
+                    &:hover, &:active
+                    {
+                        background-color: $blue;
+                    }
+                }
+
+                &.disabled
+                {
+                    color: $lesser-white;
+                }
+            }
+        }
+
+        
+    }
+
+    .MessageRenderer, .MessageEditor
+    {
+        .Messages
+        {
+            padding: 10px;
+
+            .Message
+            {
+                margin-bottom: 10px;
+            }
+        }
+    }
+
+    .MessageEditor
+    {
+        .Title
+        {
+            font-size: $bigger-font-size;
+        }
+
+        .to, .subject
+        {
+            width: 100%;
+        }
+
+        .NewMessage
+        {
+            padding: 10px;
+        }
     }
 }

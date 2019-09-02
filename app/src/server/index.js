@@ -23,6 +23,8 @@ app.get('/api/categories', function(req, res) { controller.categories(res); });
 
 app.post('/api/username', function(req, res) { controller.username(req.body.username, res); });
 
+app.post('/api/usernames', function(req, res) { controller.usernames(req.body.username, req.body.password, res); });
+
 app.post('/api/email', function(req, res) { controller.email(req.body.email, res); });
 
 app.post('/api/signup', function(req, res) { controller.signup(req.body, res); });
@@ -50,6 +52,8 @@ app.post('/api/recommended', function(req, res) { controller.recommended(req.bod
 app.get('/api/image', function(req, res) { controller.image(req.query.path, res); });
 
 app.post('/api/messages', function(req, res) { controller.messages(req.body.username, req.body.password, res); });
+
+app.post('/api/sendMessage', function(req, res) { controller.sendMessage(req.body.username, req.body.password, req.body.recipient, req.body.subject, req.body.text, req.body.time, req.body.replay, res) } );
 
 
 const options = {
