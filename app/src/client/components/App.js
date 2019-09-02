@@ -14,7 +14,7 @@ import '../style/App.scss';
 import Axios from 'axios';
 
 class App extends React.Component {
-    
+
     constructor(props)
     {
         super(props);
@@ -90,7 +90,7 @@ class App extends React.Component {
             </div>
         );
     }
-    
+
 }
 
 export default withRouter(App);
