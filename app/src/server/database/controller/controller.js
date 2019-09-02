@@ -555,7 +555,8 @@ class DBController
     userAuctions(username, res)
     {
         const query = {
-            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
+            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
+                            DATE_FORMAT(a.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y %H:%i") as Ends,
                             a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                      FROM 
                         (
@@ -592,10 +593,11 @@ class DBController
         });
     }
 
-    userWatchedAuctions(username, password)
+    userWatchedAuctions(username, password, res)
     {
         const query = {
-            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
+            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
+                            DATE_FORMAT(a.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y %H:%i") as Ends,
                             a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                      FROM 
                         (
@@ -604,7 +606,9 @@ class DBController
                             WHERE u.Username = ?
                         ) as u
                         LEFT JOIN
-                        Auction a ON a.Seller_Id = u.Id
+                        Bid b ON b.User_Id = u.Id
+                        LEFT JOIN
+                        Auction a ON a.Id = b.Auction_Id
                         LEFT JOIN
                         Image i ON i.Auction_Id = a.Id
                      GROUP BY a.Id
@@ -619,7 +623,8 @@ class DBController
                 rows = [];
             
             rows = rows.map((item) => {
-                item.Images = item.Images === null ? [] : JSON.parse(item.Images)
+                let parsedImages = JSON.parse(item.Images);
+                item.Images = parsedImages[0].Id === null ? [] : parsedImages
                 return item;
             });
 

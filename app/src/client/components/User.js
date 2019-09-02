@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 // import { withRouter } from 'react-router-dom';
 
 import {
@@ -13,6 +13,8 @@ import {
     Tabs,
     AppBar
 } from "@material-ui/core";
+
+import Pagination from 'material-ui-flat-pagination';
 
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -823,7 +825,9 @@ class AccountMenu extends Component {
             tabs: [{ label: "Active Auctions" }],
             currentAuctions: [],
             watchedAuctions: [],
-            messages: []
+            messages: [],
+            resultsPerPage: 10,
+            offset: 2
         };
         //console.log(props.loggedAsTargetUser);
         autoBind(this);
@@ -868,7 +872,25 @@ class AccountMenu extends Component {
                 return;
             }
             
-            this.setState({ currentAuctions: res.data.data });
+            let currentAuctions = [];
+            var BreakException = {};
+
+            try {
+
+                res.data.data.forEach((auction) => {
+                    let diff = (new Date(auction.Ends).getTime() - new Date().getTime()) / 1000;
+                    console.log(new Date(auction.Ends));
+                    if(diff <= 0) throw BreakException;
+
+                    currentAuctions.push(auction);
+                });
+
+            }
+            catch(e) {
+                if(e !== BreakException) throw e;
+            }
+
+            this.setState({ currentAuctions: currentAuctions });
         })
         .catch((err) => console.log(err));
 
@@ -889,7 +911,7 @@ class AccountMenu extends Component {
             this.setState({
                 tabs: [
                     { label: "Active Auctions" },
-                    { label: "Past Auctions" },
+                    { label: "Watched Auctions" },
                     { label: "Messages" }
                 ]
             });
@@ -910,72 +932,14 @@ class AccountMenu extends Component {
     render() {
         //console.log(this.state);
 
-        let target;
+        let currentPage = null;
         switch(this.state.tabValue)
         {
-            case 0: target = this.state.currentAuctions; break;
-            case 1: target = this.state.watchedAuctions; break;
-            case 2: target = this.state.messages; break;
+            case 0: currentPage = <AuctionGrid target={this.state.currentAuctions}/>; break;
+            case 1: currentPage = <AuctionGrid target={this.state.watchedAuctions}/>; break;
+            case 2: break;
             default: throw Error("Unexpected Tab Value."); break;
         }
-
-        let content = target.map((auction, index) => (
-            <Grid item key={index} xs={6}>
-                <Card className="AuctionCard">
-                    <Grid container>
-                        <Grid item xs={3}>
-                            <CardMedia className="Media"
-                                    //component="img"
-                                    image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                                    title={auction.Name}
-                            />
-                        </Grid>
-
-                        <Grid item xs={5} className="Details">
-                            <CardContent>
-                                <Typography className="Title">{auction.Name}</Typography>
-                            </CardContent>
-                        </Grid>
-
-                        <Grid item xs={4} className="Prices">
-                            <CardContent>
-                                <Grid container className="Prices" spacing={1}>
-                                    <Grid item >
-                                        <Typography variant="h5" className="Title">Starting Price:</Typography>
-                                    </Grid>
-                                    <Grid item >
-                                        <Typography className="Starting Price" variant="h4">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
-                                    </Grid>
-
-                                    <Grid item >
-                                        <Typography variant="h5" className="Title">Current Price:</Typography>
-                                    </Grid>
-                                    <Grid item  zeroMinWidth>
-                                        <Typography className="Current Price" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
-                                    </Grid>
-
-                                    <Grid item >
-                                        <Typography variant="h5" className="Title">Buyout Price:</Typography>
-                                    </Grid>
-                                    <Grid item >
-                                        <Typography className="Buyout Price" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
-                                    </Grid>
-                                </Grid>
-
-                                <Box className="Dates" mt={2}>
-                                    <Typography>
-                                        Started in: <span className="Started Date">{auction.Started}</span>
-                                    </Typography>
-                                    <Typography>
-                                        Ends in: <span className="Ends Date">{auction.Ends}</span>
-                                    </Typography>
-                                </Box>
-                            </CardContent>
-                        </Grid>
-                    </Grid>
-                </Card>
-            </Grid>
-        ));
 
 
         return (
@@ -991,16 +955,109 @@ class AccountMenu extends Component {
                         </AppBar>
                     </Grid>
 
-                    <Grid item className="AuctionGrid" xs={12}>
-                        <Grid container spacing={2}>
-                            {content}
-                        </Grid>
-                    </Grid>
+                    {currentPage}
+
                 </Grid>
             // </Grid>
         );
     }
 }
 
+function AuctionGrid(props) {
+
+    let [offset, setOffset] = useState(0);
+    let [resultsPerPage, setResultsPerPage] = useState(6);
+
+    let content = props.target.slice(offset, offset + resultsPerPage).map((auction, index) => (
+        <Grid item key={index} xs={6}>
+            <Card className="AuctionCard">
+                <Grid container>
+                    <Grid item xs={3}>
+                        <CardMedia className="Media"
+                                //component="img"
+                                image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/150x250/ffffff/4a4a4a.png&text=No+Image"}
+                                title={auction.Name}
+                        />
+                    </Grid>
+
+                    <Grid item xs={5} className="Details">
+                        <CardContent>
+                            <Typography className="Title">{auction.Name}</Typography>
+                            {
+                                (auction.Description === "")
+                                ?
+                                (<Typography className="Description Empty">No Description.</Typography>)
+                                :
+                                (<Typography className="Description">{auction.Description}</Typography>)
+                            }               
+                        </CardContent>
+                    </Grid>
+
+                    <Grid item xs={4} className="Prices">
+                        <CardContent>
+                            <Grid container className="Prices" spacing={1}>
+                                <Grid item >
+                                    <Typography variant="h5" className="Title">Starting Price:</Typography>
+                                </Grid>
+                                <Grid item >
+                                    <Typography className="Starting Price" variant="h4">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
+                                </Grid>
+
+                                <Grid item >
+                                    <Typography variant="h5" className="Title">Current Price:</Typography>
+                                </Grid>
+                                <Grid item  zeroMinWidth>
+                                    <Typography className="Current Price" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
+                                </Grid>
+
+                                <Grid item >
+                                    <Typography variant="h5" className="Title">Buyout Price:</Typography>
+                                </Grid>
+                                <Grid item >
+                                    <Typography className="Buyout Price" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
+                                </Grid>
+                            </Grid>
+
+                            <Box className="Dates" mt={2}>
+                                <Typography>
+                                    Started in: <span className="Started Date">{auction.Started}</span>
+                                </Typography>
+                                <Typography>
+                                    Ends in: <span className="Ends Date">{auction.Ends}</span>
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Grid>
+                </Grid>
+            </Card>
+        </Grid>
+    ));
+
+    return(
+        <Grid item className="AuctionGrid" xs={12}>
+            <Pagination
+                className="Pagination"
+                size='large'
+                limit={resultsPerPage}
+                offset={offset}
+                total={props.target.length}
+                onClick={(e, offset) => setOffset(offset)}
+            />
+
+            <Grid container spacing={2}>
+                {content}
+            </Grid>
+
+            <Pagination
+                className="Pagination"
+                size='large'
+                limit={resultsPerPage}
+                offset={offset}
+                total={props.target.length}
+                onClick={(e, offset) => setOffset(offset)}
+            />
+        </Grid>
+    );
+}
 
 export default withRouter(User);

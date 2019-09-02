@@ -45,7 +45,7 @@ app.post('/api/updateUser', function(req, res) { controller.updateUser(req.body,
 
 app.get('/api/userAuctions', function(req, res) { controller.userAuctions(req.query.username, res); });
 
-app.post('/api/userWatchedAuctions', function(req, res) { controller.userWatchedAuctions(req.body.username, req.body.password); });
+app.post('/api/userWatchedAuctions', function(req, res) { controller.userWatchedAuctions(req.body.username, req.body.password, res); });
 
 app.get('/api/featured', function(req, res) { controller.featured(res); });
 

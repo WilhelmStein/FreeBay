@@ -103,11 +103,10 @@ h1
 
             .AuctionCard
             {
+                height: 250px;
+
                 transition: 200ms;
-                overflow: auto;
-
                 cursor: pointer;
-
                 background-color: $almost-white;
 
                 &:hover
@@ -129,6 +128,19 @@ h1
                         &:hover
                         {
                             color: $graphite;
+                        }
+                    }
+
+                    .Description
+                    {
+                        margin-top: 10px;
+                        color: $graphite;
+                        overflow: hidden;
+                        height: 140px;
+
+                        &.Empty
+                        {
+                            font-style: italic;
                         }
                     }
                 }
