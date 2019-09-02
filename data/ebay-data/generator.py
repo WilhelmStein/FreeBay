@@ -24,44 +24,60 @@ class Generator:
 
     queries = {
         "User": (
-            "INSERT INTO User"
-            "(Id, Username, Password, Email)"
-            "VALUES (%(Id)s, %(Username)s, %(Password)s, %(Email)s)"
+            "INSERT INTO User "
+                "(Id, Username, Password, Email) "
+            "VALUES "
+                "(%(Id)s, %(Username)s, %(Password)s, %(Email)s)"
         ),
         "General_User": (
-            "INSERT INTO General_User"
-            "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated)"
-            "VALUES (%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
+            "INSERT INTO General_User "
+                "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated) "
+            "VALUES "
+                "(%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
         ),
         "Address": (
-            "INSERT INTO Address"
-            "(Id, Street, Number, ZipCode, Country, City)"
-            "VALUES (%(Id)s, %(Street)s, %(Number)s, %(ZipCode)s, %(Country)s, %(City)s)"
+            "INSERT INTO Address "
+                "(Id, Street, Number, ZipCode, Country, City) "
+            "VALUES "
+                "(%(Id)s, %(Street)s, %(Number)s, %(ZipCode)s, %(Country)s, %(City)s)"
         ),
         "Category": (
-            "INSERT INTO Category"
-            "(Id, Name, Caption)"
-            "VALUES (%(Id)s, %(Name)s, %(Caption)s)"
+            "INSERT INTO Category "
+                "(Id, Name, Caption) "
+            "VALUES "
+                "(%(Id)s, %(Name)s, %(Caption)s)"
         ),
         "Auction_has_Category": (
-            "INSERT INTO Auction_has_Category"
-            "(Auction_Id, Category_Id)"
-            "VALUES (%(Auction_Id)s, %(Category_Id)s)"
+            "INSERT INTO Auction_has_Category "
+                "(Auction_Id, Category_Id) "
+            "VALUES "
+                "(%(Auction_Id)s, %(Category_Id)s)"
         ),
         "Auction": (
-            "INSERT INTO Auction"
-            "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description)"
-            "VALUES (%(Id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s)"
+            "INSERT INTO Auction "
+                "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description) "
+            "VALUES "
+                "(%(Id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s)"
         ),
         "Bid": (
-            "INSERT INTO Bid"
-            "(Id, User_id, Auction_Id, Amount, Time)"
-            "VALUES (%(Id)s, %(User_id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
+            "INSERT INTO Bid "
+                "(Id, User_id, Auction_Id, Amount, Time) "
+            "VALUES "
+                "(%(Id)s, %(User_id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
         ),
         "Image": (
-            "INSERT INTO Image"
-            "(Id, Path, Auction_Id)"
-            "VALUES (%(Id)s, %(Path)s, %(Auction_Id)s)"
+            "INSERT INTO Image "
+                "(Id, Path, Auction_Id) "
+            "VALUES "
+                "(%(Id)s, %(Path)s, %(Auction_Id)s)"
+        ),
+        "Views": (
+            "INSERT INTO Views "
+                "(User_Id, Auction_Id, Time) "
+            "VALUES "
+                "(%(User_Id)s, %(Auction_Id)s, %(Time)s) "
+            "ON DUPLICATE KEY UPDATE "
+                "Time = IF(VALUES(Time) > Time, VALUES(Time), Time)"
         )
     }
 
@@ -282,6 +298,15 @@ class Generator:
         }
 
 
+    def __generate_view__(self, user_id, auction_id, time):
+
+        return {
+            "User_Id": user_id,
+            "Auction_Id": auction_id,
+            "Time": time
+        }
+
+
     def __register__(self, table, entry):
 
         if table is None or not isinstance(table, str):
@@ -311,9 +336,7 @@ class Generator:
 
             code, message = str(error).split(": ")
 
-            print("[Generator] [ERROR {}] {}".format(code, message), dump, sep='\n\n')
-
-            exit(1)
+            raise connector.errors.DatabaseError("[Generator] [ERROR {}] {}\n\nDump:{}".format(code, message, dump))
 
         self.cnx.commit()
 
@@ -352,7 +375,19 @@ class Generator:
 
             for path in self.downloader.download(auction["Name"]):
 
-                self.__register__("Image", self.__generate_image__(self.auction_id, path))
+                try:
+
+                    self.__register__("Image", self.__generate_image__(self.auction_id, path))
+
+                except connector.errors.DatabaseError as error:
+
+                    print("[Generator] Failed to insert (%d, %s) into table 'Image'" % (self.auction_id, path))
+
+                    if self.verbose:
+
+                        print(str(error))
+
+                    pass
 
         for bid in auction["Bids"]:
 
@@ -367,6 +402,14 @@ class Generator:
                 self.__register__("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]], bidder_rating=bidder["Rating"]))
 
                 self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=self.auction_id, amount=bid["Amount"], time=bid["Time"]))
+
+            self.__register__("Views",
+                self.__generate_view__(
+                    user_id=self.users[bidder["UserID"]],
+                    auction_id=self.auction_id,
+                    time=bid["Time"]
+                )
+            )
 
         for category in auction["Category"]:
 
