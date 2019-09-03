@@ -121,6 +121,12 @@
                 filter: brightness(110%);
             }
         }
+
+        .Time
+        {
+            padding: 10px;
+            font-size: $small-font-size;
+        }
     }
 
     .MessageRenderer
@@ -190,6 +196,22 @@
         .NewMessage
         {
             padding: 10px;
+        }
+
+        .Message:not(.New)
+        {
+            background-color: $not-white;
+        }
+
+        .New.Message
+        {
+            cursor: pointer;
+            transition: 200ms;
+
+            &:hover
+            {
+                background-color: $not-white;
+            }
         }
     }
 }

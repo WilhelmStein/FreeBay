@@ -81,7 +81,7 @@
       - [x] Received / Sent Sorting
       - [x] Conversations Sorting
       - [ ] Notifications
-      - [ ] Send
+      - [x] Send
       - [x] Reply
       - [ ] Delete Message
     - [ ] Settings

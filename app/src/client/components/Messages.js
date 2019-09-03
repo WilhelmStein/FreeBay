@@ -24,7 +24,14 @@ class Messages extends Component
 
         this.state = {
             active: null,
-            editor: false
+            editor: false,
+            editorProps: {
+                to: "",
+                subject: "",
+                prev: [],
+                reply: false
+            },
+            messages: []
         }
 
         autoBind(this);
@@ -45,6 +52,16 @@ class Messages extends Component
 
     newMessage(props)
     {
+        if (props === null || props === undefined)
+        {
+            props = {
+                to: "",
+                subject: "",
+                history: [],
+                reply: false
+            }
+        }
+
         if (!props.reply)
         {
             props.reply = false
@@ -56,16 +73,60 @@ class Messages extends Component
         })
     }
 
+    sendMessage()
+    {
+        console.log("hi")
+        this.setState({
+            editor: true,
+            editorProps: {
+                to: "",
+                subject: "",
+                history: [],
+                reply: false
+            }
+        })
+
+        this.getMessages();
+    }
+
+    deleteMessage()
+    {
+        this.getMessages();
+    }
+
+    componentDidMount()
+    {
+        this.getMessages();
+    }
+
+    getMessages()
+    {
+        axios.post("/api/messages", {username: this.props.user.Username, password: this.props.user.Password})
+        .then((res) => {
+
+            if (res.data.error)
+            {
+                console.error(res.data.message)
+                return;
+            }
+
+            this.setState({
+                messages: res.data.data
+            })
+        })
+        .catch(err => console.error(err));
+    }
+
     render()
     {
         return (
             <Grid container className="Messages">
-                <MessageList user={this.props.user} messageClick={this.changeActive} userClick={this.userClick} newMessage={this.newMessage}/>
+                <MessageList user={this.props.user} messages={this.state.messages} messageClick={this.changeActive} userClick={this.userClick} newMessage={this.newMessage}/>
                 {
                     this.state.editor ?
-                    <MessageEditor user={this.props.user} {...this.state.editorProps}/>
+                    <MessageEditor user={this.props.user} {...this.state.editorProps} send={this.sendMessage}/>
                     :
-                    <MessageRenderer active={this.state.active} userClick={this.userClick} reply={this.newMessage}/>
+                    <MessageRenderer active={this.state.active} userClick={this.userClick} reply={this.newMessage} delete={this.deleteMessage}/>
                 }
             </Grid>
         );
@@ -73,6 +134,16 @@ class Messages extends Component
 }
 
 let userColorDex = {};
+const renderTime = (time) => {
+
+    time = new Date(time);
+    if ((Date.now() - time) / (1000 * 60 * 60 * 24) < 0)
+    {
+        return time.toDateString();
+    }
+
+    return time.toLocaleTimeString();
+}
 
 class MessageList extends Component
 {
@@ -81,7 +152,7 @@ class MessageList extends Component
         super(props);
         
         this.state = {
-            headers: [],
+            propMessages: this.props.messages,
             messages: [],
             display: [],
             displayType: "Received"
@@ -93,42 +164,41 @@ class MessageList extends Component
     {
         if (!(this.props.user)) return;
 
-        axios.post("/api/messages", {username: this.props.user.Username, password: this.props.user.Password})
-        .then((res) => {
+        this.processMessages();
+    }
 
-            if (res.data.error)
-            {
-                console.error(res.data.message)
-                return;
-            }
+    componentWillReceiveProps(nextProps)
+    {
+        this.processMessages(nextProps);
+    }
 
-            const withHistory = res.data.data.map( header => {
-                header.Messages = header.Messages.map( (message) => {
+    processMessages(props=this.props)
+    {
+        console.log("hi")
+        const arraysWithHistory = props.messages.map( header => {
+            header.Messages = header.Messages.map( (message) => {
 
-                    if ( ! userColorDex.hasOwnProperty(message[this.state.displayType ? "Sender" : "Receiver"]) )
-                    {
-                        userColorDex[message[this.state.displayType ? "Sender" : "Receiver"]] = getRandomColor();
-                    }
+                const user = message[this.state.displayType === "Received" ? "Sender" : "Receiver"];
 
-                    message.color = userColorDex[message[this.state.displayType ? "Sender" : "Receiver"]];
+                if ( ! userColorDex.hasOwnProperty(user) )
+                {
+                    userColorDex[user] = getRandomColor();
+                }
 
-                    message.History = this.history(header, message);
-                    return message;
-                })
-
-                return header;
+                message.History = this.history(header, message);
+                return message;
             })
-            const messageArrays = withHistory.map(h => h.Messages)
-            const messages = [].concat.apply([], messageArrays);
-            const display = this.getMessagesByType(messages, this.state.displayType);
 
-            this.setState({
-                headers: res.data.data,
-                messages: messages,
-                display: display
-            })
+            return header.Messages;
         })
-        .catch(err => console.error(err))
+        
+        const messages = [].concat.apply([], arraysWithHistory);
+        const display = this.getMessagesByType(messages, this.state.displayType);
+        
+        this.setState({
+            messages: messages,
+            display: display
+        })
     }
 
     changeDisplayType(event)
@@ -141,10 +211,10 @@ class MessageList extends Component
 
     history(header, message)
     {
-        const ret = header.Messages.reverse().filter( (m) => {
+        const ret = header.Messages.filter( (m) => {
             if (new Date(m.Time) >= new Date(message.Time)) return false;
             return true;
-        })
+        }).reverse();
 
         return ret;
     }
@@ -183,8 +253,18 @@ class MessageList extends Component
 
     render()
     {
-        const items = this.state.display.map( (message, index) => {
+        const items = this.state.display.sort( (a, b) => {
+            const atime = new Date(a.Time);
+            const btime = new Date(b.Time);
+
+            if (atime < btime) return 1;
+            if (atime > btime) return -1;
+            return 0;
+
+        }).map( (message, index) => {
             const oddity = index % 2 === 0 ? "even" : "odd"
+            const user = this.state.displayType === "Received" ? message.Sender : message.Receiver;
+
             return (
                 <Fade in={true} key={message.Id}>
                     <ListItem  className={`ListItem ${oddity}`} onClick={(e) => {this.props.messageClick(e, message)}}>
@@ -194,15 +274,36 @@ class MessageList extends Component
                                 avatar={
                                     <Avatar 
                                         className="Avatar" 
-                                        style={{backgroundColor: message.color}} 
-                                        title={this.state.displayType === "Received" ? message.Sender : message.Receiver} 
-                                        onClick={(e) => { this.props.userClick(e, this.state.displayType === "Received" ? message.Sender : message.Receiver); }}
+                                        style={{backgroundColor: userColorDex[user]}} 
+                                        title={user} 
+                                        onClick={(e) => { this.props.userClick(e, user)}}
                                     >
-                                        {this.state.displayType === "Received" ? message.Sender.toUpperCase()[0] : message.Receiver.toUpperCase()[0]}
+                                        {this.state.displayType === "Received" ? user.toUpperCase()[0] : user.toUpperCase()[0]}
                                     </Avatar>
                                 }
-                                title={message.Subject}
-                                subheader={new Date(message.Time).toDateString()}                  
+                                title={
+                                    <div>
+                                        {
+                                            this.state.displayType === "Sent" ?
+                                                <Typography display="inline" color="textSecondary">
+                                                    {"To: "}
+                                                </Typography>
+                                                :
+                                                null
+                                        }
+                                        
+                                        <Typography display="inline">
+                                            {this.state.displayType === "Sent" ? message.Receiver : message.Sender}
+                                        </Typography>
+                                    </div>
+                                }
+                                subheader={message.Subject}
+                                action={
+                                    <Typography color="textSecondary" className="Time">
+                                        {renderTime(message.Time)}
+                                    </Typography>
+                                    
+                                }
                             />
                             <CardContent className="CardContent">
                                 <Typography variant="body2" color="textSecondary">
@@ -241,7 +342,7 @@ class MessageList extends Component
                                 className="ComposeMessage Button"
                                 variant="contained"
                                 title="Compose New Message"
-                                onClick={(e) => {this.newMessage(e, {})}}
+                                onClick={(e) => {this.newMessage(e)}}
                             >
                                 <AddCommentIcon/>
                             </IconButton>
@@ -266,6 +367,11 @@ class MessageRenderer extends Component
         autoBind(this);
     }
 
+    delete()
+    {
+
+    }
+
     render()
     {
         let items = []
@@ -281,15 +387,20 @@ class MessageRenderer extends Component
                                 avatar={
                                     <Avatar 
                                         className="Avatar" 
-                                        style={{backgroundColor: m.color}} 
+                                        style={{backgroundColor: userColorDex[m.Sender]}} 
                                         title={m.Sender} 
                                         onClick={(e) => { this.props.userClick(e, m.Sender); }}
                                     >
                                         {m.Sender.toUpperCase()[0]}
                                     </Avatar>
                                 }
-                                title={m.Subject}
-                                subheader={new Date(m.Time).toDateString()}                  
+                                title={m.Sender}
+                                subheader={m.Subject}
+                                action={
+                                    <Typography color="textSecondary" className="Time">
+                                        {renderTime(m.Time)}
+                                    </Typography>
+                                }
                             />
                             <CardContent>
                                 <MarkdownRenderer markdown={m.Body}/>
@@ -306,7 +417,12 @@ class MessageRenderer extends Component
                     <AppBar position="sticky">
                         <Toolbar className="Toolbar">
                             <div style={{flexGrow: 1}}/>
-                            <Button className={`Delete Button ${!this.props.active ? " disabled" : ""}`} variant="contained" color="secondary" disabled={!this.props.active}>
+                            <Button
+                                className={`Delete Button ${!this.props.active ? " disabled" : ""}`}
+                                variant="contained" color="secondary"
+                                disabled={!this.props.active}
+                                onClick={this.delete}
+                            >
                                 Delete
                                 <DeleteIcon/>
                             </Button>
@@ -341,10 +457,13 @@ class MessageEditor extends Component
         this.state = {
             to: this.props.to,
             subject: this.props.subject,
-            prev: this.props.prev,
+            toError: "",
+            subjectError: "",
             text: "",
             usernames: [],
         }
+
+        this.inputRef = React.createRef();
     }
 
     componentDidMount()
@@ -362,6 +481,17 @@ class MessageEditor extends Component
             })
         })
         .catch(err => console.error(err))
+    }
+
+    componentWillReceiveProps(nextProps)
+    {
+        this.setState({
+            to: nextProps.to || "",
+            subject: nextProps.subject || "",
+            toError: "",
+            subjectError: "",
+            text: "",
+        });
     }
 
     write(event)
@@ -385,7 +515,7 @@ class MessageEditor extends Component
         if (this.props.reply) return;
 
         this.setState({
-            to: event.target.to
+            to: event.target.value
         })
     }
 
@@ -393,21 +523,23 @@ class MessageEditor extends Component
     {
         if (this.state.text === "") 
         {
-            this.setState({
-                textError: true
-            })
+            return;
         }
         if (!this.state.to)
         {
             this.setState({
-                toError: true
+                toError: "Cannot send a message with no recipient"
             })
+
+            return;
         }
         if (!this.state.subject)
         {
             this.setState({
-                subjectError: true
+                subjectError: "Cannot send a message with no subject"
             })
+
+            return;
         }
 
         axios.post('/api/sendMessage', {
@@ -424,42 +556,74 @@ class MessageEditor extends Component
             if (res.data.error)
             {
                 console.error(res.data.message);
+                if (res.data.message === "User does not exist")
+                {
+                    this.setState({
+                        toError: true
+                    })
+                }
                 return;
             }
+
+            alert("Message successfully sent!");
+            this.props.send();
         })
         .catch(err => console.error(err))
     }
 
     toOnBlur(event)
     {
-        if (event.target.value !== "")
+        if (this.state.to && this.state.to !== "")
         {
-            this.setState({
-                toError: false
+            axios.post("/api/username", {username: this.state.to})
+            .then( res => {
+                if (res.data.error) {
+                    console.error(res.data.message);
+                    return;
+                }
+    
+                if (res.data.data.length === 0)
+                {
+                    this.setState({
+                        toError: "Username does not exist"
+                    })
+                }
+                else
+                {
+                    this.setState({
+                        toError: ""
+                    })
+                }
             })
+            .catch( err => console.error(err))
         }
         else
         {
             this.setState({
-                toError: true
+                toError: "Cannot send a message with no recipient"
             })
         }
     }
 
     subjectOnBlur(event)
     {
-        if (event.target.value !== "")
+        if (this.state.subject !== "")
         {
             this.setState({
-                subjectError: false
+                subjectError: ""
             })
         }
         else
         {
             this.setState({
-                subjectError: true
+                subjectError: "Cannot send a message with no subject"
             })
         }
+    }
+
+    focusInput()
+    {
+        this.inputRef.current.focus();
     }
 
     render()
@@ -485,7 +649,8 @@ class MessageEditor extends Component
                                 <TextField 
                                     className="to"
                                     variant="filled"
-                                    error={this.state.toError}
+                                    title={this.state.toError}
+                                    error={this.state.toError !== ""}
                                     value={this.state.to}
                                     onChange={this.changeRecipient}
                                     onBlur={this.toOnBlur}
@@ -496,7 +661,8 @@ class MessageEditor extends Component
                                 <TextField
                                     className="subject"
                                     variant="filled"
-                                    error={this.state.subjectError}
+                                    title={this.state.subjectError}
+                                    error={this.state.subjectError !== ""}
                                     value={this.state.subject}
                                     onChange={this.changeSubject}
                                     onBlur={this.subjectOnBlur}
@@ -505,7 +671,7 @@ class MessageEditor extends Component
                                     }}
                                 />
                             </div>
-                            <Card className="New Message" raised>
+                            <Card className="New Message" onClick={this.focusInput} raised>
                                 <CardHeader
                                     className="CardHeader"
                                     avatar={
@@ -518,8 +684,13 @@ class MessageEditor extends Component
                                             {this.props.user.Username.toUpperCase()[0]}
                                         </Avatar>
                                     }
-                                    title={this.state.subject}
-                                    subheader={new Date().toDateString()}                  
+                                    title={this.props.user.Username}
+                                    subheader={this.state.subject}
+                                    action={
+                                        <Typography color="textSecondary" className="Time">
+                                            {new Date().toDateString()}
+                                        </Typography>
+                                    }              
                                 />
                                 <CardContent>
                                     <InputBase
@@ -527,6 +698,7 @@ class MessageEditor extends Component
                                         value={this.state.text}
                                         onChange={this.write}
                                         placeholder="Type here..."
+                                        inputRef={this.inputRef}
                                         multiline
                                     />
                                 </CardContent>

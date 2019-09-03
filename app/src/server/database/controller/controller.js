@@ -296,7 +296,7 @@ class DBController
     {
         // Check username existence
         const query = {
-            string: `Select * From User Where Username = ?`,
+            string: `Select Id From User Where Username = ?`,
             escape: [username]
         }
 
@@ -462,7 +462,6 @@ class DBController
         };
 
         this.query(query, res, (rows) => {
-            console.log(rows)
             
             res.send({
                 error: false,
@@ -729,7 +728,8 @@ class DBController
     messages(username, password, res)
     {
         const query = {
-            string: `SELECT mh.Id as Header_Id, mh.Subject, JSON_ARRAYAGG(JSON_OBJECT("Subject", mh.Subject, "Header_Id", mh.Id, "Id", m.Id, "Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver" ,ru.Username)) as Messages
+            string: `SELECT mh.Id as Header_Id, mh.Subject, 
+                            JSON_ARRAYAGG(JSON_OBJECT("Subject", mh.Subject, "Header_Id", mh.Id, "Id", m.Id, "Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver" ,ru.Username)) as Messages
                     FROM 
                         (
                             SELECT * FROM Message Where Time ORDER BY Time Asc
@@ -762,10 +762,80 @@ class DBController
 
     sendMessage(username, password, recipient, subject, text, time, reply, res)
     {
+        this.user_permission(username, password, res, () => {
 
+            this.sql.beginTransaction(err => {
+
+                if (err) 
+                {
+                    console.error(err);
+                    return;
+                }
+
+                const checkRecipient = (callback) => {
+                    const query = {
+                        string: "Select 1 From User as u, General_User as gu Where u.Username = ? AND gu.User_Id = u.Id",
+                        escape: [recipient]
+                    }
+            
+                    this.query(query, res, (rows) => {
+                        if (rows.length !== 1)
+                        {
+                            res.send({
+                                error: true,
+                                message: `User does not exist`,
+                            })
+            
+                            return;
+                        }
+
+                        return callback();
+                    })
+                }
+
+                const insertMessage = (message_header_id) => {
+                    const query = {
+                        string: `   INSERT INTO Message (Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status)
+                                    VALUES (?, ?, NOW(), (SELECT Id FROM User Where Username = ?), (SELECT Id FROM User WHERE Username = ?), 'Unread')`,
+                        escape: [message_header_id, text, username, recipient]
+                    }
+
+                    this.query(query, res, (result) => {
+
+                        res.send({
+                            error: false,
+                            message: "Sent",
+                        });
+
+                        this.sql.commit(err => {if (err) console.error(err)});
+
+                    }, null, true)
+                }
+
+                const insertHeader = (reply, callback) => {
+                    if (!reply)
+                    {
+                        const query = {
+                            string: `INSERT INTO Message_Header (Subject) VALUES (?)`,
+                            escape: [subject]
+                        }
+        
+                        this.query(query, res, (result) => {
+                            callback(result.insertId);
+                        }, null, true)
+                    }
+                    else
+                    {
+                        callback(reply);
+                    }
+                }
+
+                return checkRecipient( () => {insertHeader (reply, insertMessage)} );
+            })
+        });
     }
 
-    query(query, res, callback = null, check = null)
+    query(query, res, callback = null, check = null, transaction=false)
     {
         this.sql.query(query.string, query.escape, function(err, rows)
         {
@@ -776,7 +846,9 @@ class DBController
                     error: true,
                     message: "Something went wrong in database retrieval. Please try again."
                 });
-                return;
+                
+                if (transaction)
+                    return this.sql.rollback();
             }
 
             if (check)

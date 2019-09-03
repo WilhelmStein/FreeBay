@@ -53,7 +53,7 @@ app.get('/api/image', function(req, res) { controller.image(req.query.path, res)
 
 app.post('/api/messages', function(req, res) { controller.messages(req.body.username, req.body.password, res); });
 
-app.post('/api/sendMessage', function(req, res) { controller.sendMessage(req.body.username, req.body.password, req.body.recipient, req.body.subject, req.body.text, req.body.time, req.body.replay, res) } );
+app.post('/api/sendMessage', function(req, res) { controller.sendMessage(req.body.username, req.body.password, req.body.recipient, req.body.subject, req.body.text, req.body.time, req.body.reply, res) } );
 
 
 const options = {
