@@ -56,6 +56,16 @@ class Generator:
 
         self.image_id = 0
 
+        self.__register__("User",
+            self.__generate_user__(
+                username=admin["Username"],
+                password=admin["Password"],
+                email=admin["Email"]
+            )
+        )
+
+        self.__register__("Admin", self.__generate_admin__(self.users[admin["Username"]]))
+
 
     def __normalize_rating__(self, decimal, dst_lower=0.0, dst_upper=100.0):
 
