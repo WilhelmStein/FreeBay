@@ -42,9 +42,10 @@ class Downloader:
 
         try:
 
-            limit = randrange(self.max_limit - self.min_limit)
+            limit = randrange(self.min_limit, self.max_limit) if self.min_limit < self.max_limit else self.max_limit
 
-            print("[Downloader] Downloading %d image(s) at most" % limit)
+            print("[Downloader] Limit set to %d" % limit)
+
 
             paths = []
 
