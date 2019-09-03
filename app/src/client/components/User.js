@@ -1,5 +1,4 @@
 import React, { Component, useState } from "react";
-// import { withRouter } from 'react-router-dom';
 
 import {
     Card,
@@ -824,6 +823,7 @@ class AccountMenu extends Component {
             tabValue: 0,
             tabs: [{ label: "Active Auctions" }],
             currentAuctions: [],
+            pastAuctions: [],
             watchedAuctions: [],
             messages: [],
             resultsPerPage: 10,
@@ -871,26 +871,19 @@ class AccountMenu extends Component {
                 console.error(res.data.message)
                 return;
             }
-            
-            let currentAuctions = [];
-            var BreakException = {};
+        
 
-            try {
+            let currentAuctions = res.data.data.filter((auction) => {
+                let diff = new Date(auction.Ends_Raw) - new Date();
+                return (diff > 0);
+            });
 
-                res.data.data.forEach((auction) => {
-                    let diff = (new Date(auction.Ends).getTime() - new Date().getTime()) / 1000;
-                    console.log(new Date(auction.Ends));
-                    if(diff <= 0) throw BreakException;
+            let pastAuctions = res.data.data.filter((auction) => {
+                let diff = new Date(auction.Ends_Raw) - new Date();
+                return (diff <= 0);
+            })
 
-                    currentAuctions.push(auction);
-                });
-
-            }
-            catch(e) {
-                if(e !== BreakException) throw e;
-            }
-
-            this.setState({ currentAuctions: currentAuctions });
+            this.setState({ currentAuctions: currentAuctions, pastAuctions: pastAuctions });
         })
         .catch((err) => console.log(err));
 
@@ -911,6 +904,7 @@ class AccountMenu extends Component {
             this.setState({
                 tabs: [
                     { label: "Active Auctions" },
+                    { label: "Past Auctions" },
                     { label: "Watched Auctions" },
                     { label: "Messages" }
                 ]
@@ -919,8 +913,10 @@ class AccountMenu extends Component {
         else
         {
             this.setState({
-                tabValue: 0,
-                tabs: [{ label: "Active Auctions" }]
+                tabs: [ 
+                    { label: "Active Auctions" },
+                    { label: "Past Auctions" }
+                ]
             });
         }
     }
@@ -936,9 +932,9 @@ class AccountMenu extends Component {
         switch(this.state.tabValue)
         {
             case 0: currentPage = <AuctionGrid target={this.state.currentAuctions}/>; break;
-            case 1: currentPage = <AuctionGrid target={this.state.watchedAuctions}/>; break;
-            case 2: break;
-            default: throw Error("Unexpected Tab Value."); break;
+            case 1: currentPage = <AuctionGrid target={this.state.pastAuctions}/>; break;
+            case 2: currentPage = <AuctionGrid target={this.state.watchedAuctions}/>; break;
+            default: currentPage = <div/>; break;
         }
 
 
@@ -966,7 +962,8 @@ class AccountMenu extends Component {
 function AuctionGrid(props) {
 
     let [offset, setOffset] = useState(0);
-    let [resultsPerPage, setResultsPerPage] = useState(6);
+    //let [resultsPerPage, setResultsPerPage] = useState(6);
+    const resultsPerPage = 6;
 
     let content = props.target.slice(offset, offset + resultsPerPage).map((auction, index) => (
         <Grid item key={index} xs={6}>
