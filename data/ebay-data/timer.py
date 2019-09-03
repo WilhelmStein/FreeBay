@@ -22,9 +22,11 @@ class Timer:
 
     def stop(self, message=None):
 
-        self.elapsed = time() - self.elapsed
+        self.elapsed = int(time() - self.elapsed)
 
-        print("[Timer] Completed after {:05.3g} minutes".format(self.elapsed / 60))
+        minutes, seconds = self.elapsed // 60, self.elapsed % 60
+
+        print("[Timer] Completed after {:02d} minutes and {:02d} seconds".format(minutes, seconds))
 
         if message:
 
