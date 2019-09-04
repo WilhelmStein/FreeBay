@@ -5,7 +5,8 @@ function initConnection() {
         host: 'localhost',
         user: 'root',
         password: 'password',
-        database: 'freebay'
+        database: 'freebay',
+        multipleStatements: true
     }) );
 }
 

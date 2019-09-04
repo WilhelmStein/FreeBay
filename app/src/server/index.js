@@ -53,8 +53,11 @@ app.get('/api/image', function(req, res) { controller.image(req.query.path, res)
 
 app.post('/api/messages', function(req, res) { controller.messages(req.body.username, req.body.password, res); });
 
-app.post('/api/sendMessage', function(req, res) { controller.sendMessage(req.body.username, req.body.password, req.body.recipient, req.body.subject, req.body.text, req.body.time, req.body.reply, res) } );
+app.post('/api/readMessage', function(req, res) { controller.readMessage(req.body.username, req.body.password, req.body.message, res); });
 
+app.post('/api/sendMessage', function(req, res) { controller.sendMessage(req.body.username, req.body.password, req.body.recipient, req.body.subject, req.body.text, req.body.reply, res); });
+
+app.post('/api/deleteMessage', function(req, res) { controller.deleteMessage(req.body.username, req.body.password, req.body.message, req.body.who, res); });
 
 const options = {
     key: fs.readFileSync(path.join(__dirname, 'encryption/server.key'), 'utf8'),

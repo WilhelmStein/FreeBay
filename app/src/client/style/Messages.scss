@@ -85,7 +85,6 @@
             {
                 .MessageCard
                 {
-                    transition: 200ms;
                     background-color: $lesser-white;
                 }
             }
@@ -96,6 +95,8 @@
                 border-radius: 0;
                 padding-left: 10px;
 
+                transition: 200ms;
+
                 .CardContent
                 {
                     padding:
@@ -103,6 +104,11 @@
                         top: 0;
                         left: 50px;
                     }
+                }
+
+                &.Unread
+                {
+                    font-weight: 500;
                 }
             }
         }
@@ -122,10 +128,15 @@
             }
         }
 
-        .Time
+        .Action
         {
             padding: 10px;
             font-size: $small-font-size;
+
+            &.Status
+            {
+                color: $mui-secondary;
+            }
         }
     }
 

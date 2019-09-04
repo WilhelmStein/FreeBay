@@ -37,17 +37,33 @@ class Messages extends Component
         autoBind(this);
     }
 
-    userClick(event, user)
+    userClick(user)
     {
         this.props.history.push(`/user/${user}`);
     }
 
-    changeActive(event, message)
+    readMessage(message)
     {
+        
         this.setState({
             active: message,
             editor: false
         })
+
+        if (isUnread(message, this.props.user.Username))
+        {
+            axios.post('/api/readMessage', {username: this.props.user.Username, password: this.props.user.Password, message: message})
+            .then( res => {
+                if (res.data.error)
+                {
+                    console.error(res.data.message);
+                    return;
+                }
+
+                this.getMessages();
+            })
+            .catch( err => console.error(err))
+        }
     }
 
     newMessage(props)
@@ -75,23 +91,36 @@ class Messages extends Component
 
     sendMessage()
     {
-        console.log("hi")
-        this.setState({
-            editor: true,
-            editorProps: {
-                to: "",
-                subject: "",
-                history: [],
-                reply: false
-            }
-        })
-
         this.getMessages();
     }
 
-    deleteMessage()
+    deleteMessage(message)
     {
-        this.getMessages();
+        axios.post('/api/deleteMessage', {
+            username: this.props.user.Username,
+            password: this.props.user.Password,
+            message: {
+                Id: message.Id,
+                Header_Id: message.Header_Id
+            },
+            who: message.Receiver === this.props.user.Username ? "Receiver" : "Sender"
+        })
+        .then( res => {
+            if (res.data.error)
+            {
+                console.error(res.data.message);
+                return;
+            }
+
+            alert("Message deleted successfully!");
+
+            this.setState({
+                active: null
+            })
+
+            this.getMessages();
+        })
+        .catch( err => console.error(err));
     }
 
     componentDidMount()
@@ -99,7 +128,7 @@ class Messages extends Component
         this.getMessages();
     }
 
-    getMessages()
+    getMessages(callback)
     {
         axios.post("/api/messages", {username: this.props.user.Username, password: this.props.user.Password})
         .then((res) => {
@@ -110,9 +139,11 @@ class Messages extends Component
                 return;
             }
 
+            console.log(res.data.data)
+
             this.setState({
-                messages: res.data.data
-            })
+                messages: res.data.data,
+            }, callback)
         })
         .catch(err => console.error(err));
     }
@@ -121,12 +152,12 @@ class Messages extends Component
     {
         return (
             <Grid container className="Messages">
-                <MessageList user={this.props.user} messages={this.state.messages} messageClick={this.changeActive} userClick={this.userClick} newMessage={this.newMessage}/>
+                <MessageList user={this.props.user} messages={this.state.messages} messageClick={this.readMessage} userClick={this.userClick} newMessage={this.newMessage}/>
                 {
                     this.state.editor ?
                     <MessageEditor user={this.props.user} {...this.state.editorProps} send={this.sendMessage}/>
                     :
-                    <MessageRenderer active={this.state.active} userClick={this.userClick} reply={this.newMessage} delete={this.deleteMessage}/>
+                    <MessageRenderer user={this.props.user} active={this.state.active} userClick={this.userClick} reply={this.newMessage} delete={this.deleteMessage}/>
                 }
             </Grid>
         );
@@ -143,6 +174,10 @@ const renderTime = (time) => {
     }
 
     return time.toLocaleTimeString();
+}
+
+const isUnread = (message, username) => {
+    return message.Receiver === username && message.Status === "Unread";
 }
 
 class MessageList extends Component
@@ -174,7 +209,6 @@ class MessageList extends Component
 
     processMessages(props=this.props)
     {
-        console.log("hi")
         const arraysWithHistory = props.messages.map( header => {
             header.Messages = header.Messages.map( (message) => {
 
@@ -211,8 +245,9 @@ class MessageList extends Component
 
     history(header, message)
     {
+
         const ret = header.Messages.filter( (m) => {
-            if (new Date(m.Time) >= new Date(message.Time)) return false;
+            if ( new Date(m.Time) >= new Date(message.Time)) return false;
             return true;
         }).reverse();
 
@@ -253,7 +288,14 @@ class MessageList extends Component
 
     render()
     {
-        const items = this.state.display.sort( (a, b) => {
+        const items = this.state.display
+        .filter( (m) => {
+            if (m.Sender === this.props.user.Username && m.Sender_Deleted === 1) return false;
+            if (m.Receiver === this.props.user.Username && m.Receiver_Deleted === 1) return false;
+
+            return true;
+        })
+        .sort( (a, b) => {
             const atime = new Date(a.Time);
             const btime = new Date(b.Time);
 
@@ -267,8 +309,8 @@ class MessageList extends Component
 
             return (
                 <Fade in={true} key={message.Id}>
-                    <ListItem  className={`ListItem ${oddity}`} onClick={(e) => {this.props.messageClick(e, message)}}>
-                        <Card className="MessageCard">
+                    <ListItem  className={`ListItem ${oddity}`} onClick={(e) => {this.props.messageClick(message, this.state.displayType)}}>
+                        <Card className={`MessageCard ${message.Status}`}>
                             <CardHeader
                                 className="CardHeader"
                                 avatar={
@@ -276,7 +318,7 @@ class MessageList extends Component
                                         className="Avatar" 
                                         style={{backgroundColor: userColorDex[user]}} 
                                         title={user} 
-                                        onClick={(e) => { this.props.userClick(e, user)}}
+                                        onClick={() => { this.props.userClick(user)}}
                                     >
                                         {this.state.displayType === "Received" ? user.toUpperCase()[0] : user.toUpperCase()[0]}
                                     </Avatar>
@@ -299,8 +341,8 @@ class MessageList extends Component
                                 }
                                 subheader={message.Subject}
                                 action={
-                                    <Typography color="textSecondary" className="Time">
-                                        {renderTime(message.Time)}
+                                    <Typography color="textSecondary" className={`Action ${isUnread(message, this.props.user.Username) ? "Status" : "Time"}`}>
+                                        {isUnread(message, this.props.user.Username) ? "New" : renderTime(message.Time) }
                                     </Typography>
                                     
                                 }
@@ -369,7 +411,7 @@ class MessageRenderer extends Component
 
     delete()
     {
-
+        this.props.delete(this.props.active);
     }
 
     render()
@@ -378,7 +420,14 @@ class MessageRenderer extends Component
 
         if (this.props.active)
         {
-            items = [this.props.active].concat(this.props.active.History).map( (m) => {
+            items = [this.props.active].concat(this.props.active.History)
+            .filter( m => {
+                if (m.Sender === this.props.user.Username && m.Sender_Deleted === 1) return false;
+                if (m.Receiver === this.props.user.Username && m.Receiver_Deleted === 1) return false;
+
+                return true;
+            })
+            .map( (m) => {
                 return (
                     <Fade in key={m.Id}>
                         <Card className="Message" raised>
@@ -389,7 +438,7 @@ class MessageRenderer extends Component
                                         className="Avatar" 
                                         style={{backgroundColor: userColorDex[m.Sender]}} 
                                         title={m.Sender} 
-                                        onClick={(e) => { this.props.userClick(e, m.Sender); }}
+                                        onClick={() => { this.props.userClick(m.Sender); }}
                                     >
                                         {m.Sender.toUpperCase()[0]}
                                     </Avatar>
@@ -397,7 +446,7 @@ class MessageRenderer extends Component
                                 title={m.Sender}
                                 subheader={m.Subject}
                                 action={
-                                    <Typography color="textSecondary" className="Time">
+                                    <Typography color="textSecondary" className="Action Time">
                                         {renderTime(m.Time)}
                                     </Typography>
                                 }
@@ -679,7 +728,7 @@ class MessageEditor extends Component
                                             className="Avatar"
                                             style={{backgroundColor: userColorDex.hasOwnProperty([this.props.user.Username]) ? userColorDex[this.props.user.Username] : getRandomColor()}}
                                             title={this.props.user.Username} 
-                                            onClick={(e) => { this.props.userClick(e, this.props.user.Username); }}
+                                            onClick={() => { this.props.userClick(this.props.user.Username); }}
                                         >
                                             {this.props.user.Username.toUpperCase()[0]}
                                         </Avatar>

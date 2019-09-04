@@ -729,7 +729,9 @@ class DBController
     {
         const query = {
             string: `SELECT mh.Id as Header_Id, mh.Subject, 
-                            JSON_ARRAYAGG(JSON_OBJECT("Subject", mh.Subject, "Header_Id", mh.Id, "Id", m.Id, "Body", m.Body, "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver" ,ru.Username)) as Messages
+                            JSON_ARRAYAGG(JSON_OBJECT(  "Subject", mh.Subject, "Header_Id", mh.Id, "Id", m.Id, "Body", m.Body, 
+                                                        "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username,
+                                                        "Sender_Deleted", m.Sender_Deleted, "Receiver_Deleted", m.Receiver_Deleted)) as Messages
                     FROM 
                         (
                             SELECT * FROM Message Where Time ORDER BY Time Asc
@@ -740,9 +742,9 @@ class DBController
                     WHERE   mh.Id = m.Message_Header_Id AND
                             su.Id = m.Sender_Id AND
                             ru.Id = m.Receiver_Id AND
-                            ((ru.Username = 'user' AND ru.Password = 'password') OR (su.Username = 'user' AND su.Password = 'password'))
+                            ((ru.Username = ? AND ru.Password = ?) OR (su.Username = ? AND su.Password = ?))
                     GROUP BY mh.Id`,
-            escape: []
+            escape: [username, password, username, password]
         }
 
         this.query(query, res, (rows) => {
@@ -760,7 +762,17 @@ class DBController
         });
     }
 
-    sendMessage(username, password, recipient, subject, text, time, reply, res)
+    readMessage(username, password, message, res)
+    {
+        const query = {
+            string: "Update Message Set Status = 'Read' Where Id = ?",
+            escape: [message.Id]
+        }
+
+        this.query(query, res);
+    }
+
+    sendMessage(username, password, recipient, subject, text, reply, res)
     {
         this.user_permission(username, password, res, () => {
 
@@ -795,8 +807,8 @@ class DBController
 
                 const insertMessage = (message_header_id) => {
                     const query = {
-                        string: `   INSERT INTO Message (Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status)
-                                    VALUES (?, ?, NOW(), (SELECT Id FROM User Where Username = ?), (SELECT Id FROM User WHERE Username = ?), 'Unread')`,
+                        string: `   INSERT INTO Message (Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status, Sender_Deleted, Receiver_Deleted)
+                                    VALUES (?, ?, NOW(), (SELECT Id FROM User Where Username = ?), (SELECT Id FROM User WHERE Username = ?), 'Unread', FALSE, FALSE)`,
                         escape: [message_header_id, text, username, recipient]
                     }
 
@@ -832,6 +844,85 @@ class DBController
 
                 return checkRecipient( () => {insertHeader (reply, insertMessage)} );
             })
+        });
+    }
+
+    deleteMessage(username, password, message, who, res)
+    {
+        this.user_permission(username, password, res, () => {
+
+            const query = {
+                string: `UPDATE Message SET ${who}_Deleted = TRUE WHERE Id = ?`,
+                escape: [message.Id]
+            }
+
+            this.query(query, res, (result) => {
+
+                const query = {
+                    string: "SELECT 1 From Message Where Id = ? AND Sender_Deleted = TRUE AND Receiver_Deleted = TRUE",
+                    escape: [message.Id]
+                }
+
+                this.query(query, res, (rows) => {
+
+                    if (rows.length !== 0)
+                    {
+                        this.banishMessage(message, res, () => {
+                            res.send({
+                                error: false,
+                                message: "Deleted"
+                            })
+                        })
+
+                        return;
+                    }
+
+                    res.send({
+                        error: false,
+                        message: "Deleted"
+                    })
+                })
+            })
+        });
+    }
+
+    banishMessage(message, res, callback)
+    {
+        this.sql.beginTransaction(err => {
+
+            if (err) 
+            {
+                console.error(err);
+                return;
+            }
+
+            const query = {
+                string: "SELECT mh.Id FROM Message_Header as mh WHERE mh.Id = ? AND EXISTS (SELECT m.Id FROM Message as m WHERE m.Message_Header_Id = mh.Id AND m.Id != ?)",
+                escape: [message.Header_Id, message.Id]
+            }
+
+            this.query(query, res, (rows) => {
+
+                let query = {
+                    string: "DELETE FROM Message WHERE Id = ?;",
+                    escape: [message.Id]
+                }
+
+                if (rows.length === 0)
+                {
+                    query.string += " DELETE FROM Message_Header Where Id = ?;";
+                    query.escape.push(message.Header_Id);
+                }
+
+                this.query(query, res, (result) => {
+
+                    this.sql.commit(err => {if (err) console.error(err)});
+
+                    callback();
+
+                }, null, true)
+
+            }, null, true)
         });
     }
 
