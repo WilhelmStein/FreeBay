@@ -80,7 +80,7 @@ class App extends React.Component {
                     <Route path='/auction/:id' component={AuctionPage} />
                     <Route path='/user/:username' render={(props) => <UserPage user={this.state.user}
                                                                                username={props.match.params.username}
-                                                                               updateHandler={(username, password) => this.updateHandler(username, password)}
+                                                                               updateHandler={this.updateHandler}
                                                                      />
                                                          }
                     />

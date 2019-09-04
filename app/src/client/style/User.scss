@@ -37,19 +37,11 @@ h1
 
 .UserGrid
 {
-    padding-left: 3%;
-    padding-right: 3%;
-
-    padding-top: 2%; 
-
-    .UserData
+    .UserMenu
     {
-        width: 320px;
 
-        .UserMedia
+        .UserClickable
         {
-            height: 320px;
-            object-fit: contain;
             &:hover {
                 cursor: pointer;
             }
@@ -68,134 +60,119 @@ h1
                 color: $blue;
                 font-size: 1.2em;
             }
-
-            .Validated
-            {
-                color: green;
-            }
-
-            .Invalidated
-            {
-                color: red;
-            }
-
-            .Submit
-            {
-                color: white;
-                background: $blue;
-            }
         }
     }
 
-    .UserMenu
+    .UserTabs
     {
-        .UserTabs
+        flex-grow: 1;
+        // height: 60px;
+        .Tab
         {
-            .Tab
-            {
-                font-size: $normal-font-size;
-            }
+            font-size: $normal-font-size;
         }
+    }
 
-        .AuctionGrid
+    .AuctionGrid
+    {
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+
+        .AuctionCard
         {
-            margin-top: 10px;
+            height: 200px;
 
-            .AuctionCard
+            transition: 200ms;
+            cursor: pointer;
+            background-color: $almost-white;
+
+            &:hover
             {
-                height: 250px;
+                background-color: $less-white;
+            }
 
-                transition: 200ms;
-                cursor: pointer;
-                background-color: $almost-white;
-
-                &:hover
+            .Media
+            {
+                height: 200px;
+            }
+            
+            .Details
+            {
+                .Title
                 {
-                    background-color: $less-white;
-                }
-
-                .Media
-                {
-                    height: 250px;
-                }
-                
-                .Details
-                {
-                    .Title
+                    font-size: 1.4em;
+                    
+                    &:hover
                     {
-                        font-size: 1.4em;
-                        
-                        &:hover
-                        {
-                            color: $graphite;
-                        }
-                    }
-
-                    .Description
-                    {
-                        margin-top: 10px;
                         color: $graphite;
-                        overflow: hidden;
-                        height: 140px;
-
-                        &.Empty
-                        {
-                            font-style: italic;
-                        }
                     }
                 }
 
-                .Prices
+                .Description
                 {
+                    margin-top: 10px;
                     color: $graphite;
-                    background-color: $lesser-white;
-            
-                    .Title
+                    overflow: hidden;
+                    height: 100px;
+
+                    &.Empty
                     {
-                        font-size: $small-font-size;
-                        font-weight: 300;
-                    }
-            
-                    .Price
-                    {
-                        font-size: $normal-font-size;
-                        &.Starting
-                        {
-                            color: $blue;
-                        }
-            
-                        &.Current
-                        {
-                            color: $green;
-                        }
-            
-                        &.Buyout
-                        {
-                            color: $red;
-                        }
+                        font-style: italic;
                     }
                 }
-            
-                .Dates
+            }
+
+            .Prices
+            {
+                color: $graphite;
+                background-color: $lesser-white;
+        
+                .Title
                 {
-                    p
+                    font-size: $small-font-size;
+                    font-weight: 300;
+                }
+        
+                .Price
+                {
+                    font-size: $normal-font-size;
+                    &.Starting
                     {
-                        font-size: $smaller-font-size !important;
-                        font-weight: 300;
+                        color: $blue;
                     }
-            
-                    .Date
+        
+                    &.Current
                     {
-                        font-weight: 400;
-                        &.Started
-                        {
-                            color: $green;
-                        }
-            
-                        &.Ends
-                        {
-                            color: $red;
-                        }
+                        color: $green;
+                    }
+        
+                    &.Buyout
+                    {
+                        color: $red;
+                    }
+                }
+            }
+        
+            .Dates
+            {
+                p
+                {
+                    font-size: $smaller-font-size !important;
+                    font-weight: 300;
+                }
+        
+                .Date
+                {
+                    font-weight: 400;
+                    &.Started
+                    {
+                        color: $green;
+                    }
+        
+                    &.Ends
+                    {
+                        color: $red;
                     }
                 }
             }

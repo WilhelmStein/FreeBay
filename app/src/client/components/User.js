@@ -1,7 +1,9 @@
 import React, { Component, useState } from "react";
 
 import {
+    Avatar,
     Card,
+    CardHeader,
     Grid,
     CardMedia,
     CardContent,
@@ -160,40 +162,29 @@ class User extends Component {
         }
 
         return (
-            <div>
-                <AccountForm
-                    open={this.state.dialogOpen}
-                    toggleDialog={this.toggleDialog}
-                    userData={this.state.userData}
-                    updateHandler={this.props.updateHandler}
-                    history={this.props.history}
-                />
 
-                <Grid container direction="row" justify="flex-start" className="UserGrid" spacing={5}>
+                <div>
+                    <AccountForm
+                        open={this.state.dialogOpen}
+                        toggleDialog={this.toggleDialog}
+                        userData={this.state.userData}
+                        updateHandler={this.props.updateHandler}
+                        history={this.props.history}
+                    /> 
+                        
+                    <AccountMenu
+                        userData={this.state.userData}
+                        loggedAsTargetUser={this.state.loggedAsTargetUser}
+                        toggleDialog={this.toggleDialog}
+                    />
+                </div>
 
-                    <Grid item xs={3}>
-                        <AccountDetails
-                            userData={this.state.userData}
-                            loggedAsTargetUser={this.state.loggedAsTargetUser}
-                            toggleDialog={this.toggleDialog}
-                        />
-                    </Grid> 
-                    
-                    <Grid item xs={9} className="UserMenu">
-                        <AccountMenu
-                            userData={this.state.userData}
-                            loggedAsTargetUser={this.state.loggedAsTargetUser}
-                        />
-                    </Grid>
-                </Grid>
-            </div>
         );
     }
 }
 
 function AccountDetails(props) {
-    const rating =
-        Math.round(((props.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
+    const rating = Math.round(((props.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
 
     return (
         // <Grid item xs={3}>
@@ -351,7 +342,7 @@ class AccountForm extends Component {
         });
     }
 
-    async clearState() {
+    clearState() {
         this.setState({
             newUsername: this.props.userData.Username,
             oldPassword: "",
@@ -927,7 +918,7 @@ class AccountMenu extends Component {
 
     render() {
         //console.log(this.state);
-
+        const rating = Math.round(((this.props.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
         let currentPage = null;
         switch(this.state.tabValue)
         {
@@ -940,20 +931,56 @@ class AccountMenu extends Component {
 
         return (
             // <Grid item className="UserMenu" xs={9} /*sm={3}*/>
-                <Grid container>
-                    <Grid item className="UserTabs" xs={12}>
-                        <AppBar position="static" color="default">
-                            <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
-                                {this.state.tabs.map(tab => (
-                                    <Tab key={tab.label} label={tab.label} className="Tab" />
-                                ))}
-                            </Tabs>
-                        </AppBar>
+                <div className="UserGrid">
+
+                    <Grid item>
+                        <Card className="UserMenu">
+                            <CardHeader
+                                avatar={
+                                    <Avatar aria-label="User" className="UserClickable">
+                                        {this.props.userData.Username[0]}
+                                    </Avatar>
+                                }
+                                action={
+                                    <SettingsIcon aria-label="settings" className="UserClickable" onClick={this.props.toggleDialog}/>
+                                }
+                                title={`Username: ${this.props.userData.Username}`}
+                                subheader={
+                                            <Grid container spacing={1}>
+                                                <Grid item>
+                                                    <Typography className="Title">Rating: </Typography>
+                                                </Grid>
+            
+                                                <Grid item>
+                                                    <Rating
+                                                        display="inline"
+                                                        value={rating}
+                                                        precision={0.5}
+                                                        readOnly
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                         }
+                            />
+                            <CardContent>
+                                <AppBar position="static">
+                                    <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
+                                        {this.state.tabs.map(tab => (
+                                            <Tab key={tab.label} label={tab.label} className="Tab" />
+                                        ))}
+                                    </Tabs>
+                                </AppBar>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+
+                    <Grid item className="UserTabs">
+                        
                     </Grid>
 
                     {currentPage}
 
-                </Grid>
+                </div>
             // </Grid>
         );
     }
@@ -965,70 +992,96 @@ function AuctionGrid(props) {
     //let [resultsPerPage, setResultsPerPage] = useState(6);
     const resultsPerPage = 6;
 
-    let content = props.target.slice(offset, offset + resultsPerPage).map((auction, index) => (
-        <Grid item key={index} xs={6}>
-            <Card className="AuctionCard">
-                <Grid container>
-                    <Grid item xs={3}>
-                        <CardMedia className="Media"
-                                //component="img"
-                                image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/150x250/ffffff/4a4a4a.png&text=No+Image"}
-                                title={auction.Name}
-                        />
-                    </Grid>
+    let content = props.target.slice(offset, offset + resultsPerPage).map((auction, index) => {
 
-                    <Grid item xs={5} className="Details">
-                        <CardContent>
-                            <Typography className="Title">{auction.Name}</Typography>
-                            {
-                                (auction.Description === "")
-                                ?
-                                (<Typography className="Description Empty">No Description.</Typography>)
-                                :
-                                (<Typography className="Description">{auction.Description}</Typography>)
-                            }               
-                        </CardContent>
-                    </Grid>
+        let ended = (new Date(auction.Ends_Raw) - new Date() <= 0);
 
-                    <Grid item xs={4} className="Prices">
-                        <CardContent>
-                            <Grid container className="Prices" spacing={1}>
-                                <Grid item >
-                                    <Typography variant="h5" className="Title">Starting Price:</Typography>
-                                </Grid>
-                                <Grid item >
-                                    <Typography className="Starting Price" variant="h4">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
-                                </Grid>
-
-                                <Grid item >
-                                    <Typography variant="h5" className="Title">Current Price:</Typography>
-                                </Grid>
-                                <Grid item  zeroMinWidth>
-                                    <Typography className="Current Price" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
-                                </Grid>
-
-                                <Grid item >
-                                    <Typography variant="h5" className="Title">Buyout Price:</Typography>
-                                </Grid>
-                                <Grid item >
-                                    <Typography className="Buyout Price" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
-                                </Grid>
+        return <Grid item key={index} xs={6}>
+                    <Card className="AuctionCard">
+                        <Grid container>
+                            <Grid item xs={3}>
+                                <CardMedia className="Media"
+                                        //component="img"
+                                        image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/150x250/ffffff/4a4a4a.png&text=No+Image"}
+                                        title={auction.Name}
+                                />
                             </Grid>
 
-                            <Box className="Dates" mt={2}>
-                                <Typography>
-                                    Started in: <span className="Started Date">{auction.Started}</span>
-                                </Typography>
-                                <Typography>
-                                    Ends in: <span className="Ends Date">{auction.Ends}</span>
-                                </Typography>
-                            </Box>
-                        </CardContent>
-                    </Grid>
+                            <Grid item xs={5} className="Details">
+                                <CardContent>
+                                    <Typography className="Title">{auction.Name}</Typography>
+                                    {
+                                        (auction.Description === "")
+                                        ?
+                                        (<Typography className="Description Empty">No Description.</Typography>)
+                                        :
+                                        (<Typography className="Description">{auction.Description}</Typography>)
+                                    }               
+                                </CardContent>
+                            </Grid>
+
+                            <Grid item xs={4} className="Prices">
+                                <CardContent>
+                                    <Grid container className="Prices" spacing={1}>
+                                        <Grid item >
+                                            <Typography variant="h5" className="Title">Starting Price:</Typography>
+                                        </Grid>
+                                        <Grid item >
+                                            <Typography className="Starting Price" variant="h4">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
+                                        </Grid>
+
+
+                                        {
+                                            (ended)
+                                            ?
+                                            (
+                                                ""
+                                            )
+                                            :
+                                            (
+                                                <Grid item>
+                                                    <Grid container spacing={1}>
+                                                        <Grid item >
+                                                            <Typography variant="h5" className="Title">Current Price:</Typography>
+                                                        </Grid>
+                                                        <Grid item  zeroMinWidth>
+                                                            <Typography className="Current Price" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                            )
+                                        }
+
+                                        <Grid item >
+                                            <Typography variant="h5" className="Title">Buyout Price:</Typography>
+                                        </Grid>
+                                        <Grid item >
+                                            <Typography className="Buyout Price" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
+                                        </Grid>
+                                    </Grid>
+
+                                    <Box className="Dates" mt={2}>
+                                        <Typography>
+                                            Started in: <span className="Started Date">{auction.Started}</span>
+                                        </Typography>
+                                        
+                                        <Typography>
+                                            {
+                                                (ended)
+                                                ?
+                                                ("Ended:")
+                                                :
+                                                ("Ends in:")
+                                            }
+                                            <span className="Ends Date">{auction.Ends}</span>
+                                        </Typography>
+                                    </Box>
+                                </CardContent>
+                            </Grid>
+                        </Grid>
+                    </Card>
                 </Grid>
-            </Card>
-        </Grid>
-    ));
+    });
 
     return(
         <Grid item className="AuctionGrid" xs={12}>
