@@ -931,56 +931,49 @@ class AccountMenu extends Component {
 
         return (
             // <Grid item className="UserMenu" xs={9} /*sm={3}*/>
-                <div className="UserGrid">
+            <Card raised className="UserMenu">
+                <CardHeader
+                    avatar={
+                        <Avatar aria-label="User" className="UserAvatar">
+                            {this.props.userData.Username[0]}
+                        </Avatar>
+                    }
 
-                    <Grid item>
-                        <Card className="UserMenu">
-                            <CardHeader
-                                avatar={
-                                    <Avatar aria-label="User" className="UserClickable">
-                                        {this.props.userData.Username[0]}
-                                    </Avatar>
-                                }
-                                action={
-                                    <SettingsIcon aria-label="settings" className="UserClickable" onClick={this.props.toggleDialog}/>
-                                }
-                                title={`Username: ${this.props.userData.Username}`}
-                                subheader={
-                                            <Grid container spacing={1}>
-                                                <Grid item>
-                                                    <Typography className="Title">Rating: </Typography>
-                                                </Grid>
-            
-                                                <Grid item>
-                                                    <Rating
-                                                        display="inline"
-                                                        value={rating}
-                                                        precision={0.5}
-                                                        readOnly
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                         }
-                            />
-                            <CardContent>
-                                <AppBar position="static">
-                                    <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
-                                        {this.state.tabs.map(tab => (
-                                            <Tab key={tab.label} label={tab.label} className="Tab" />
-                                        ))}
-                                    </Tabs>
-                                </AppBar>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                    title={
+                            <div>
+                                Username: {this.props.userData.Username}
+                                <SettingsIcon aria-label="settings" className="SettingsIcon" onClick={this.props.toggleDialog}/>
+                            </div>
+                          }
+                    subheader={
+                                <Grid container spacing={1}>
+                                    <Grid item>
+                                        <Typography className="Title">Rating: </Typography>
+                                    </Grid>
 
-                    <Grid item className="UserTabs">
-                        
-                    </Grid>
+                                    <Grid item>
+                                        <Rating
+                                            display="inline"
+                                            value={rating}
+                                            precision={0.5}
+                                            readOnly
+                                        />
+                                    </Grid>
+                                </Grid>
+                                }
+                />
+                <CardContent>
+                    <AppBar position="static">
+                        <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
+                            {this.state.tabs.map(tab => (
+                                <Tab key={tab.label} label={tab.label} className="Tab" />
+                            ))}
+                        </Tabs>
+                    </AppBar>
 
                     {currentPage}
-
-                </div>
+                </CardContent>
+            </Card>
             // </Grid>
         );
     }

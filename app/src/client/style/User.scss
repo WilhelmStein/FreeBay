@@ -35,145 +35,151 @@ h1
 }  
 
 
-.UserGrid
+.UserMenu
 {
-    .UserMenu
+    padding: 20px;
+    
+    .UserAvatar
     {
+        &:hover {
+            cursor: pointer;
+        }
+    }
 
-        .UserClickable
+    .SettingsIcon
+    {
+        padding-left: 100px;
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .UserDetails
+    {
+        .Title
         {
-            &:hover {
-                cursor: pointer;
-            }
+            color: $graphite;
+            font-size: 1em;
         }
 
-        .UserDetails
+        .Data
+        {
+            color: $blue;
+            font-size: 1.2em;
+        }
+    }
+}
+
+.UserTabs
+{
+    flex-grow: 1;
+    // height: 60px;
+    .Tab
+    {
+        font-size: $normal-font-size;
+    }
+}
+
+.AuctionGrid
+{
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+
+    .AuctionCard
+    {
+        height: 200px;
+
+        transition: 200ms;
+        cursor: pointer;
+        background-color: $almost-white;
+
+        &:hover
+        {
+            background-color: $less-white;
+        }
+
+        .Media
+        {
+            height: 200px;
+        }
+        
+        .Details
         {
             .Title
             {
-                color: $graphite;
-                font-size: 1em;
-            }
-
-            .Data
-            {
-                color: $blue;
-                font-size: 1.2em;
-            }
-        }
-    }
-
-    .UserTabs
-    {
-        flex-grow: 1;
-        // height: 60px;
-        .Tab
-        {
-            font-size: $normal-font-size;
-        }
-    }
-
-    .AuctionGrid
-    {
-        margin-top: 10px;
-        margin-left: 10px;
-        margin-right: 10px;
-
-        .AuctionCard
-        {
-            height: 200px;
-
-            transition: 200ms;
-            cursor: pointer;
-            background-color: $almost-white;
-
-            &:hover
-            {
-                background-color: $less-white;
-            }
-
-            .Media
-            {
-                height: 200px;
-            }
-            
-            .Details
-            {
-                .Title
+                font-size: 1.4em;
+                
+                &:hover
                 {
-                    font-size: 1.4em;
-                    
-                    &:hover
-                    {
-                        color: $graphite;
-                    }
-                }
-
-                .Description
-                {
-                    margin-top: 10px;
                     color: $graphite;
-                    overflow: hidden;
-                    height: 100px;
-
-                    &.Empty
-                    {
-                        font-style: italic;
-                    }
                 }
             }
 
-            .Prices
+            .Description
             {
+                margin-top: 10px;
                 color: $graphite;
-                background-color: $lesser-white;
-        
-                .Title
+                overflow: hidden;
+                height: 100px;
+
+                &.Empty
                 {
-                    font-size: $small-font-size;
-                    font-weight: 300;
-                }
-        
-                .Price
-                {
-                    font-size: $normal-font-size;
-                    &.Starting
-                    {
-                        color: $blue;
-                    }
-        
-                    &.Current
-                    {
-                        color: $green;
-                    }
-        
-                    &.Buyout
-                    {
-                        color: $red;
-                    }
+                    font-style: italic;
                 }
             }
-        
-            .Dates
+        }
+
+        .Prices
+        {
+            color: $graphite;
+            background-color: $lesser-white;
+    
+            .Title
             {
-                p
+                font-size: $small-font-size;
+                font-weight: 300;
+            }
+    
+            .Price
+            {
+                font-size: $normal-font-size;
+                &.Starting
                 {
-                    font-size: $smaller-font-size !important;
-                    font-weight: 300;
+                    color: $blue;
                 }
-        
-                .Date
+    
+                &.Current
                 {
-                    font-weight: 400;
-                    &.Started
-                    {
-                        color: $green;
-                    }
-        
-                    &.Ends
-                    {
-                        color: $red;
-                    }
+                    color: $green;
+                }
+    
+                &.Buyout
+                {
+                    color: $red;
+                }
+            }
+        }
+    
+        .Dates
+        {
+            p
+            {
+                font-size: $smaller-font-size !important;
+                font-weight: 300;
+            }
+    
+            .Date
+            {
+                font-weight: 400;
+                &.Started
+                {
+                    color: $green;
+                }
+    
+                &.Ends
+                {
+                    color: $red;
                 }
             }
         }
