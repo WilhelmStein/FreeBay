@@ -1,6 +1,8 @@
 
 from mysql import connector
 
+from timer import Timer
+
 from logger import Logger
 
 
@@ -127,6 +129,11 @@ class Cache:
             self.cache[table] = []
 
 
+        self.timer = Timer()
+
+        self.timer.start()
+
+
     def __del__(self):
 
         for table, entries in self.cache.items():
@@ -141,6 +148,8 @@ class Cache:
         self.cur.close()
 
         self.cnx.close()
+
+        self.timer.stop("Done")
 
 
     def __flush__(self, table):
