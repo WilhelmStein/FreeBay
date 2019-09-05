@@ -61,8 +61,8 @@ class App extends React.Component {
             if (res.data.error)
                 console.error(res.data.message);
                 
-            this.setState({user: res.data.data});
-            sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
+            this.setState({user: res.data.data}, () => sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data)));
+            
         })
         .catch(err => console.log(err));
     }

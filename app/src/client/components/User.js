@@ -47,66 +47,19 @@ class User extends Component {
     }
 
     componentDidMount() {
-
-        if(this.props.user && this.props.user.Username === this.props.username)
-        {
-            Axios.post(`/api/getUser`, {
-                username: this.props.user.Username,
-                password: this.props.user.Password
-            })
-            .then(res => {
-
-                if(res.data.error)
-                {
-                    console.log(res.data.message);
-                    return;
-                }
-
-                this.setState({ userData: res.data.data }, () => {
-                    if (
-                        this.state.userData != null &&
-                        this.props.user != null &&
-                        this.state.userData.Username === this.props.user.Username
-                    ) {
-                        this.setState({ loggedAsTargetUser: true });
-                    } else this.setState({ loggedAsTargetUser: false });
-                });
-            })
-            .catch(err => console.log(err));
-        }
-        else
-        {
-            Axios.get(`/api/publicUserDetails?username=${this.props.username}`)
-            .then(res => {
-
-                if(res.data.error)
-                {
-                    console.log(res.data.message);
-                    return;
-                }
-
-                this.setState({ userData: res.data.data }, () => {
-                    if (
-                        this.state.userData != null &&
-                        this.props.user != null &&
-                        this.state.userData.Username === this.props.user.Username
-                    ) {
-                        this.setState({ loggedAsTargetUser: true });
-                    } else this.setState({ loggedAsTargetUser: false });
-                });
-            })
-            .catch(err => console.log(err));
-        }
-
+        this.updateData(this.props);
     }
 
     componentWillReceiveProps(nextProps) {
-        //console.log(nextProps)
-        if(nextProps.user && nextProps.user.Username === nextProps.username)
+        this.updateData(nextProps);
+    }
+
+    updateData(props) {
+        if(props.user && props.user.Username === props.username)
         {
             Axios.post(`/api/getUser`, {
-                username: nextProps.user.Username,
-                password: nextProps.user.Password
+                username: props.user.Username,
+                password: props.user.Password
             })
             .then(res => {
 
@@ -119,8 +72,8 @@ class User extends Component {
                 this.setState({ userData: res.data.data }, () => {
                     if (
                         this.state.userData != null &&
-                        this.props.user != null &&
-                        this.state.userData.Username === this.props.user.Username
+                        props.user != null &&
+                        this.state.userData.Username === props.user.Username
                     ) {
                         this.setState({ loggedAsTargetUser: true });
                     } else this.setState({ loggedAsTargetUser: false });
@@ -130,7 +83,7 @@ class User extends Component {
         }
         else
         {
-            Axios.get(`/api/publicUserDetails?username=${nextProps.username}`)
+            Axios.get(`/api/publicUserDetails?username=${props.username}`)
             .then(res => {
 
                 if(res.data.error)
@@ -142,8 +95,8 @@ class User extends Component {
                 this.setState({ userData: res.data.data }, () => {
                     if (
                         this.state.userData != null &&
-                        this.props.user != null &&
-                        this.state.userData.Username === this.props.user.Username
+                        props.user != null &&
+                        this.state.userData.Username === props.user.Username
                     ) {
                         this.setState({ loggedAsTargetUser: true });
                     } else this.setState({ loggedAsTargetUser: false });
