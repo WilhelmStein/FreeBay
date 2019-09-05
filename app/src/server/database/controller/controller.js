@@ -517,12 +517,12 @@ class DBController
 
         this.query(query, res, (rows) => {
             
-            rows = rows.map( (item) => {
-                    item.User = JSON.parse(item.User);
-                    item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-                    item.Bids = JSON.parse(item.Bids);
-                    return item;
-                });
+            // rows = rows.map( (item) => {
+            //         item.User = JSON.parse(item.User);
+            //         item.Images = item.Images === null ? [] : JSON.parse(item.Images);
+            //         item.Bids = JSON.parse(item.Bids);
+            //         return item;
+            //     });
 
                 res.send({
                     error: false,
@@ -723,6 +723,29 @@ class DBController
                 message: "Image Not Found"
             });
         }
+    }
+
+    notifications(username, password, res)
+    {
+        const query = {
+            string: "SELECT n.* FROM Notification as n, User as u WHERE n.User_Id = u.Id AND u.Username = ? AND u.Password = ? AND n.Status = 'Unread'",
+            escape: [username, password]
+        }
+
+        this.query(query, res);
+    }
+
+    readNotification(username, password, notification, res)
+    {
+        this.user_permission(username, password, res, () => {
+            const query = {
+                string: "UPDATE Notification SET Status = 'Read' WHERE Id = ?",
+                escape: [notification] 
+            }
+    
+            this.query(query, res);
+        })
+        
     }
 
     messages(username, password, res)
@@ -940,6 +963,8 @@ class DBController
                 
                 if (transaction)
                     return this.sql.rollback();
+
+                return;
             }
 
             if (check)

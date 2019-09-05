@@ -51,6 +51,10 @@ app.post('/api/recommended', function(req, res) { controller.recommended(req.bod
 
 app.get('/api/image', function(req, res) { controller.image(req.query.path, res); });
 
+app.post('/api/notifications', function(req, res) { controller.notifications(req.body.username, req.body.password, res); });
+
+app.post('/api/readNotification', function(req, res) { controller.readNotification(req.body.username, req.body.password, req.body.notification, res); });
+
 app.post('/api/messages', function(req, res) { controller.messages(req.body.username, req.body.password, res); });
 
 app.post('/api/readMessage', function(req, res) { controller.readMessage(req.body.username, req.body.password, req.body.message, res); });

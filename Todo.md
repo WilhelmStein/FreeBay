@@ -67,7 +67,10 @@
   - [x] Square Grid (Scrapped)
   - [x] Pagination
   - [x] Redo with one button
-- [ ] Notification System
+- [x] Notification System
+  - [x] Database Tweak
+  - [x] Backend query
+  - [x] Link handling
 - [ ] Account Page
   * Everybody
     - [ ] Profile

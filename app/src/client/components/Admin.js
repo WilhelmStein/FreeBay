@@ -87,7 +87,7 @@ function Dashboard(props)
 
     return (
         <Paper className="Dashboard Paper">
-            <AppBar position="sticky">
+            <AppBar position="sticky" style={{zIndex: "1"}}>
                 <Toolbar className="DashboardToolbar">
                     <Typography className="DashboardTitle" variant="h6" noWrap>
                         Admin Dashboard
@@ -331,7 +331,7 @@ class Users extends Component
         
         return (
             <Paper className="Users Paper">
-                <AppBar position="sticky">
+                <AppBar position="sticky" style={{zIndex: "1"}}>
                     <Toolbar className="TableToolbar">
                         <Typography className="TableTitle" variant="h6" noWrap>
                             Active Users
@@ -614,7 +614,7 @@ class Auctions extends Component
 
         return (
             <Paper className="Auctions Paper">
-                <AppBar position="sticky">
+                <AppBar position="sticky"  style={{zIndex: "1"}}>
                     <Toolbar className="TableToolbar">
                         <Typography className="TableTitle" variant="h6" noWrap>
                             Export Auctions

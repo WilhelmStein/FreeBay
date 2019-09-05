@@ -51,6 +51,11 @@ Values  (1, 1, "# Congratulations! \n* You won 100000 euro by doing absoluteley 
         (4, 1, "I would like to commence a bank transfer or paypal payment instead of providing you my credit card information. What can we do about it?", NOW() + 3, 1010, 1, 'Unread', FALSE, FALSE),
         (5, 2, "Olymnpu1 101", NOW() - 1, 3, 1010, 'Unread', FALSE, FALSE);
 
+Insert into Notification (User_Id, Content, Link, Status, Type, Time)
+Values  (1010, "rulabula sent you a message!", "/messages", "Unread", "Message", NOW()),
+        (1010, "egw outbed you on: Your Mother", "/auction/1", "Unread", "Auction", NOW()),
+        (1010, "esy sent you a message!", "/messages", "Unread", "Message", NOW());
+
 -- Category --
 
 -- INSERT INTO Category VALUES (1, "Health & Fitness"), (2, "Electronics & Computers"), (3, "Home & Garden");

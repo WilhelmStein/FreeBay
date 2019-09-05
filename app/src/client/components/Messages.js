@@ -361,7 +361,7 @@ class MessageList extends Component
         return (
             <Grid item xs={3}>
                 <Paper className="MessageListWrapper Paper Scrollbar">
-                    <AppBar position="sticky">
+                    <AppBar position="sticky"  style={{zIndex: "1"}}>
                         <Toolbar className="Toolbar">
                             <div style={{flexGrow: 1}}>
                                 <InputBase
@@ -463,7 +463,7 @@ class MessageRenderer extends Component
         return (
             <Grid item xs={9}>
                 <Paper className="MessageRenderer Paper">
-                    <AppBar position="sticky">
+                    <AppBar position="sticky"  style={{zIndex: "1"}}>
                         <Toolbar className="Toolbar">
                             <div style={{flexGrow: 1}}/>
                             <Button
@@ -680,7 +680,7 @@ class MessageEditor extends Component
         return (
             <Grid item xs={9}>
                 <Paper className="MessageEditor Paper">
-                    <AppBar position="sticky">
+                    <AppBar position="sticky"  style={{zIndex: "1"}}>
                         <Toolbar className="Toolbar">
                             <Typography style={{flexGrow: 1}} className="Title">
                                 New Message
