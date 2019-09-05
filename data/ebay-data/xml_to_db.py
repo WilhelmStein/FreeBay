@@ -11,6 +11,8 @@ from downloader import Downloader
 
 from generator import Generator
 
+from cache import Cache
+
 
 total_timer, partial_timer = Timer(), Timer()
 
@@ -18,7 +20,7 @@ total_timer.start()
 
 partial_timer.start("Initializing the 'Parser'...")
 
-parser = Parser(target='./items-0.xml')
+parser = Parser()
 
 example_id = -1 # 1045310980
 
@@ -29,8 +31,6 @@ if example_id in parser.auctions:
 partial_timer.stop("The 'Parser' has been initialized")
 
 
-downloader = None
-
 # partial_timer.start("Initializing the 'Downloader'...")
 
 # downloader = Downloader(no_download=True)
@@ -38,20 +38,23 @@ downloader = None
 # partial_timer.stop("The 'Downloader' has been initialized")
 
 
+partial_timer.start("Initializing the 'Cache'...")
+
+cache = Cache()
+
+partial_timer.stop("The 'Cache' has been initialized")
+
+
 partial_timer.start("Initializing the 'Generator'...")
 
-generator = Generator(downloader)
+generator = Generator(cache)
 
 partial_timer.stop("The 'Generator' has been initialized")
 
-
-partial_timer.start("Registering auctions...")
 
 for auction in parser.auctions.values():
 
     generator.register(auction)
 
-partial_timer.stop("Auctions have been registered")
-
-total_timer.stop()
+total_timer.stop("Done")
 

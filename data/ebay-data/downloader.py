@@ -7,18 +7,24 @@ from os.path import relpath
 
 from random import randrange
 
+from logger import Logger
+
 
 class Downloader:
 
     def __init__(
         self,
+        logger=Logger("Downloader"),
         no_download=False,
         format="jpg",
         min_limit=0, max_limit=3,
         size=">400*300",
         aspect_ratio="panoramic",
         output_directory="auction_images",
-        max_size=(640, 640)):
+        max_size=(640, 640)
+    ):
+
+        self.logger = logger
 
         self.min_limit, self.max_limit = min_limit, max_limit
 
@@ -44,7 +50,7 @@ class Downloader:
 
             limit = randrange(self.min_limit, self.max_limit) if self.min_limit < self.max_limit else self.max_limit
 
-            print("[Downloader] Limit set to %d" % limit)
+            self.logger.log("Limit set to %d" % limit)
 
             paths = []
 
@@ -62,7 +68,7 @@ class Downloader:
 
                 for path in paths:
 
-                    print("[Downloader] Resizing '{}' to {}".format(relpath(path), self.max_size))
+                    self.logger.log("Resizing '{}' to {}".format(relpath(path), self.max_size))
 
                     image = Image.open(path)
 

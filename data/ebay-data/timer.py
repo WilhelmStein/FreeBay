@@ -3,12 +3,14 @@ from time import time
 
 from datetime import date
 
+from logger import Logger
+
 
 class Timer:
 
-    def __init__(self):
+    def __init__(self, logger=Logger("Timer")):
 
-        self.elapsed = 0
+        self.elapsed, self.logger = 0, logger
 
 
     def start(self, message=None):
@@ -17,18 +19,20 @@ class Timer:
 
         if message:
 
-            print("[Timer] %s" % message)
+            self.logger.log("%s" % message)
 
 
     def stop(self, message=None):
 
-        self.elapsed = time() - self.elapsed
+        self.elapsed = int(time() - self.elapsed)
 
-        print("[Timer] Completed after {:05.3g} minutes".format(self.elapsed / 60))
+        minutes, seconds = self.elapsed // 60, self.elapsed % 60
+
+        self.logger.log("Completed after {:02d} minutes and {:02d} seconds".format(minutes, seconds))
 
         if message:
 
-            print("[Timer] %s" % message)
+            self.logger.log("%s" % message)
 
         self.elapsed = 0
 
