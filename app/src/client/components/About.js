@@ -3,7 +3,8 @@ import React from 'react';
 import { Grid, Card, CardHeader, CardContent, Typography, CardMedia } from '@material-ui/core';
 
 import '../style/About.scss';
-import TransportImage from '../images/airplane.png';
+import airplane from '../images/airplane.png';
+import transport from '../images/transport.png';
 
 export default function About() {
 
@@ -12,14 +13,14 @@ export default function About() {
             header: 'About Freebay', 
             text: `Launched in 2019, FreeBay is the leading platform for global wholesale trade.
                    We serve millions of buyers and suppliers around the world.`,
-            image: TransportImage
+            image: airplane
         },
         {
             header: 'Our Mission', 
             text: `Is to make it easy to do business anywhere.
                    We do this by giving suppliers the tools necessary to reach a global audience for their products,
                    and by helping buyers find products and suppliers quickly and efficiently.`,
-            image: 'https://bit.ly/2m0GOXI'
+            image: transport
         },
         {
             header: 'One-Stop Sourcing', 
@@ -57,11 +58,11 @@ export default function About() {
 
                         <Grid container>
 
-                            <Grid item>
+                            <Grid item xs={6}>
                                 <CardMedia className="Media" image={item.image}/>
                             </Grid>
 
-                            <Grid item>
+                            <Grid item xs={6}>
                                 <CardContent className="Text">
                                     {item.text}
                                 </CardContent>
