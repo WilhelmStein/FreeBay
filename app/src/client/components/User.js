@@ -12,7 +12,8 @@ import {
     Button,
     Tab,
     Tabs,
-    AppBar
+    AppBar,
+    IconButton
 } from "@material-ui/core";
 
 import Pagination from 'material-ui-flat-pagination';
@@ -176,6 +177,7 @@ class User extends Component {
                         userData={this.state.userData}
                         loggedAsTargetUser={this.state.loggedAsTargetUser}
                         toggleDialog={this.toggleDialog}
+                        history={this.props.history}
                     />
                 </div>
 
@@ -865,12 +867,12 @@ class AccountMenu extends Component {
         
 
             let currentAuctions = res.data.data.filter((auction) => {
-                let diff = new Date(auction.Ends_Raw) - new Date();
+                let diff = new Date(auction.Ends) - new Date();
                 return (diff > 0);
             });
 
             let pastAuctions = res.data.data.filter((auction) => {
-                let diff = new Date(auction.Ends_Raw) - new Date();
+                let diff = new Date(auction.Ends) - new Date();
                 return (diff <= 0);
             })
 
@@ -922,9 +924,9 @@ class AccountMenu extends Component {
         let currentPage = null;
         switch(this.state.tabValue)
         {
-            case 0: currentPage = <AuctionGrid target={this.state.currentAuctions}/>; break;
-            case 1: currentPage = <AuctionGrid target={this.state.pastAuctions}/>; break;
-            case 2: currentPage = <AuctionGrid target={this.state.watchedAuctions}/>; break;
+            case 0: currentPage = <AuctionGrid target={this.state.currentAuctions} history={this.props.history}/>; break;
+            case 1: currentPage = <AuctionGrid target={this.state.pastAuctions} history={this.props.history}/>; break;
+            case 2: currentPage = <AuctionGrid target={this.state.watchedAuctions} history={this.props.history}/>; break;
             default: currentPage = <div/>; break;
         }
 
@@ -942,7 +944,17 @@ class AccountMenu extends Component {
                     title={
                             <div>
                                 Username: {this.props.userData.Username}
-                                <SettingsIcon aria-label="settings" className="SettingsIcon" onClick={this.props.toggleDialog}/>
+                                {
+                                    (this.props.loggedAsTargetUser)
+                                    ?
+                                    (
+                                        <IconButton aria-label="settings" className="SettingsIcon" onClick={this.props.toggleDialog}>
+                                            <SettingsIcon/>
+                                        </IconButton>
+                                    )
+                                    :
+                                    ("")
+                                }
                             </div>
                           }
                     subheader={
@@ -987,12 +999,12 @@ function AuctionGrid(props) {
 
     let content = props.target.slice(offset, offset + resultsPerPage).map((auction, index) => {
 
-        let ended = (new Date(auction.Ends_Raw) - new Date() <= 0);
+        let ended = (new Date(auction.Ends) - new Date() <= 0);
 
-        return <Grid item key={index} xs={6}>
-                    <Card className="AuctionCard">
-                        <Grid container>
-                            <Grid item xs={3}>
+        return <Grid item key={index}>
+                    <Card onClick={() => props.history.push(`/auction/${auction.Id}`)}>
+                        <Grid container className="AuctionCard">
+                            <Grid item>
                                 <CardMedia className="Media"
                                         //component="img"
                                         image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/150x250/ffffff/4a4a4a.png&text=No+Image"}
@@ -1000,7 +1012,7 @@ function AuctionGrid(props) {
                                 />
                             </Grid>
 
-                            <Grid item xs={5} className="Details">
+                            <Grid item className="Details">
                                 <CardContent>
                                     <Typography className="Title">{auction.Name}</Typography>
                                     {
@@ -1013,15 +1025,17 @@ function AuctionGrid(props) {
                                 </CardContent>
                             </Grid>
 
-                            <Grid item xs={4} className="Prices">
+                            <Grid item className="Prices">
                                 <CardContent>
-                                    <Grid container className="Prices" spacing={1}>
-                                        <Grid item >
+                                    <Grid container spacing={1}>
+                                        <Grid item>
                                             <Typography variant="h5" className="Title">Starting Price:</Typography>
                                         </Grid>
-                                        <Grid item >
-                                            <Typography className="Starting Price" variant="h4">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
+
+                                        <Grid item>
+                                            <Typography variant="h4" className="Price Starting">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
                                         </Grid>
+                                    </Grid>
 
 
                                         {
@@ -1032,30 +1046,32 @@ function AuctionGrid(props) {
                                             )
                                             :
                                             (
-                                                <Grid item>
-                                                    <Grid container spacing={1}>
-                                                        <Grid item >
-                                                            <Typography variant="h5" className="Title">Current Price:</Typography>
-                                                        </Grid>
-                                                        <Grid item  zeroMinWidth>
-                                                            <Typography className="Current Price" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
-                                                        </Grid>
+                                                <Grid container spacing={1}>
+                                                    <Grid item >
+                                                        <Typography variant="h5" className="Title">Current Price:</Typography>
+                                                    </Grid>
+                                                    <Grid item  zeroMinWidth>
+                                                        <Typography className="Price Current" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
                                                     </Grid>
                                                 </Grid>
                                             )
                                         }
+                                    
+                                    <Grid container spacing={1}>
+                                        <Grid item >
+                                            <Typography variant="h5" className="Title">
+                                                { (ended) ? ("Bought for:") : ("Buyout Price:") }
+                                            </Typography>
+                                         </Grid>
 
                                         <Grid item >
-                                            <Typography variant="h5" className="Title">Buyout Price:</Typography>
-                                        </Grid>
-                                        <Grid item >
-                                            <Typography className="Buyout Price" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
+                                            <Typography className="Price Buyout" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
                                         </Grid>
                                     </Grid>
 
                                     <Box className="Dates" mt={2}>
                                         <Typography>
-                                            Started in: <span className="Started Date">{auction.Started}</span>
+                                            Started in: <span className="Started Date">{new Date(auction.Started).toLocaleString()}</span>
                                         </Typography>
                                         
                                         <Typography>
@@ -1066,7 +1082,7 @@ function AuctionGrid(props) {
                                                 :
                                                 ("Ends in:")
                                             }
-                                            <span className="Ends Date">{auction.Ends}</span>
+                                            <span className="Ends Date">{new Date(auction.Ends).toLocaleString()}</span>
                                         </Typography>
                                     </Box>
                                 </CardContent>
@@ -1087,7 +1103,7 @@ function AuctionGrid(props) {
                 onClick={(e, offset) => setOffset(offset)}
             />
 
-            <Grid container spacing={2}>
+            <Grid container spacing={3}>
                 {content}
             </Grid>
 
