@@ -52,6 +52,7 @@ class Downloader:
 
             self.logger.log("Limit set to %d" % limit)
 
+
             paths = []
 
             if limit > 0:
