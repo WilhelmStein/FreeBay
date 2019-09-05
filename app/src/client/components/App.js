@@ -8,6 +8,7 @@ import SearchResults from './SearchResults';
 import AdminPage from './Admin';
 import AuctionPage from './Auction';
 import UserPage from './User';
+import AboutPage from './About';
 import NotFound from './NotFound';
 
 import '../style/App.scss';
@@ -83,8 +84,10 @@ class App extends React.Component {
                                                                                updateHandler={(username, password) => this.updateHandler(username, password)}
                                                                      />
                                                          }
+                    
                     />
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
+                    <Route path='/about' component={AboutPage}/>
                     <Route path='*' component={NotFound} />
                 </Switch>
             </div>

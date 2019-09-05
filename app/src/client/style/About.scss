@@ -1,0 +1,86 @@
+@import 'global.scss';
+
+.AboutCard
+{
+    height: 350px;
+    width: 100%;
+
+    color: $graphite;
+    padding: 30px;
+
+    .Title
+    {
+        font-size: $huge-font-size;
+        // font-weight: 100;
+    }
+
+    .Subtitle
+    {
+        font-style: italic;
+    }
+
+    .Text
+    {
+        font-size: $header-font-size;
+    }
+
+    .Media
+    {
+        height:200px;
+        width: 200px;
+    }
+
+    &.Odd
+    {
+        background-color: $lesser-white;
+
+        .Title
+        {
+            font-size: $huge-font-size;
+            // font-weight: 100;
+        }
+    
+        .Subtitle
+        {
+            font-style: italic;
+        }
+    
+        .Text
+        {
+            font-size: $header-font-size;
+        }
+    
+        .Media
+        {
+            height:200px;
+            width: 200px;
+        }
+    }
+
+    &.Even
+    {
+        background-color: $less-white;
+
+        .Title
+        {
+            font-size: $huge-font-size;
+            // font-weight: 100;
+        }
+    
+        .Subtitle
+        {
+            font-style: italic;
+        }
+    
+        .Text
+        {
+            font-size: $header-font-size;
+        }
+    
+        .Media
+        {
+            height:200px;
+            width: 200px;
+        }
+    }
+}
