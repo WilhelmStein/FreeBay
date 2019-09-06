@@ -744,6 +744,7 @@ class AccountForm extends Component {
 class AccountMenu extends Component {
     constructor(props) {
         super(props);
+        
         this.state = {
             tabValue: 0,
             tabs: [{ label: "Active Auctions" }],

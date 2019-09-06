@@ -87,7 +87,7 @@ function Dashboard(props)
 
     return (
         <Paper className="Dashboard Paper">
-            <AppBar position="sticky">
+            <AppBar position="sticky" style={{zIndex: "1"}}>
                 <Toolbar className="DashboardToolbar">
                     <Typography className="DashboardTitle" variant="h6" noWrap>
                         Admin Dashboard
@@ -161,11 +161,10 @@ class Users extends Component
                 console.error(res.data.message)
             }
 
-            let display = res.data.data
-            for (let i = 0; i < res.data.data.length; i++)
-            {
-                display[i].index = i;
-            }
+            const display = res.data.data.map( (user, index) => {
+                user.index = index;
+                return user;
+            })
 
             this.setState({
                 display: display,
@@ -231,15 +230,13 @@ class Users extends Component
 
     searchChange(event)
     {
-        let display = []
-        for (let i = 0 ; i < this.state.users.length; i++)
-        {
-            let user = this.state.users[i];
-            user.index = i;
+        const display = this.state.users.filter ( user => {
 
-            if (user.Username.includes(event.target.value)) 
-                display.push(user)
-        }
+            if (user.Username.toLowerCase().includes(event.target.value.toLowerCase())) 
+                return true;
+
+            return false;
+        })
 
         this.setState({
             display: display
@@ -334,7 +331,7 @@ class Users extends Component
         
         return (
             <Paper className="Users Paper">
-                <AppBar position="sticky">
+                <AppBar position="sticky" style={{zIndex: "1"}}>
                     <Toolbar className="TableToolbar">
                         <Typography className="TableTitle" variant="h6" noWrap>
                             Active Users
@@ -441,12 +438,12 @@ class Auctions extends Component
                 console.error(res.data.message)
             }
 
-            let display = res.data.data
-            for (let i = 0; i < res.data.data.length; i++)
-            {
-                display[i].index = i;
-                display[i].selected = false;
-            }
+            const display = res.data.data.map( (auction, index) => {
+                auction.index = index;
+                auction.selected = false;
+
+                return auction;
+            })
 
             this.setState({
                 display: display,
@@ -480,8 +477,6 @@ class Auctions extends Component
             display[i].selected = event.target.checked;
             auctions[display[i].index].selected = event.target.checked;
         }
-
-        console.log(display.map(i => i.selected))
 
         this.setState({
             display: display,
@@ -530,14 +525,10 @@ class Auctions extends Component
 
     search(event)
     {
-        let display = [];
-        for (let i = 0 ; i < this.state.auctions.length; i++)
-        {
-            let auction = this.state.auctions[i];
-            auction.index = i;
-
-            if (this.searchIndex[this.state.search](auction, event.target.value)) display.push(auction);
-        }
+        const display = this.state.auctions.filter( (auction) => {
+            if (this.searchIndex[this.state.search](auction, event.target.value)) return true;
+            return false;
+        })
 
         this.setState({
             display: display
@@ -610,9 +601,9 @@ class Auctions extends Component
                         <p className="AuctionUsername" onClick={(e) => {this.props.userClick(e, auction.User.Username);}}>{auction.User.Username}</p>
                     </TableCell>
 
-                    {__cell(`\u20AC${parseFloat(auction.First_Bid).toFixed(2)}`, 'left')}
-                    {__cell(`\u20AC${parseFloat(auction.Currently).toFixed(2)}`, 'left')}
-                    {__cell(`\u20AC${parseFloat(auction.Buy_Price).toFixed(2)}`, 'left')}
+                    {__cell(auction.First_Bid ? `\u20AC${parseFloat(auction.First_Bid).toFixed(2)}` : "-", 'left')}
+                    {__cell(auction.Currently ? `\u20AC${parseFloat(auction.Currently).toFixed(2)}` : "-", 'left')}
+                    {__cell(auction.Buy_Price ? `\u20AC${parseFloat(auction.Buy_Price).toFixed(2)}` : "-", 'left')}
                     {__cell(auction.Location, 'left')}
                     {__cell(new Date(auction.Started).toDateString(), 'left')}
                     {__cell(new Date(auction.Ends).toDateString(), 'left')}
@@ -623,7 +614,7 @@ class Auctions extends Component
 
         return (
             <Paper className="Auctions Paper">
-                <AppBar position="sticky">
+                <AppBar position="sticky"  style={{zIndex: "1"}}>
                     <Toolbar className="TableToolbar">
                         <Typography className="TableTitle" variant="h6" noWrap>
                             Export Auctions
@@ -763,31 +754,36 @@ class ExportDialog extends Component
         
         if (this.state.type === "XML")
         {
-            let xmlstring = "";
+            let xmlstring = "<Items>";
             for (let i = 0; i < this.props.items.length; i++)
             {
                 const item = this.props.items[i];
 
-                xmlstring += `<Item ItemID="${item.Id}">\n\t<Name>${item.Name}</Name>\n\t<First_Bid>$7.00</First_Bid>\n\t<Number_of_Bids>${item.Bids.length}</Number_of_Bids>\n`
+                xmlstring += `<Item ItemID="${item.Id}"><Name>${item.Name}</Name><First_Bid>$7.00</First_Bid><Number_of_Bids>${item.Bids.length}</Number_of_Bids>`
 
                 if (item.Bids.length !== 0)
                 {
-                    xmlstring += `\t<Bids>\n`
+                    xmlstring += `<Bids>`
 
                     for (let j = 0; j < item.Bids.length; j++)
                     {
                         const bid = item.Bids[j];
-                        xmlstring +=`\t\t<Bid>\n\t\t\t<Bidder Rating="${bid.User.Bidder_Rating}" UserID="${bid.User.Username}">\n\t\t\t\t<Location>${bid.User.City}</Location>\n\t\t\t\t<Country>${bid.User.Country}</Country>\n`
-                        xmlstring += `\t\t\t</Bidder>\n\t\t\t<Time>${bid.Time}</Time>\n\t\t\t<Amount>${bid.Amount}</Amount>\n\t\t</Bid>\n`
+                        xmlstring +=`<Bid><Bidder Rating="${bid.User.Bidder_Rating}" UserID="${bid.User.Username}"><Location>${bid.User.City}</Location><Country>${bid.User.Country}</Country>`
+                        xmlstring += `</Bidder><Time>${bid.Time}</Time><Amount>${bid.Amount}</Amount></Bid>`
                     }
-                    xmlstring +=`\t</Bids>\t`
+                    xmlstring +=`</Bids>`
                 }
                 
-                xmlstring +=`\t<Location>J${item.Location}</Location>\n\t<Country>${item.User.Country}</Country>\n\t<Started>${item.Started}</Started>\n\t<Ends>${item.Ends}</Ends>\n`
-                xmlstring += `\t<Seller Rating="${item.User.Seller_Rating}" UserID="${item.User.Username}"/>\n\t<Description>${item.Description}</Description>\n\t</Item>\n`
+                xmlstring +=`<Location>J${item.Location}</Location><Country>${item.User.Country}</Country><Started>${item.Started}</Started><Ends>${item.Ends}</Ends>`
+                xmlstring += `<Seller Rating="${item.User.Seller_Rating}" UserID="${item.User.Username}"/><Description>${item.Description}</Description></Item>`
             }
 
-            download(filename, xmlstring);
+            xmlstring += "</Items>";
+
+            const format = require("xml-formatter");
+            const formatted = format(xmlstring);
+
+            download(filename, formatted);
         }
         else
         {
@@ -825,7 +821,7 @@ class ExportDialog extends Component
 
             console.log(jsonitems);
 
-            const toPrint = JSON.stringify(jsonitems);
+            const toPrint = JSON.stringify(jsonitems, null,  4);
 
             download(filename, toPrint);
         }

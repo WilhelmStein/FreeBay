@@ -1,11 +1,33 @@
 const p = require('path');
 const fs = require('fs');
+const mysql = require('mysql');
 
 class DBController
 {
-    constructor(sql)
+    constructor(connectionOptions, options)
     {
-        this.sql = sql;
+        this.connectionOptions = connectionOptions;
+
+        this.onError = (err) => {
+            console.error(err);
+        }
+
+        this.onSuccess = (queries, data) => {
+            console.log(`Successfully executed ${queries.length} queries.`);
+        }
+
+        this.sql = null;
+    }
+
+    connect()
+    {
+        this.sql = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: 'password',
+            database: 'freebay',
+            multipleStatements: true
+        })
     }
 
     login(username, password, res)
@@ -42,26 +64,6 @@ class DBController
                 return !(rows.length === 0)
             }
         )
-    }
-
-    admin_users(username, password, res)
-    {
-        this.admin_permission(username, password, res, () => {
-            const query = {
-                string: `Select Concat(gu.Name, ' ', gu.Surname) as Name,
-                                gu.Phone, 
-                                u.Username, 
-                                u.Email, 
-                                gu.Validated,
-                                Concat(a.Street, ' ', a.Number, ', ', a.ZipCode, ' ', a.City) as Address,
-                                a.Country
-                            From General_User as gu, User as u, Address as a 
-                            Where u.Id = gu.User_Id and gu.Address_Id = a.Id Order By gu.Validated`,
-                escape: []
-            }
-
-            this.query(query, res)
-        })
     }
 
     signup(data, res)
@@ -128,6 +130,26 @@ class DBController
             }
 
             if (callback) callback();
+        })
+    }
+
+    admin_users(username, password, res)
+    {
+        this.admin_permission(username, password, res, () => {
+            const query = {
+                string: `Select Concat(gu.Name, ' ', gu.Surname) as Name,
+                                gu.Phone, 
+                                u.Username, 
+                                u.Email, 
+                                gu.Validated,
+                                Concat(a.Street, ' ', a.Number, ', ', a.ZipCode, ' ', a.City) as Address,
+                                a.Country
+                            From General_User as gu, User as u, Address as a 
+                            Where u.Id = gu.User_Id and gu.Address_Id = a.Id Order By gu.Validated`,
+                escape: []
+            }
+
+            this.query(query, res)
         })
     }
 
@@ -260,6 +282,28 @@ class DBController
         })
     }
 
+    user_permission(username, password, res, callback)
+    {
+        const query = {
+            string: "Select 1 From User Where Username = ? And Password = ?",
+            escape: [username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            if (rows.length !== 1)
+            {
+                res.send({
+                    error: true,
+                    message: "Permission Denied",
+                })
+
+                return;
+            }
+
+            if (callback) callback();
+        })
+    }
+
     categories(res)
     {
         const query = {
@@ -274,11 +318,23 @@ class DBController
     {
         // Check username existence
         const query = {
-            string: `Select * From User Where Username = ?`,
+            string: `Select Id From User Where Username = ?`,
             escape: [username]
         }
 
         this.query(query, res);
+    }
+
+    usernames(username, password, res)
+    {
+        this.user_permission(username, password, res, () => {
+            const query = {
+                string: "Select u.Username From User as u, General_User as gu Where u.Id = gu.User_Id",
+                escape: []
+            }
+
+            this.query(query, res);
+        });
     }
 
     email(email, res)
@@ -680,12 +736,12 @@ class DBController
 
         this.query(query, res, (rows) => {
             
-            rows = rows.map( (item) => {
-                    item.User = JSON.parse(item.User);
-                    item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-                    item.Bids = JSON.parse(item.Bids);
-                    return item;
-                });
+            // rows = rows.map( (item) => {
+            //         item.User = JSON.parse(item.User);
+            //         item.Images = item.Images === null ? [] : JSON.parse(item.Images);
+            //         item.Bids = JSON.parse(item.Bids);
+            //         return item;
+            //     });
 
                 res.send({
                     error: false,
@@ -888,7 +944,242 @@ class DBController
         }
     }
 
-    query(query, res, callback = null, check = null)
+    notifications(username, password, res)
+    {
+        const query = {
+            string: "SELECT n.* FROM Notification as n, User as u WHERE n.User_Id = u.Id AND u.Username = ? AND u.Password = ? AND n.Status = 'Unread'",
+            escape: [username, password]
+        }
+
+        this.query(query, res);
+    }
+
+    readNotification(username, password, notification, res)
+    {
+        this.user_permission(username, password, res, () => {
+            const query = {
+                string: "UPDATE Notification SET Status = 'Read' WHERE Id = ?",
+                escape: [notification] 
+            }
+    
+            this.query(query, res);
+        })
+        
+    }
+
+    messages(username, password, res)
+    {
+        const query = {
+            string: `SELECT mh.Id as Header_Id, mh.Subject, 
+                            JSON_ARRAYAGG(JSON_OBJECT(  "Subject", mh.Subject, "Header_Id", mh.Id, "Id", m.Id, "Body", m.Body, 
+                                                        "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username,
+                                                        "Sender_Deleted", m.Sender_Deleted, "Receiver_Deleted", m.Receiver_Deleted)) as Messages
+                    FROM 
+                        (
+                            SELECT * FROM Message Where Time ORDER BY Time Asc
+                        ) as m, 
+                        User as ru, 
+                        User as su, 
+                        Message_Header as mh
+                    WHERE   mh.Id = m.Message_Header_Id AND
+                            su.Id = m.Sender_Id AND
+                            ru.Id = m.Receiver_Id AND
+                            ((ru.Username = ? AND ru.Password = ?) OR (su.Username = ? AND su.Password = ?))
+                    GROUP BY mh.Id`,
+            escape: [username, password, username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            
+            const Messages = rows.map( (row) => {
+                row.Messages = JSON.parse(row.Messages);
+                return row;
+            })
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: Messages
+            });
+        });
+    }
+
+    readMessage(username, password, message, res)
+    {
+        const query = {
+            string: "Update Message Set Status = 'Read' Where Id = ?",
+            escape: [message.Id]
+        }
+
+        this.query(query, res);
+    }
+
+    sendMessage(username, password, recipient, subject, text, reply, res)
+    {
+        this.user_permission(username, password, res, () => {
+
+            this.sql.beginTransaction(err => {
+
+                if (err) 
+                {
+                    console.error(err);
+                    return;
+                }
+
+                const checkRecipient = (callback) => {
+                    const query = {
+                        string: "Select 1 From User as u, General_User as gu Where u.Username = ? AND gu.User_Id = u.Id",
+                        escape: [recipient]
+                    }
+            
+                    this.query(query, res, (rows) => {
+                        if (rows.length !== 1)
+                        {
+                            res.send({
+                                error: true,
+                                message: `User does not exist`,
+                            })
+            
+                            return;
+                        }
+
+                        return callback();
+                    })
+                }
+
+                const insertHeader = (reply, callback) => {
+                    if (!reply)
+                    {
+                        const query = {
+                            string: `INSERT INTO Message_Header (Subject) VALUES (?)`,
+                            escape: [subject]
+                        }
+        
+                        this.query(query, res, (result) => {
+                            callback(result.insertId);
+                        }, null, true)
+                    }
+                    else
+                    {
+                        callback(reply);
+                    }
+                }
+
+                const sendNotification = () => {
+                    const query = {
+                        string: `INSERT INTO Notification (User_Id, Content, Link, Status, Type, Time) Values ( (SELECT Id FROM User WHERE Username = ?), "${username} sent you a message!", "/messages", "Unread", "Message", NOW())`,
+                        escape: [recipient, username]
+                    }
+
+                    this.query(query, res, (result) => {
+                        res.send({
+                            error: false,
+                            message: "Sent"
+                        });
+
+                        this.sql.commit(err => {if (err) console.error(err)})
+                    })
+                }
+
+                const insertMessage = (message_header_id) => {
+                    const query = {
+                        string: `   INSERT INTO Message (Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status, Sender_Deleted, Receiver_Deleted)
+                                    VALUES (?, ?, NOW(), (SELECT Id FROM User Where Username = ?), (SELECT Id FROM User WHERE Username = ?), 'Unread', FALSE, FALSE)`,
+                        escape: [message_header_id, text, username, recipient]
+                    }
+
+                    this.query(query, res, (result) => {
+
+                        return sendNotification();
+
+                    }, null, true)
+                }
+
+                return checkRecipient( () => {insertHeader (reply, insertMessage)} );
+            })
+        });
+    }
+
+    deleteMessage(username, password, message, who, res)
+    {
+        this.user_permission(username, password, res, () => {
+
+            const query = {
+                string: `UPDATE Message SET ${who}_Deleted = TRUE WHERE Id = ?`,
+                escape: [message.Id]
+            }
+
+            this.query(query, res, (result) => {
+
+                const query = {
+                    string: "SELECT 1 From Message Where Id = ? AND Sender_Deleted = TRUE AND Receiver_Deleted = TRUE",
+                    escape: [message.Id]
+                }
+
+                this.query(query, res, (rows) => {
+
+                    if (rows.length !== 0)
+                    {
+                        this.banishMessage(message, res, () => {
+                            res.send({
+                                error: false,
+                                message: "Deleted"
+                            })
+                        })
+
+                        return;
+                    }
+
+                    res.send({
+                        error: false,
+                        message: "Deleted"
+                    })
+                })
+            })
+        });
+    }
+
+    banishMessage(message, res, callback)
+    {
+        this.sql.beginTransaction(err => {
+
+            if (err) 
+            {
+                console.error(err);
+                return;
+            }
+
+            const query = {
+                string: "SELECT mh.Id FROM Message_Header as mh WHERE mh.Id = ? AND EXISTS (SELECT m.Id FROM Message as m WHERE m.Message_Header_Id = mh.Id AND m.Id != ?)",
+                escape: [message.Header_Id, message.Id]
+            }
+
+            this.query(query, res, (rows) => {
+
+                let query = {
+                    string: "DELETE FROM Message WHERE Id = ?;",
+                    escape: [message.Id]
+                }
+
+                if (rows.length === 0)
+                {
+                    query.string += " DELETE FROM Message_Header Where Id = ?;";
+                    query.escape.push(message.Header_Id);
+                }
+
+                this.query(query, res, (result) => {
+
+                    this.sql.commit(err => {if (err) console.error(err)});
+
+                    callback();
+
+                }, null, true)
+
+            }, null, true)
+        });
+    }
+
+    query(query, res, callback = null, check = null, transaction=false)
     {
         this.sql.query(query.string, query.escape, function(err, rows)
         {
@@ -899,6 +1190,10 @@ class DBController
                     error: true,
                     message: "Something went wrong in database retrieval. Please try again."
                 });
+                
+                if (transaction)
+                    return this.sql.rollback();
+
                 return;
             }
 
@@ -924,6 +1219,68 @@ class DBController
                 message: "OK",
                 data: rows
             });
+        })
+    }
+
+    transaction(queries, onError, onSuccess)
+    {
+        this.sql.beginTransaction(err => {
+            if (err)
+            {
+                return this.onError(err);
+            }
+
+            return this.__transactionQuery(queries, 0, null, onError, onSuccess);
+        })
+        
+    }
+
+    __transactionQuery(queries, index, data, onError, onSuccess)
+    {
+        if (index === queries.length)
+        {
+            this.sql.commit(err => {
+                if (err)
+                {
+                    this.onError(err);
+                    return this.sql.rollback();
+                }
+            })
+
+            if (onSuccess)
+                return onSuccess(queries, data);
+            else
+                return this.onSuccess(queries, data);
+        }
+
+        const query = queries[index];
+        let toExecute = query;
+
+        if (query.hasOwnProperty("prepare") && data)
+        {
+            toExecute = query.prepapre(data)
+        }
+
+        this.sql.query(toExecute.string, toExecute.escape, (err, rows) => {
+            if (err)
+            {
+                if (query.hasOwnProperty("onError"))
+                {
+                    query.onError(err);
+                }
+                else if (onError)
+                {
+                    onError(err);
+                }
+                else
+                {
+                    this.onError(err);
+                }
+
+                return this.sql.rollback();
+            }
+
+            this.__transactionQuery(queries, index + 1, rows, onSuccess)
         })
     }
 }
