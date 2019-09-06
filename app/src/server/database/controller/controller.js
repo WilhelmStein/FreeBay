@@ -1,11 +1,33 @@
 const p = require('path');
 const fs = require('fs');
+const mysql = require('mysql');
 
 class DBController
 {
-    constructor(sql)
+    constructor(connectionOptions, options)
     {
-        this.sql = sql;
+        this.connectionOptions = connectionOptions;
+
+        this.onError = (err) => {
+            console.error(err);
+        }
+
+        this.onSuccess = (queries, data) => {
+            console.log(`Successfully executed ${queries.length} queries.`);
+        }
+
+        this.sql = null;
+    }
+
+    connect()
+    {
+        this.sql = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: 'password',
+            database: 'freebay',
+            multipleStatements: true
+        })
     }
 
     login(username, password, res)
@@ -828,25 +850,6 @@ class DBController
                     })
                 }
 
-                const insertMessage = (message_header_id) => {
-                    const query = {
-                        string: `   INSERT INTO Message (Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status, Sender_Deleted, Receiver_Deleted)
-                                    VALUES (?, ?, NOW(), (SELECT Id FROM User Where Username = ?), (SELECT Id FROM User WHERE Username = ?), 'Unread', FALSE, FALSE)`,
-                        escape: [message_header_id, text, username, recipient]
-                    }
-
-                    this.query(query, res, (result) => {
-
-                        res.send({
-                            error: false,
-                            message: "Sent",
-                        });
-
-                        this.sql.commit(err => {if (err) console.error(err)});
-
-                    }, null, true)
-                }
-
                 const insertHeader = (reply, callback) => {
                     if (!reply)
                     {
@@ -863,6 +866,36 @@ class DBController
                     {
                         callback(reply);
                     }
+                }
+
+                const sendNotification = () => {
+                    const query = {
+                        string: `INSERT INTO Notification (User_Id, Content, Link, Status, Type, Time) Values ( (SELECT Id FROM User WHERE Username = ?), "${username} sent you a message!", "/messages", "Unread", "Message", NOW())`,
+                        escape: [recipient, username]
+                    }
+
+                    this.query(query, res, (result) => {
+                        res.send({
+                            error: false,
+                            message: "Sent"
+                        });
+
+                        this.sql.commit(err => {if (err) console.error(err)})
+                    })
+                }
+
+                const insertMessage = (message_header_id) => {
+                    const query = {
+                        string: `   INSERT INTO Message (Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status, Sender_Deleted, Receiver_Deleted)
+                                    VALUES (?, ?, NOW(), (SELECT Id FROM User Where Username = ?), (SELECT Id FROM User WHERE Username = ?), 'Unread', FALSE, FALSE)`,
+                        escape: [message_header_id, text, username, recipient]
+                    }
+
+                    this.query(query, res, (result) => {
+
+                        return sendNotification();
+
+                    }, null, true)
                 }
 
                 return checkRecipient( () => {insertHeader (reply, insertMessage)} );
@@ -989,6 +1022,68 @@ class DBController
                 message: "OK",
                 data: rows
             });
+        })
+    }
+
+    transaction(queries, onError, onSuccess)
+    {
+        this.sql.beginTransaction(err => {
+            if (err)
+            {
+                return this.onError(err);
+            }
+
+            return this.__transactionQuery(queries, 0, null, onError, onSuccess);
+        })
+        
+    }
+
+    __transactionQuery(queries, index, data, onError, onSuccess)
+    {
+        if (index === queries.length)
+        {
+            this.sql.commit(err => {
+                if (err)
+                {
+                    this.onError(err);
+                    return this.sql.rollback();
+                }
+            })
+
+            if (onSuccess)
+                return onSuccess(queries, data);
+            else
+                return this.onSuccess(queries, data);
+        }
+
+        const query = queries[index];
+        let toExecute = query;
+
+        if (query.hasOwnProperty("prepare") && data)
+        {
+            toExecute = query.prepapre(data)
+        }
+
+        this.sql.query(toExecute.string, toExecute.escape, (err, rows) => {
+            if (err)
+            {
+                if (query.hasOwnProperty("onError"))
+                {
+                    query.onError(err);
+                }
+                else if (onError)
+                {
+                    onError(err);
+                }
+                else
+                {
+                    this.onError(err);
+                }
+
+                return this.sql.rollback();
+            }
+
+            this.__transactionQuery(queries, index + 1, rows, onSuccess)
         })
     }
 }

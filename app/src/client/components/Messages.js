@@ -6,13 +6,14 @@ import Autosuggest from 'react-autosuggest';
 
 import MarkdownRenderer from 'react-markdown-renderer';
 import { getRandomColor } from './Header';
-import { Card, CardHeader, Avatar, CardContent, AppBar, Toolbar, Select, MenuItem, InputAdornment } from '@material-ui/core';
+import { Card, CardHeader, Avatar, CardContent, AppBar, Toolbar, Select, MenuItem, InputAdornment, Snackbar } from '@material-ui/core';
 import { Box, Grid, Typography, InputBase, Paper, Fade, List, ListItem, Button, IconButton, TextField } from '@material-ui/core';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import ReplyIcon from '@material-ui/icons/Reply';
 import SendIcon from '@material-ui/icons/Send'
 import AddCommentIcon from '@material-ui/icons/AddComment';
+import CloseIcon from '@material-ui/icons/Close';
 
 import "../style/Messages.scss";
 
@@ -509,7 +510,7 @@ class MessageEditor extends Component
             toError: "",
             subjectError: "",
             text: "",
-            usernames: [],
+            openSnackbar: false
         }
 
         this.inputRef = React.createRef();
@@ -614,7 +615,10 @@ class MessageEditor extends Component
                 return;
             }
 
-            alert("Message successfully sent!");
+            this.setState({
+                openSnackbar: true
+            })
+            // alert("Message successfully sent!");
             this.props.send();
         })
         .catch(err => console.error(err))
@@ -675,10 +679,40 @@ class MessageEditor extends Component
         this.inputRef.current.focus();
     }
 
+    closeSnackbar(event, reason)
+    {
+        if (reason === 'clickaway') {
+            return;
+        }
+      
+        this.setState({
+            openSnackbar: false
+        });
+    }
+
     render()
     {
         return (
             <Grid item xs={9}>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left'
+                    }}
+                    open={this.state.openSnackbar}
+                    autoHideDuration={3000}
+                    message={<span>Message Sent!</span>}
+                    onClose={this.closeSnackbar}
+                    action={[
+                        <IconButton
+                            key="close"
+                            color="inherit"
+                            onClick={this.closeSnackbar}
+                        >
+                            <CloseIcon/>
+                        </IconButton>
+                    ]}
+                />
                 <Paper className="MessageEditor Paper">
                     <AppBar position="sticky"  style={{zIndex: "1"}}>
                         <Toolbar className="Toolbar">

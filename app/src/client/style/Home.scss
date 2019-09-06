@@ -58,13 +58,18 @@
             &:hover
             {
                 background-color: $less-white;
+
+                .Media
+                {
+                    filter: brightness(110%);
+                }
             }
         }
 
         .Media
         {
             height: 250px;
-
+            transition: 200ms;
             background-color: white;
         }
 

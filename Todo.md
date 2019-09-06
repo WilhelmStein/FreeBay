@@ -87,6 +87,7 @@
       - [x] Reply
       - [x] Delete
       - [x] Read / Unread Styling
+      - [x] Send Notification
     - [ ] Settings
 - [ ] Auction Page
   - [ ] View - Bid Auction
