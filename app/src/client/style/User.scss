@@ -1,6 +1,23 @@
 @import 'global';
 
-
+.UserCard
+{
+    .User.CardHeader
+    {
+        .Action
+        {
+            background-color: $blue;
+    
+            margin: 10px;
+    
+            &:hover
+            {
+                background-color: $white-blue
+            }
+        }
+    }
+    
+}
 .UserForm
 {
     .DialogText
@@ -67,13 +84,12 @@
     }
 }
 
-.UserTabs
+.UserContent
 {
-    flex-grow: 1;
-    // height: 60px;
-    .Tab
+    .Tabs
     {
-        font-size: $normal-font-size;
+        color: white;
+        background-color: $blue;
     }
 }
 

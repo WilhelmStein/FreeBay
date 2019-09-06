@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom'
 import autoBind from 'auto-bind';
 import axios from "axios"
+import {getRandomColor} from "./Utils"
 
 import LoginPopup from './LoginPopup';
 import Logo from '../images/Logo2.png';
@@ -164,10 +165,6 @@ export class Menu extends Component
                 path: "/myauctions"
             },
             {
-                name: "Messages",
-                path: "/messages"
-            },
-            {
                 name: "About Us",
                 path: "/about"
             },
@@ -285,10 +282,10 @@ class Notifications extends Component
                 console.error(res.data.message);
                 return;
             }
+
+            this.getNotifications();
         })
         .catch(err => console.error(err))
-
-
     }
 
     getNotifications()
@@ -327,7 +324,7 @@ class Notifications extends Component
 
         const items = this.state.notifications.map( (not, index) => {
             const oddity = index % 2 === 1 ? "odd" : "even"
-            console.log(not)
+
             return (
             <Card className={`Notification ${oddity}`} key={not.Id} onClick={() => {this.clickNotification(not)}}>
                 <CardHeader
@@ -365,15 +362,6 @@ class Notifications extends Component
             </Popup>
         )
     }
-}
-
-export function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
 }
 
 export default withRouter(Header);

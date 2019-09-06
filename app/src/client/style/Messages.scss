@@ -30,12 +30,6 @@
                 background-color: $whiter-blue;
             }
         }
-    }
-
-    .Paper
-    {
-        height: 82vh;
-        overflow-y: auto;
 
         ::-webkit-scrollbar 
         {
@@ -59,6 +53,14 @@
         {
             background: $lesser-white;
         }
+    }
+
+    .Paper
+    {
+        height: 65vh;
+        overflow-y: auto;
+
+       
     }
 
     .MessageList

@@ -1,5 +1,5 @@
 import React, { Component, useState } from "react";
-
+import { getRandomColor } from './Utils'
 import {
     Avatar,
     Card,
@@ -11,10 +11,10 @@ import {
     Box,
     Button,
     Tab,
-    Tabs,
-    AppBar,
-    IconButton
+    Tabs
 } from "@material-ui/core";
+
+import Messages from './Messages'
 
 import Pagination from 'material-ui-flat-pagination';
 
@@ -32,9 +32,12 @@ import { withRouter } from 'react-router-dom'
 import ValidatedIcon from "@material-ui/icons/VerifiedUser";
 import InvalidatedIcon from "@material-ui/icons/Clear";
 import SettingsIcon from "@material-ui/icons/Settings";
+import MailIcon from '@material-ui/icons/Mail';
+
 import "../style/User.scss";
 
 class User extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -51,7 +54,11 @@ class User extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.updateData(nextProps);
+
+        if (this.props.username !== nextProps.username)
+        {
+            this.updateData(nextProps);
+        }
     }
 
     updateData(props) {
@@ -71,162 +78,367 @@ class User extends Component {
         request.then(res => {
             if(res.data.error)
             {
-                console.log(res.data.message);
+                console.error(res.data.message);
                 return;
             }
 
             this.setState({ userData: res.data.data })
         })
-        .catch(err => console.log(err));
+        .catch(err => console.error(err));
     }
 
     toggleDialog(e) {
         this.setState({ dialogOpen: !this.state.dialogOpen });
     }
 
-    render() {
-        console.log("Render Parent User");
-        
+    render()
+    {
         if (this.state.userData == null) {
             return <h1>{`Error: User ${this.props.username} not found.`}</h1>;
         }
 
+        console.log()
+
         const loggedAsTargetUser = this.state.userData !== null && this.props.user && this.props.user.Username === this.props.username;
 
+        const rating = Math.round(((this.state.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
+
+        const tab = () => {
+            switch (this.props.tab)
+            {
+                case "active": return 0;
+                case "past": return 1;
+                case "watched": return loggedAsTargetUser ? 2 : 0;
+                case "messages": return loggedAsTargetUser ? 3 : 0;
+                default: return 0;
+            }
+        }
+
         return (
+            
+            <Card raised className="UserCard" style={{margin: "20px"}}>
+                <CardHeader
+                    className="User CardHeader"
+                    avatar={
+                        <Avatar aria-label="User" className="UserAvatar" style={{backgroundColor: getRandomColor()}}>
+                            {this.state.userData.Username.toUpperCase()[0]}
+                        </Avatar>
+                    }
+                    title={ <Typography className="Title">{this.state.userData.Username}</Typography> }
+                    subheader={
+                        <Grid container spacing={1}>
+                            <Grid item>
+                                <Typography className="Title">Rating: </Typography>
+                            </Grid>
 
-                <div style={{padding: "20px"}}>
-                    <AccountForm
-                        open={this.state.dialogOpen}
-                        toggleDialog={this.toggleDialog}
-                        userData={this.state.userData}
-                        updateHandler={this.props.updateHandler}
-                        history={this.props.history}
-                    /> 
-                        
-                    <AccountMenu
-                        userData={this.state.userData}
-                        loggedAsTargetUser={loggedAsTargetUser}
-                        toggleDialog={this.toggleDialog}
-                        history={this.props.history}
-                    />
-                </div>
+                            <Grid item>
+                                <Rating
+                                    display="inline"
+                                    value={rating}
+                                    precision={0.5}
+                                    readOnly
+                                />
+                            </Grid>
+                        </Grid>
+                    }
+                    action={
+                        loggedAsTargetUser
+                        ?
+                        <Button aria-label="settings" className="Settings Button Action" variant="contained" color="primary" onClick={this.toggleDialog}>
+                            Settings &nbsp; <SettingsIcon/>
+                        </Button>
+                        :
+                        <Button className="Message Button Action" variant="contained" color="primary" onClick={() => {this.props.history.push(`/user/${this.props.user.Username}/messages/new`)}}>
+                            Message this user &nbsp; <MailIcon/>
+                        </Button>
+                    }
+                />
 
+                <UserDetails
+                    open={this.state.dialogOpen}
+                    toggleDialog={this.toggleDialog}
+                    userData={this.state.userData}
+                    updateHandler={this.props.updateHandler}
+                    history={this.props.history}
+                /> 
+                    
+                <UserContent
+                    tab={tab()}
+                    action={this.props.action}
+                    userData={this.state.userData}
+                    loggedAsTargetUser={loggedAsTargetUser}
+                    toggleDialog={this.toggleDialog}
+                    history={this.props.history}
+                />
+            </Card>
         );
     }
 }
 
-function AccountDetails(props) {
-    const rating = Math.round(((props.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
+class UserContent extends Component {
 
-    return (
-        // <Grid item xs={3}>
-            <Card className="UserData">
-                <CardMedia
-                    className="UserMedia"
-                    //    image={props.userData.Image}
-                    image="http://placehold.jp/150x150.png"
-                />
+    constructor(props) {
+        super(props);
+        
+        this.state = {
+            tabValue: this.props.tab,
+            tabs: [{ label: "Active Auctions" }],
+            currentAuctions: [],
+            pastAuctions: [],
+            watchedAuctions: [],
+            messages: [],
+            resultsPerPage: 10,
+            offset: 2
+        };
 
-                <CardContent>
-                    <Grid container className="UserDetails">
-                        <Grid item xs={4}>
-                            <Typography className="Title">Username: </Typography>
-                        </Grid>
+        autoBind(this);
+    }
 
-                        <Grid item xs={8}>
-                            <Typography className="Data">
-                                {props.userData.Username}
-                            </Typography>
-                        </Grid>
+    componentDidMount() {
+        this.getUserData(this.props);
+        this.setTabs(this.props)
+    }
 
-                        <Grid item xs={4}>
-                            <Typography className="Title">Rating: </Typography>
-                        </Grid>
+    componentWillReceiveProps(nextProps) 
+    {
+        const loggedAsTargetUserEquality = nextProps.loggedAsTargetUser === this.props.loggedAsTargetUser;
 
-                        <Grid item xs={8}>
-                            <Rating
-                                display="inline"
-                                value={rating}
-                                precision={0.5}
-                                readOnly
+        if (nextProps.userData.Id !== this.props.userData.Id)
+            this.getUserData(nextProps);
+        else
+        {
+            if (!loggedAsTargetUserEquality)
+            {
+                this.getUserData(nextProps);
+            }
+        }
+
+        if (!loggedAsTargetUserEquality)
+            this.setTabs(nextProps);
+
+        if (nextProps.tab !== this.state.tabValue)
+            this.changeTabValue(null, nextProps.tab)
+    }
+
+    getUserData(props)
+    {
+        Axios.get(`/api/userAuctions?username=${props.userData.Username}`)
+        .then( (res) => {
+            
+            if(res.data.err)
+            {
+                console.error(res.data.message)
+                return;
+            }
+        
+            let currentAuctions = [];
+            let pastAuctions = [];
+            for (let i = 0; i < res.data.data.length; i++)
+            {
+                const auction = res.data.data[i];
+
+                if (new Date(auction.Ends) - new Date() > 0)
+                    currentAuctions.push(auction)
+                else
+                    pastAuctions.push(auction);
+            }
+
+            this.setState({ currentAuctions: currentAuctions, pastAuctions: pastAuctions });
+        })
+        .catch((err) => console.error(err));
+
+        if (props.loggedAsTargetUser) {
+
+            Axios.post(`/api/userWatchedAuctions`, {username: this.props.userData.Username, password: this.props.userData.Password})
+            .then((res) => {
+                if(res.data.err)
+                {
+                    console.error(res.data.message)
+                    return;
+                }
+
+                this.setState({ watchedAuctions: res.data.data });
+            })
+            .catch((err) => console.error(err));
+        }
+    }
+
+    setTabs(props)
+    {
+        let tabs = [];
+
+        if (props.loggedAsTargetUser)
+        {
+            tabs=  [
+                { label: "Active Auctions" },
+                { label: "Past Auctions" },
+                { label: "Watched Auctions" },
+                { label: "Messages" }
+            ]
+        }
+        else
+        {
+            tabs = [
+                { label: "Active Auctions" },
+                { label: "Past Auctions" },
+            ]
+        }
+
+        this.setState({
+            tabs: tabs
+        })
+    }
+
+    changeTabValue(event, newValue) {
+        this.setState({ tabValue: newValue });
+    }
+
+    render() {
+        
+        let currentPage = null;
+        switch(this.state.tabValue)
+        {
+            case 0: currentPage = <AuctionGrid target={this.state.currentAuctions} history={this.props.history}/>; break;
+            case 1: currentPage = <AuctionGrid target={this.state.pastAuctions} history={this.props.history}/>; break;
+            case 2: currentPage = this.props.loggedAsTargetUser ? <AuctionGrid target={this.state.watchedAuctions} history={this.props.history}/> : null; break;
+            case 3: currentPage = this.props.loggedAsTargetUser ? <Messages user={this.props.userData} action={this.props.action}/> : null; break;
+            default: currentPage = <div/>; break;
+        }
+
+
+        return (
+            <div className="UserContent">
+                <Tabs className="Tabs" value={this.state.tabValue} onChange={this.changeTabValue}>
+                    {this.state.tabs.map(tab => (
+                        <Tab key={tab.label} label={tab.label} className="Tab" />
+                    ))}
+                </Tabs>
+                {currentPage}
+            </div>
+        );
+    }
+}
+
+function AuctionGrid(props) {
+
+    let [offset, setOffset] = useState(0);
+    //let [resultsPerPage, setResultsPerPage] = useState(6);
+    const resultsPerPage = 6;
+
+    let content = props.target.slice(offset, offset + resultsPerPage).map((auction, index) => {
+
+        let ended = (new Date(auction.Ends) - new Date() <= 0);
+
+        return (
+            <Grid item key={index}>
+                <Card onClick={() => props.history.push(`/auction/${auction.Id}`)}>
+                    <Grid container className="AuctionCard">
+                        <Grid item>
+                            <CardMedia className="Media"
+                                    //component="img"
+                                    image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/150x250/ffffff/4a4a4a.png&text=No+Image"}
+                                    title={auction.Name}
                             />
                         </Grid>
 
-                        {props.loggedAsTargetUser ? (
-                            <Grid container>
-                                <Grid item xs={4}>
-                                    <Typography className="Title">E-Mail: </Typography>
+                        <Grid item className="Details">
+                            <CardContent>
+                                <Typography className="Title">{auction.Name}</Typography>
+                                {
+                                    (auction.Description === "")
+                                    ?
+                                    (<Typography className="Description Empty">No Description.</Typography>)
+                                    :
+                                    (<Typography className="Description">{auction.Description}</Typography>)
+                                }               
+                            </CardContent>
+                        </Grid>
+
+                        <Grid item className="Prices">
+                            <CardContent>
+                                <Grid container spacing={1}>
+                                    <Grid item>
+                                        <Typography variant="h5" className="Title">Starting Price:</Typography>
+                                    </Grid>
+
+                                    <Grid item>
+                                        <Typography variant="h4" className="Price Starting">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
+                                    </Grid>
                                 </Grid>
 
-                                <Grid item xs={8}>
-                                    <Typography className="Data">
-                                        {props.userData.Email}
+                                {
+                                    ended ? "" :
+                                        <Grid container spacing={1}>
+                                            <Grid item >
+                                                <Typography variant="h5" className="Title">Current Price:</Typography>
+                                            </Grid>
+                                            <Grid item  zeroMinWidth>
+                                                <Typography className="Price Current" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
+                                            </Grid>
+                                        </Grid>
+                                }
+                                
+                                <Grid container spacing={1}>
+                                    <Grid item >
+                                        <Typography variant="h5" className="Title">
+                                            { (ended) ? ("Bought for:") : ("Buyout Price:") }
+                                        </Typography>
+                                    </Grid>
+
+                                    <Grid item >
+                                        <Typography className="Price Buyout" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
+                                    </Grid>
+                                </Grid>
+
+                                <Box className="Dates" mt={2}>
+                                    <Typography>
+                                        Started in: <span className="Started Date">{new Date(auction.Started).toLocaleString()}</span>
                                     </Typography>
-                                </Grid>
-
-                                <Grid item xs={4}>
-                                    <Typography className="Title">Name: </Typography>
-                                </Grid>
-
-                                <Grid item xs={8}>
-                                    <Typography className="Data">
-                                        {props.userData.Name}
+                                    
+                                    <Typography>
+                                        {ended ? "Ended: " : "Ends in: "}
+                                        <span className="Ends Date">{new Date(auction.Ends).toLocaleString()}</span>
                                     </Typography>
-                                </Grid>
-
-                                <Grid item xs={4}>
-                                    <Typography className="Title">Surname: </Typography>
-                                </Grid>
-
-                                <Grid item xs={8}>
-                                    <Typography className="Data">
-                                        {props.userData.Surname}
-                                    </Typography>
-                                </Grid>
-
-                                <Grid item xs={4}>
-                                    <Typography className="Title">Phone: </Typography>
-                                </Grid>
-
-                                <Grid item xs={8}>
-                                    <Typography className="Data">
-                                        {props.userData.Phone}
-                                    </Typography>
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    {props.userData.Validated ? (
-                                        <Box className="Validated">
-                                            Validated
-											<ValidatedIcon style={{ marginLeft: "5px" }} />
-                                        </Box>
-                                    ) : (
-                                            <Box className="Invalidated">
-                                                Not Validated
-											<InvalidatedIcon style={{ marginLeft: "5px" }} />
-                                            </Box>
-                                        )}
-                                </Grid>
-
-                                <Grid item xs={8} style={{ marginTop: "20px" }}>
-                                    <Button variant="contained" onClick={props.toggleDialog}>
-                                        Change Settings
-										<SettingsIcon style={{ marginLeft: "5px" }} />
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        ) : (
-                                ""
-                            )}
+                                </Box>
+                            </CardContent>
+                        </Grid>
                     </Grid>
-                </CardContent>
-            </Card>
-        // </Grid>
+                </Card>
+            </Grid>
+        )
+    });
+
+    return(
+        content.length !== 0 ?
+
+            <div className="AuctionGrid">
+                <Pagination
+                    className="Pagination"
+                    size='large'
+                    limit={resultsPerPage}
+                    offset={offset}
+                    total={props.target.length}
+                    onClick={(e, offset) => setOffset(offset)}
+                />
+
+                <Grid container spacing={3}>
+                    {content}
+                </Grid>
+
+                <Pagination
+                    className="Pagination"
+                    size='large'
+                    limit={resultsPerPage}
+                    offset={offset}
+                    total={props.target.length}
+                    onClick={(e, offset) => setOffset(offset)}
+                />
+            </div>
+        : <Typography color="textSecondary" style={{padding: "50px"}}>No auctions</Typography>
     );
 }
 
-class AccountForm extends Component {
+class UserDetails extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -321,7 +533,7 @@ class AccountForm extends Component {
     }
 
     confirmNewPasswordCheck() {
-        //console.log(this.state)
+
         if (this.state.newPassword !== this.state.newPassword2) {
             this.setState({
                 passwordError: "Passwords do not match.",
@@ -741,293 +953,113 @@ class AccountForm extends Component {
     }
 }
 
-class AccountMenu extends Component {
-    constructor(props) {
-        super(props);
-        
-        this.state = {
-            tabValue: 0,
-            tabs: [{ label: "Active Auctions" }],
-            currentAuctions: [],
-            pastAuctions: [],
-            watchedAuctions: [],
-            messages: [],
-            resultsPerPage: 10,
-            offset: 2
-        };
-        //console.log(props.loggedAsTargetUser);
-        autoBind(this);
-    }
+function AccountDetails(props) {
+    const rating = Math.round(((props.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
 
-    componentDidMount() {
-        console.log("DidMount")
-        this.initData(this.props);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        console.log("WillReceiveProps")
-        this.initData(nextProps);  
-    }
-
-    initData(props)
-    {
-        Axios.get(`/api/userAuctions?username=${this.props.userData.Username}`)
-        .then( (res) => {
-            
-            if(res.data.err)
-            {
-                console.error(res.data.message)
-                return;
-            }
-        
-
-            let currentAuctions = res.data.data.filter((auction) => {
-                let diff = new Date(auction.Ends) - new Date();
-                return (diff > 0);
-            });
-
-            let pastAuctions = res.data.data.filter((auction) => {
-                let diff = new Date(auction.Ends) - new Date();
-                return (diff <= 0);
-            })
-
-            this.setState({ currentAuctions: currentAuctions, pastAuctions: pastAuctions });
-        })
-        .catch((err) => console.error(err));
-
-        if (props.loggedAsTargetUser) {
-
-            Axios.post(`/api/userWatchedAuctions`, {username: this.props.userData.Username, password: this.props.userData.Password})
-            .then((res) => {
-                if(res.data.err)
-                {
-                    console.error(res.data.message)
-                    return;
-                }
-
-                this.setState({ watchedAuctions: res.data.data });
-            })
-            .catch((err) => console.error(err));
-
-            this.setState({
-                tabs: [
-                    { label: "Active Auctions" },
-                    { label: "Past Auctions" },
-                    { label: "Watched Auctions" },
-                    { label: "Messages" }
-                ]
-            });
-        }
-        else
-        {
-            this.setState({
-                tabs: [ 
-                    { label: "Active Auctions" },
-                    { label: "Past Auctions" }
-                ]
-            });
-        }
-    }
-
-    changeTabValue(event, newValue) {
-        this.setState({ tabValue: newValue });
-    }
-
-    render() {
-        //console.log(this.state);
-        const rating = Math.round(((this.props.userData.Seller_Rating * 5.0) / 100.0) * 2) / 2;
-        let currentPage = null;
-        switch(this.state.tabValue)
-        {
-            case 0: currentPage = <AuctionGrid target={this.state.currentAuctions} history={this.props.history}/>; break;
-            case 1: currentPage = <AuctionGrid target={this.state.pastAuctions} history={this.props.history}/>; break;
-            case 2: currentPage = <AuctionGrid target={this.state.watchedAuctions} history={this.props.history}/>; break;
-            default: currentPage = <div/>; break;
-        }
-
-
-        return (
-            // <Grid item className="UserMenu" xs={9} /*sm={3}*/>
-            <Card raised className="UserMenu">
-                <CardHeader
-                    avatar={
-                        <Avatar aria-label="User" className="UserAvatar">
-                            {this.props.userData.Username.toUpperCase()[0]}
-                        </Avatar>
-                    }
-
-                    title={ <Typography className="Title">{this.props.userData.Username}</Typography> }
-                    subheader={
-                                <Grid container spacing={1}>
-                                    <Grid item>
-                                        <Typography className="Title">Rating: </Typography>
-                                    </Grid>
-
-                                    <Grid item>
-                                        <Rating
-                                            display="inline"
-                                            value={rating}
-                                            precision={0.5}
-                                            readOnly
-                                        />
-                                    </Grid>
-                                </Grid>
-                                }
-                    action={
-                        
-                            (this.props.loggedAsTargetUser)
-                            ?
-                            (
-                                <Button aria-label="settings" className="SettingsIcon" onClick={this.props.toggleDialog}>
-                                    Settings <SettingsIcon/>
-                                </Button>
-                            )
-                            :
-                            ("")
-                    }
+    return (
+        // <Grid item xs={3}>
+            <Card className="UserData">
+                <CardMedia
+                    className="UserMedia"
+                    //    image={props.userData.Image}
+                    image="http://placehold.jp/150x150.png"
                 />
-                <CardContent style={{padding: "0"}}>
-                    <AppBar position="sticky">
-                        <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
-                            {this.state.tabs.map(tab => (
-                                <Tab key={tab.label} label={tab.label} className="Tab" />
-                            ))}
-                        </Tabs>
-                    </AppBar>
 
-                    {currentPage}
+                <CardContent>
+                    <Grid container className="UserDetails">
+                        <Grid item xs={4}>
+                            <Typography className="Title">Username: </Typography>
+                        </Grid>
+
+                        <Grid item xs={8}>
+                            <Typography className="Data">
+                                {props.userData.Username}
+                            </Typography>
+                        </Grid>
+
+                        <Grid item xs={4}>
+                            <Typography className="Title">Rating: </Typography>
+                        </Grid>
+
+                        <Grid item xs={8}>
+                            <Rating
+                                display="inline"
+                                value={rating}
+                                precision={0.5}
+                                readOnly
+                            />
+                        </Grid>
+
+                        {props.loggedAsTargetUser ? (
+                            <Grid container>
+                                <Grid item xs={4}>
+                                    <Typography className="Title">E-Mail: </Typography>
+                                </Grid>
+
+                                <Grid item xs={8}>
+                                    <Typography className="Data">
+                                        {props.userData.Email}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item xs={4}>
+                                    <Typography className="Title">Name: </Typography>
+                                </Grid>
+
+                                <Grid item xs={8}>
+                                    <Typography className="Data">
+                                        {props.userData.Name}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item xs={4}>
+                                    <Typography className="Title">Surname: </Typography>
+                                </Grid>
+
+                                <Grid item xs={8}>
+                                    <Typography className="Data">
+                                        {props.userData.Surname}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item xs={4}>
+                                    <Typography className="Title">Phone: </Typography>
+                                </Grid>
+
+                                <Grid item xs={8}>
+                                    <Typography className="Data">
+                                        {props.userData.Phone}
+                                    </Typography>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    {props.userData.Validated ? (
+                                        <Box className="Validated">
+                                            Validated
+											<ValidatedIcon style={{ marginLeft: "5px" }} />
+                                        </Box>
+                                    ) : (
+                                            <Box className="Invalidated">
+                                                Not Validated
+											<InvalidatedIcon style={{ marginLeft: "5px" }} />
+                                            </Box>
+                                        )}
+                                </Grid>
+
+                                <Grid item xs={8} style={{ marginTop: "20px" }}>
+                                    <Button variant="contained" onClick={props.toggleDialog}>
+                                        Change Settings
+										<SettingsIcon style={{ marginLeft: "5px" }} />
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        ) : (
+                                ""
+                            )}
+                    </Grid>
                 </CardContent>
             </Card>
-            // </Grid>
-        );
-    }
-}
-
-function AuctionGrid(props) {
-
-    let [offset, setOffset] = useState(0);
-    //let [resultsPerPage, setResultsPerPage] = useState(6);
-    const resultsPerPage = 6;
-
-    let content = props.target.slice(offset, offset + resultsPerPage).map((auction, index) => {
-
-        let ended = (new Date(auction.Ends) - new Date() <= 0);
-
-        return <Grid item key={index}>
-                    <Card onClick={() => props.history.push(`/auction/${auction.Id}`)}>
-                        <Grid container className="AuctionCard">
-                            <Grid item>
-                                <CardMedia className="Media"
-                                        //component="img"
-                                        image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : "https://dummyimage.com/150x250/ffffff/4a4a4a.png&text=No+Image"}
-                                        title={auction.Name}
-                                />
-                            </Grid>
-
-                            <Grid item className="Details">
-                                <CardContent>
-                                    <Typography className="Title">{auction.Name}</Typography>
-                                    {
-                                        (auction.Description === "")
-                                        ?
-                                        (<Typography className="Description Empty">No Description.</Typography>)
-                                        :
-                                        (<Typography className="Description">{auction.Description}</Typography>)
-                                    }               
-                                </CardContent>
-                            </Grid>
-
-                            <Grid item className="Prices">
-                                <CardContent>
-                                    <Grid container spacing={1}>
-                                        <Grid item>
-                                            <Typography variant="h5" className="Title">Starting Price:</Typography>
-                                        </Grid>
-
-                                        <Grid item>
-                                            <Typography variant="h4" className="Price Starting">{auction.First_Bid ? `EUR ${parseFloat(auction.First_Bid).toFixed(2)}` : "-"}</Typography>
-                                        </Grid>
-                                    </Grid>
-
-
-                                        {
-                                            (ended)
-                                            ?
-                                            (
-                                                ""
-                                            )
-                                            :
-                                            (
-                                                <Grid container spacing={1}>
-                                                    <Grid item >
-                                                        <Typography variant="h5" className="Title">Current Price:</Typography>
-                                                    </Grid>
-                                                    <Grid item  zeroMinWidth>
-                                                        <Typography className="Price Current" variant="h4">{auction.Currently ? `EUR ${parseFloat(auction.Currently).toFixed(2)}` : "-"}</Typography>
-                                                    </Grid>
-                                                </Grid>
-                                            )
-                                        }
-                                    
-                                    <Grid container spacing={1}>
-                                        <Grid item >
-                                            <Typography variant="h5" className="Title">
-                                                { (ended) ? ("Bought for:") : ("Buyout Price:") }
-                                            </Typography>
-                                         </Grid>
-
-                                        <Grid item >
-                                            <Typography className="Price Buyout" variant="h4">{auction.Buy_Price ? `EUR ${parseFloat(auction.Buy_Price).toFixed(2)}` : "-"}</Typography>
-                                        </Grid>
-                                    </Grid>
-
-                                    <Box className="Dates" mt={2}>
-                                        <Typography>
-                                            Started in: <span className="Started Date">{new Date(auction.Started).toLocaleString()}</span>
-                                        </Typography>
-                                        
-                                        <Typography>
-                                            {
-                                                (ended)
-                                                ?
-                                                ("Ended: ")
-                                                :
-                                                ("Ends in: ")
-                                            }
-                                            <span className="Ends Date">{new Date(auction.Ends).toLocaleString()}</span>
-                                        </Typography>
-                                    </Box>
-                                </CardContent>
-                            </Grid>
-                        </Grid>
-                    </Card>
-                </Grid>
-    });
-
-    return(
-        <Grid item className="AuctionGrid" xs={12}>
-            <Pagination
-                className="Pagination"
-                size='large'
-                limit={resultsPerPage}
-                offset={offset}
-                total={props.target.length}
-                onClick={(e, offset) => setOffset(offset)}
-            />
-
-            <Grid container spacing={3}>
-                {content}
-            </Grid>
-
-            <Pagination
-                className="Pagination"
-                size='large'
-                limit={resultsPerPage}
-                offset={offset}
-                total={props.target.length}
-                onClick={(e, offset) => setOffset(offset)}
-            />
-        </Grid>
+        // </Grid>
     );
 }
 

@@ -55,10 +55,10 @@ Values  (1, 1, "# Congratulations! \n* You won 100000 euro by doing absoluteley 
         (5, 2, "Olymnpu1 101", NOW() - 1, 3, 1010, 'Unread', FALSE, FALSE);
 
 Insert into Notification (User_Id, Content, Link, Status, Type, Time)
-Values  (1010, "rulabula sent you a message!", "/messages", "Unread", "Message", NOW()),
+Values  (1010, "rulabula sent you a message!", "/user/user/messages", "Unread", "Message", NOW()),
         (1010, "egw outbed you on: Your Mother", "/auction/1", "Unread", "Auction", NOW()),
-        (1010, "esy sent you a message!", "/messages", "Unread", "Message", NOW()),
-        ( (SELECT Id FROM User WHERE Username = "rulabula"), "user sent you a message!", "/messages", "Unread", "Message", NOW());
+        (1010, "esy sent you a message!", "/user/user/messages", "Unread", "Message", NOW()),
+        ( (SELECT Id FROM User WHERE Username = "rulabula"), "user sent you a message!", "/user/rulabula/messages", "Unread", "Message", NOW());
 
 Update User Set Password = 'password' Where Username = 'rulabula';
 

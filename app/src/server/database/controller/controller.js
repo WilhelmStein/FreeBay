@@ -288,7 +288,7 @@ class DBController
             string: "Select 1 From User Where Username = ? And Password = ?",
             escape: [username, password]
         }
-
+        console.log(query.escape);
         this.query(query, res, (rows) => {
             if (rows.length !== 1)
             {
@@ -444,25 +444,7 @@ class DBController
     getUser(username, password, res)
     {
 
-        const query = {
-            string: "SELECT 1 FROM User WHERE Username=? AND Password=?",
-            escape: [username, password]
-        }
-
-        this.query(query, res, (rows) => {
-
-            // console.log(rows)
-            // console.log(username + " : " + password)
-            if(rows.length !== 1)
-            {
-                res.send({
-                    error: true,
-                    message: "Authentication Failed.",
-                    data: false
-                });
-
-                return;
-            }
+        this.user_permission(username, password, res, () => {
 
             const query = {
                 string: `SELECT *
@@ -475,59 +457,41 @@ class DBController
             };
 
             this.query(query, res, (rows) => {
+
                 res.send({
                     error: false,
                     message: "OK",
                     data: rows[0]
                 });
             });
-        });
+        })
     }
 
     updateUser(body, res)
     {
         // console.log(body)
 
-        const query = {
-            string: "SELECT 1 FROM User WHERE Username=? AND Password=?",
-            escape: [body.oldUsername, body.oldPassword]
-        }
-
-        this.query(query, res, (rows) => {
-            // console.log("Authentication Result:");
-            // console.log(rows);
-            
-            if(rows.length !== 1)
-            {
-                res.send({
-                    error: true,
-                    message: "Authentication Failed.",
-                    data: false
-                });
-
-                return;
-            }
-
-
+        this.user_permission(body.oldUsername, body.oldPassword, res, () => {
             let string = `UPDATE 
-                            (
-                                (
-                                    User u 
-                                    JOIN
-                                    General_User gu ON u.Username = ? AND u.Id = gu.User_Id
-                                )
-                                LEFT JOIN 
-                                Address a ON a.Id = gu.Address_Id
-                            )
-                            SET `;
+            (
+                (
+                    User u 
+                    JOIN
+                    General_User gu ON u.Username = ? AND u.Id = gu.User_Id
+                )
+                LEFT JOIN 
+                Address a ON a.Id = gu.Address_Id
+            )
+            SET `;
+
             let escape = [body.oldUsername];
-            
+
             if(body.username)
             {
                 string += `u.Username = ?,`
                 escape.push(body.username);
             }
-            
+
             if(body.email)
             {
                 string += `u.Email = ?,`;
@@ -581,7 +545,7 @@ class DBController
                 string += `a.Country = ?,`;
                 escape.push(body.country);
             }
-            
+
             if(body.city)
             {
                 string += `a.City = ?,`;
@@ -595,7 +559,7 @@ class DBController
                 string: string,
                 escape: escape
             }
-    
+
             this.query(query, res, (err, rows) => {
 
                 res.send({
@@ -604,7 +568,6 @@ class DBController
                     data: true
                 });
             });
-
         });
     }
 
@@ -1067,7 +1030,8 @@ class DBController
 
                 const sendNotification = () => {
                     const query = {
-                        string: `INSERT INTO Notification (User_Id, Content, Link, Status, Type, Time) Values ( (SELECT Id FROM User WHERE Username = ?), "${username} sent you a message!", "/messages", "Unread", "Message", NOW())`,
+                        string: `INSERT INTO Notification (User_Id, Content, Link, Status, Type, Time)
+                        Values ( (SELECT Id FROM User WHERE Username = ?), "${username} sent you a message!", "/user/${recipient}/messages", "Unread", "Message", NOW())`,
                         escape: [recipient, username]
                     }
 

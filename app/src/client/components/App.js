@@ -8,7 +8,6 @@ import SearchResults from './SearchResults';
 import AdminPage from './Admin';
 import AuctionPage from './Auction';
 import UserPage from './User';
-import Messages from './Messages';
 import NotFound from './NotFound';
 
 import '../style/App.scss';
@@ -78,14 +77,17 @@ class App extends React.Component {
                     <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
                     <Route path='/auction/:id' component={AuctionPage} />
-                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user}
-                                                                               username={props.match.params.username}
-                                                                               updateHandler={this.updateHandler}
-                                                                     />
-                                                         }
-                    />
+                    <Route path='/user/:username/:tab?/:action?' render={ (props) => {
+                        return (
+                            <UserPage user={this.state.user}
+                                username={props.match.params.username}
+                                tab={props.match.params.tab}
+                                action={props.match.params.action}
+                                updateHandler={this.updateHandler}
+                            />
+                        )
+                    }}/>
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
-                    <Route path='/messages' render={ () => <Messages user={this.state.user}/> } />
                     <Route path='*' component={NotFound} />
                 </Switch>
             </div>

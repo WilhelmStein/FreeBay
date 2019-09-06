@@ -1,4 +1,4 @@
-function __getTime(string)
+export function getTime(string)
 {
     let ret = string.split(' ');
     let date = ret[0].split('-')
@@ -14,7 +14,7 @@ function __getTime(string)
     return ret;
 }
 
-function __timeDifference(started, ends)
+export function timeDifference(started, ends)
 {
     let difference = {
         years: ends.year - started.year,
@@ -64,4 +64,11 @@ function __timeDifference(started, ends)
     return difference;
 }
 
-export { __getTime, __timeDifference};
+export function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}

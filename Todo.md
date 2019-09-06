@@ -88,6 +88,7 @@
       - [x] Delete
       - [x] Read / Unread Styling
       - [x] Send Notification
+      - [ ] Integrate with user page
     - [ ] Settings
 - [ ] Auction Page
   - [ ] View - Bid Auction

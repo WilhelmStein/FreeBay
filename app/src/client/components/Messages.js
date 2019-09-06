@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import autoBind from 'auto-bind';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
-import Autosuggest from 'react-autosuggest';
 
 import MarkdownRenderer from 'react-markdown-renderer';
-import { getRandomColor } from './Header';
+import { getRandomColor } from './Utils';
 import { Card, CardHeader, Avatar, CardContent, AppBar, Toolbar, Select, MenuItem, InputAdornment, Snackbar } from '@material-ui/core';
 import { Box, Grid, Typography, InputBase, Paper, Fade, List, ListItem, Button, IconButton, TextField } from '@material-ui/core';
 
@@ -25,14 +24,15 @@ class Messages extends Component
 
         this.state = {
             active: null,
-            editor: false,
+            editor: this.props.action && this.props.action === "new" ? true : false,
             editorProps: {
                 to: "",
                 subject: "",
                 prev: [],
                 reply: false
             },
-            messages: []
+            messages: [],
+            openSnackbar: false
         }
 
         autoBind(this);
@@ -113,10 +113,9 @@ class Messages extends Component
                 return;
             }
 
-            alert("Message deleted successfully!");
-
             this.setState({
-                active: null
+                active: null,
+                openSnackbar: true
             })
 
             this.getMessages();
@@ -129,8 +128,16 @@ class Messages extends Component
         this.getMessages();
     }
 
+    componentWillReceiveProps(nextProps)
+    {
+        // if (this.props.user.Id !== nextProps.user.Id || this.state.messages.length === 0)
+        //     this.getMessages();
+    }
+
     getMessages(callback)
     {
+        console.log(this.props.user.Password)
+
         axios.post("/api/messages", {username: this.props.user.Username, password: this.props.user.Password})
         .then((res) => {
 
@@ -140,8 +147,6 @@ class Messages extends Component
                 return;
             }
 
-            console.log(res.data.data)
-
             this.setState({
                 messages: res.data.data,
             }, callback)
@@ -149,10 +154,37 @@ class Messages extends Component
         .catch(err => console.error(err));
     }
 
+    closeSnackbar()
+    {
+        this.setState({
+            openSnackbar: false
+        }) 
+    }
+
     render()
     {
         return (
             <Grid container className="Messages">
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left'
+                    }}
+                    open={this.state.openSnackbar}
+                    autoHideDuration={3000}
+                    message={<span>Message Deleted!</span>}
+                    onClose={this.closeSnackbar}
+                    action={[
+                        <IconButton
+                            key="close"
+                            color="inherit"
+                            onClick={this.closeSnackbar}
+                        >
+                            <CloseIcon/>
+                        </IconButton>
+                    ]}
+                />
+
                 <MessageList user={this.props.user} messages={this.state.messages} messageClick={this.readMessage} userClick={this.userClick} newMessage={this.newMessage}/>
                 {
                     this.state.editor ?
@@ -205,6 +237,13 @@ class MessageList extends Component
 
     componentWillReceiveProps(nextProps)
     {
+        // if (this.props.user.Id === nextProps.user.Id)
+        // {
+        //     const pl = [].concat.apply([], this.props.messages.map( (h) => h.Messages )).length;
+        //     const npl = [].concat.apply([], nextProps.messages.map( (h) => h.Messages )).length
+        //     if (pl === npl) return;
+        // }
+
         this.processMessages(nextProps);
     }
 
@@ -618,7 +657,6 @@ class MessageEditor extends Component
             this.setState({
                 openSnackbar: true
             })
-            // alert("Message successfully sent!");
             this.props.send();
         })
         .catch(err => console.error(err))
