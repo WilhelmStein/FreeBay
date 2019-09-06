@@ -24,83 +24,100 @@
 }
 
 
-.AboutCard
+.Wrapper
 {
-    height: 450px;
-    width: 100%;
-
-    color: $graphite;
-    // padding: 30px;
-
-    .Title
-    {
-        font-size: $huge-font-size;
-        // font-weight: 100;
-    }
-
-    .Subtitle
-    {
-        font-style: italic;
-    }
-
-    .Text
-    {
-        font-size: $header-font-size;
-    }
-
-    .Media
-    {
-        height: 300px;
-        width: 600px;
-    }
 
     &.Odd
     {
         background-color: $lesser-white;
-
-        .Title
-        {
-            font-size: $huge-font-size;
-            // font-weight: 100;
-        }
-    
-        .Subtitle
-        {
-            font-style: italic;
-        }
-    
-        .Text
-        {
-            font-size: $header-font-size;
-        }
-    
-        .Media
-        {
-        }
     }
 
     &.Even
     {
         background-color: $less-white;
+    }
+
+    .AboutCard
+    {
+        height: 450px;
+        width: 100%;
+
+        margin-left: 400px;
+        margin-right: 400px;
+
+        color: $graphite;
+        // padding: 30px;
 
         .Title
         {
             font-size: $huge-font-size;
             // font-weight: 100;
         }
-    
+
         .Subtitle
         {
             font-style: italic;
         }
-    
+
         .Text
         {
             font-size: $header-font-size;
         }
-    
+
         .Media
         {
+            height: 300px;
+            width: 600px;
+        }
+
+        &.Odd
+        {
+            background-color: $lesser-white;
+
+            .Title
+            {
+                font-size: $huge-font-size;
+                // font-weight: 100;
+            }
+        
+            .Subtitle
+            {
+                font-style: italic;
+            }
+        
+            .Text
+            {
+                font-size: $header-font-size;
+            }
+        
+            .Media
+            {
+            }
+        }
+
+        &.Even
+        {
+            background-color: $less-white;
+
+            .Title
+            {
+                font-size: $huge-font-size;
+                // font-weight: 100;
+            }
+        
+            .Subtitle
+            {
+                font-style: italic;
+            }
+        
+            .Text
+            {
+                font-size: $header-font-size;
+            }
+        
+            .Media
+            {
+            }
         }
     }
 }
