@@ -55,55 +55,29 @@ class User extends Component {
     }
 
     updateData(props) {
+        let request = null;
         if(props.user && props.user.Username === props.username)
         {
-            Axios.post(`/api/getUser`, {
+            request = Axios.post(`/api/getUser`, {
                 username: props.user.Username,
                 password: props.user.Password
             })
-            .then(res => {
-
-                if(res.data.error)
-                {
-                    console.log(res.data.message);
-                    return;
-                }
-
-                this.setState({ userData: res.data.data }, () => {
-                    if (
-                        this.state.userData != null &&
-                        props.user != null &&
-                        this.state.userData.Username === props.user.Username
-                    ) {
-                        this.setState({ loggedAsTargetUser: true });
-                    } else this.setState({ loggedAsTargetUser: false });
-                });
-            })
-            .catch(err => console.log(err));
         }
         else
         {
-            Axios.get(`/api/publicUserDetails?username=${props.username}`)
-            .then(res => {
-
-                if(res.data.error)
-                {
-                    console.log(res.data.message);
-                    return;
-                }
-
-                this.setState({ userData: res.data.data }, () => {
-                    if (
-                        this.state.userData != null &&
-                        props.user != null &&
-                        this.state.userData.Username === props.user.Username
-                    ) {
-                        this.setState({ loggedAsTargetUser: true });
-                    } else this.setState({ loggedAsTargetUser: false });
-                });
-            })
-            .catch(err => console.log(err));
+            request = Axios.get(`/api/publicUserDetails?username=${props.username}`)
         }
+
+        request.then(res => {
+            if(res.data.error)
+            {
+                console.log(res.data.message);
+                return;
+            }
+
+            this.setState({ userData: res.data.data })
+        })
+        .catch(err => console.log(err));
     }
 
     toggleDialog(e) {
@@ -111,13 +85,17 @@ class User extends Component {
     }
 
     render() {
+        console.log("Render Parent User");
+        
         if (this.state.userData == null) {
             return <h1>{`Error: User ${this.props.username} not found.`}</h1>;
         }
 
+        const loggedAsTargetUser = this.state.userData !== null && this.props.user && this.props.user.Username === this.props.username;
+
         return (
 
-                <div>
+                <div style={{padding: "20px"}}>
                     <AccountForm
                         open={this.state.dialogOpen}
                         toggleDialog={this.toggleDialog}
@@ -128,7 +106,7 @@ class User extends Component {
                         
                     <AccountMenu
                         userData={this.state.userData}
-                        loggedAsTargetUser={this.state.loggedAsTargetUser}
+                        loggedAsTargetUser={loggedAsTargetUser}
                         toggleDialog={this.toggleDialog}
                         history={this.props.history}
                     />
@@ -554,6 +532,7 @@ class AccountForm extends Component {
                                     this.change(e, "newUsername");
                                 }}
                                 onBlur={e => this.blur(e, "newUsername")}
+                                fullWidth
                             />
 
                             <TextField
@@ -653,7 +632,7 @@ class AccountForm extends Component {
                                 className="DialogText"
                                 margin="dense"
                                 id="NewPassword2"
-                                label="New Password"
+                                label="Confirm Password"
                                 error={this.state.password2Error !== undefined}
                                 type="password"
                                 placeholder="e.g. aXsdfFrtewWcv1#@!11f"
@@ -780,36 +759,18 @@ class AccountMenu extends Component {
         autoBind(this);
     }
 
-    /*componentDidMount()
-    {
-        // let diff = (new Date(auction.Ends).getTime() - new Date().getTime()) / 1000;
-        Axios.get(`/api/userAuctions?username=${this.props.userData.Username}`)
-        .then( (res) => {
-            
-            if(res.data.err)
-            {
-                console.error(res.data.message)
-                return;
-            }
-            
-            this.setState({ currentAuctions: res.data.data });
-        })
-        .catch((err) => console.log(err));
-
-        Axios.post(`/api/userWatchedAuctions`, {username: this.props.userData.Username, password: this.props.userData.Password})
-        .then((res) => {
-            if(res.data.err)
-            {
-                console.error(res.data.message)
-                return;
-            }
-
-            this.setState({ watchedAuctions: res.data.data });
-        })
-    } */
+    componentDidMount() {
+        console.log("DidMount")
+        this.initData(this.props);
+    }
 
     componentWillReceiveProps(nextProps) {
+        console.log("WillReceiveProps")
+        this.initData(nextProps);  
+    }
 
+    initData(props)
+    {
         Axios.get(`/api/userAuctions?username=${this.props.userData.Username}`)
         .then( (res) => {
             
@@ -832,9 +793,9 @@ class AccountMenu extends Component {
 
             this.setState({ currentAuctions: currentAuctions, pastAuctions: pastAuctions });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.error(err));
 
-        if (nextProps.loggedAsTargetUser) {
+        if (props.loggedAsTargetUser) {
 
             Axios.post(`/api/userWatchedAuctions`, {username: this.props.userData.Username, password: this.props.userData.Password})
             .then((res) => {
@@ -846,7 +807,7 @@ class AccountMenu extends Component {
 
                 this.setState({ watchedAuctions: res.data.data });
             })
-            .catch((err) => console.log(err));
+            .catch((err) => console.error(err));
 
             this.setState({
                 tabs: [
@@ -891,26 +852,11 @@ class AccountMenu extends Component {
                 <CardHeader
                     avatar={
                         <Avatar aria-label="User" className="UserAvatar">
-                            {this.props.userData.Username[0]}
+                            {this.props.userData.Username.toUpperCase()[0]}
                         </Avatar>
                     }
 
-                    title={
-                            <div>
-                                Username: {this.props.userData.Username}
-                                {
-                                    (this.props.loggedAsTargetUser)
-                                    ?
-                                    (
-                                        <IconButton aria-label="settings" className="SettingsIcon" onClick={this.props.toggleDialog}>
-                                            <SettingsIcon/>
-                                        </IconButton>
-                                    )
-                                    :
-                                    ("")
-                                }
-                            </div>
-                          }
+                    title={ <Typography className="Title">{this.props.userData.Username}</Typography> }
                     subheader={
                                 <Grid container spacing={1}>
                                     <Grid item>
@@ -927,9 +873,21 @@ class AccountMenu extends Component {
                                     </Grid>
                                 </Grid>
                                 }
+                    action={
+                        
+                            (this.props.loggedAsTargetUser)
+                            ?
+                            (
+                                <Button aria-label="settings" className="SettingsIcon" onClick={this.props.toggleDialog}>
+                                    Settings <SettingsIcon/>
+                                </Button>
+                            )
+                            :
+                            ("")
+                    }
                 />
-                <CardContent>
-                    <AppBar position="static">
+                <CardContent style={{padding: "0"}}>
+                    <AppBar position="sticky">
                         <Tabs value={this.state.tabValue} onChange={this.changeTabValue}>
                             {this.state.tabs.map(tab => (
                                 <Tab key={tab.label} label={tab.label} className="Tab" />
@@ -1032,9 +990,9 @@ function AuctionGrid(props) {
                                             {
                                                 (ended)
                                                 ?
-                                                ("Ended:")
+                                                ("Ended: ")
                                                 :
-                                                ("Ends in:")
+                                                ("Ends in: ")
                                             }
                                             <span className="Ends Date">{new Date(auction.Ends).toLocaleString()}</span>
                                         </Typography>
