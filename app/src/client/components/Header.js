@@ -2,12 +2,17 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom'
 import autoBind from 'auto-bind';
 import axios from "axios"
+import {getRandomColor} from "./Utils"
 
 import LoginPopup from './LoginPopup';
 import Logo from '../images/Logo2.png';
 
 import SearchIcon from '@material-ui/icons/Search'
-import {Button, Box, Avatar, Typography} from '@material-ui/core'
+import {Button, Avatar, Typography, IconButton, Badge, Paper, Card, CardHeader, Fade} from '@material-ui/core'
+import NotificationsIcon from '@material-ui/icons/Notifications'
+import ExitToAppIcon from '@material-ui/icons/ExitToApp'
+
+import Popup from 'reactjs-popup';
 
 import "../style/Header.scss"
 
@@ -35,6 +40,11 @@ class Header extends Component
         this.props.history.push(`/user/${this.props.user.Username}`);
     }
 
+    notificationClick(link)
+    {
+        this.props.history.push(link);
+    }
+
 
     render()
     {
@@ -45,7 +55,7 @@ class Header extends Component
                     <p>FreeBay</p>
                 </Link>
                 <SearchBar history={this.props.history}/>
-                <AccountSnapshot user={this.props.user} loginHandler={this.props.loginHandler} userClick={this.userClick}/>
+                <AccountSnapshot user={this.props.user} loginHandler={this.props.loginHandler} userClick={this.userClick} notificationClick={this.notificationClick}/>
             </div>
         );
     }
@@ -155,10 +165,6 @@ export class Menu extends Component
                 path: "/myauctions"
             },
             {
-                name: "Messages",
-                path: "/messages"
-            },
-            {
                 name: "About Us",
                 path: "/about"
             },
@@ -210,15 +216,6 @@ class AccountSnapshot extends Component
         })
     }
 
-    getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-          color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-      }
-      
 
     render()
     {
@@ -240,21 +237,130 @@ class AccountSnapshot extends Component
         {
             return (
                 <div className="AccountSnapshot Full">
-                        <Avatar style={{backgroundColor: this.getRandomColor()}} className="Avatar" onClick={this.props.userClick}>{this.props.user.Username[0]}</Avatar>
-                        <Box>
-                            <Typography className="Username" onClick={this.props.userClick}>
-                                {this.props.user.Username}
-                            </Typography>
-                            <Typography
-                                className="Logout"
-                                onClick={() => { sessionStorage.removeItem("LoggedUser"); this.props.loginHandler(null); }}
-                            >
-                                Log Out
-                            </Typography>
-                        </Box>
+                    <Notifications user={this.props.user} onClick={this.props.notificationClick}/>
+                    <IconButton className="Button" onClick={() => { sessionStorage.removeItem("LoggedUser"); this.props.loginHandler(null); }} title="Log Out">
+                        <ExitToAppIcon/>
+                    </IconButton>
+                    <IconButton className="Button" onClick={this.props.userClick}>
+                        <Avatar style={{backgroundColor: getRandomColor()}} className="Avatar" >
+                            {this.props.user.Username[0]}
+                        </Avatar>
+                    </IconButton>
+                    
                 </div>
             )
         }
+    }
+}
+
+class Notifications extends Component
+{
+    constructor(props)
+    {
+        super(props);
+
+        this.state = {
+            notifications: []
+        }
+
+        autoBind(this);
+    }
+
+    componentDidMount()
+    {
+        this.getNotifications();
+    }
+
+    clickNotification(notification)
+    {
+        this.props.onClick(notification.Link);
+
+        axios.post('/api/readNotification', {username: this.props.user.Username, password: this.props.user.Password, notification: notification.Id})
+        .then( res => {
+            if (res.data.error)
+            {
+                console.error(res.data.message);
+                return;
+            }
+
+            this.getNotifications();
+        })
+        .catch(err => console.error(err))
+    }
+
+    getNotifications()
+    {
+        axios.post('/api/notifications', {username: this.props.user.Username, password: this.props.user.Password})
+        .then( res => {
+            if (res.data.error)
+            {
+                console.error(res.data.message);
+                return;
+            }
+
+            this.setState({
+                notifications: res.data.data
+            })
+        })
+        .catch( err => console.error(err))
+    }
+
+    render()
+    {
+        let colors = {};
+        colors['Message'] = getRandomColor();
+        colors['Auction'] = getRandomColor();
+
+        const renderTime = (time) => {
+
+            time = new Date(time);
+            if ((Date.now() - time) / (1000 * 60 * 60 * 24) < 0)
+            {
+                return time.toDateString();
+            }
+        
+            return time.toLocaleTimeString();
+        }
+
+        const items = this.state.notifications.map( (not, index) => {
+            const oddity = index % 2 === 1 ? "odd" : "even"
+
+            return (
+            <Card className={`Notification ${oddity}`} key={not.Id} onClick={() => {this.clickNotification(not)}}>
+                <CardHeader
+                    avatar={
+                        <Avatar className="Avatar" style={{backgroundColor: colors[not.Type]}}>
+                            {not.Type[0]}
+                        </Avatar>
+                    }
+                    action={<Typography className="Action">Unread</Typography>}
+                    title={not.Content}
+                    subheader={renderTime(not.Time)}
+                />
+            </Card>
+            )
+        })
+
+        return (
+            <Popup
+                className="Notifications"
+                position="bottom right"
+                trigger = {
+                    <IconButton className="Button">
+                        <Badge badgeContent={this.state.notifications.length} className="Badge" color="primary">
+                            <NotificationsIcon/>
+                        </Badge>
+                    </IconButton>
+                }
+            >
+                <Fade in={true}>
+                    <Paper className="Paper">
+                        {items.length !== 0 ? items : <Typography className="Empty" color="textSecondary">No new notifications</Typography>}
+                    </Paper>
+                </Fade>
+                
+            </Popup>
+        )
     }
 }
 
