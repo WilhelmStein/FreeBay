@@ -9,6 +9,8 @@ import json
 
 import os
 
+from logger import Logger
+
 
 class Parser:
 
@@ -132,7 +134,7 @@ class Parser:
         return auction
 
 
-    def __init__(self, target=os.path.curdir, verbose=True):
+    def __init__(self, target=os.path.curdir, verbose=True, logger=Logger("Parser")):
 
         if isinstance(target, list):
 
@@ -162,7 +164,7 @@ class Parser:
 
                 if verbose:
 
-                    print("[Parser] Processing file '%s'" % filename)
+                    logger.log("Processing file '%s'" % filename)
 
                 for element in ET.parse(filename).getroot():
 
@@ -170,7 +172,7 @@ class Parser:
 
                     if verbose:
 
-                        print("[Parser] Processing auction '%s'" % id)
+                        logger.log("Processing auction '%s'" % id)
 
                     self.auctions[id] = { "ItemID": id, **Parser.auction(element) }
 
@@ -178,9 +180,9 @@ class Parser:
 
                 if verbose:
 
-                    print("[Parser] Skipping file '%s'" % filename)
+                    logger.log("Skipping file '%s'" % filename)
 
-        print('[Parser] %d auctions were processed' % len(self.auctions))
+        logger.log("%d auctions were processed" % len(self.auctions))
 
 
     def dumps(self, id):

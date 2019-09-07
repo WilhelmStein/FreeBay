@@ -14,9 +14,7 @@ from generator import Generator
 from cache import Cache
 
 
-total_timer, partial_timer = Timer(), Timer()
-
-total_timer.start()
+partial_timer = Timer()
 
 partial_timer.start("Initializing the 'Parser'...")
 
@@ -52,13 +50,7 @@ generator = Generator(cache)
 partial_timer.stop("The 'Generator' has been initialized")
 
 
-partial_timer.start("Registering auctions...")
-
 for auction in parser.auctions.values():
 
     generator.register(auction)
-
-partial_timer.stop("Auctions have been registered")
-
-total_timer.stop()
 

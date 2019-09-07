@@ -9,6 +9,8 @@ import random
 
 import os
 
+from logger import Logger
+
 
 class Generator:
 
@@ -18,6 +20,7 @@ class Generator:
         downloader=None,
         seed=123456789,
         verbose=True,
+        logger=Logger("Generator"),
         rating_lower=0.0, rating_upper=58823.0, rating_digits=1,
         dollar_digits=2,
         validated_percentage=0.7
@@ -25,7 +28,7 @@ class Generator:
 
         self.cache = cache
 
-        self.verbose = verbose
+        self.verbose, self.logger = verbose, logger
 
         self.rating_lower, self.rating_upper, self.rating_digits = rating_lower, rating_upper, rating_digits
 
@@ -55,16 +58,6 @@ class Generator:
         self.bid_id = 0
 
         self.image_id = 0
-
-        self.__register__("User",
-            self.__generate_user__(
-                username=admin["Username"],
-                password=admin["Password"],
-                email=admin["Email"]
-            )
-        )
-
-        self.__register__("Admin", self.__generate_admin__(self.users[admin["Username"]]))
 
 
     def __normalize_rating__(self, decimal, dst_lower=0.0, dst_upper=100.0):
@@ -215,7 +208,7 @@ class Generator:
 
         if self.verbose:
 
-            print("[Generator] Processing auction '%s'" % auction["ItemID"])
+            self.logger.log("Processing auction '%s'" % auction["ItemID"])
 
         seller = auction["Seller"]
 
@@ -241,7 +234,7 @@ class Generator:
             )
         )
 
-        print("[Generator] Auction '%s' registered as '%d'" % (auction["ItemID"], self.auction_id))
+        self.logger.log("Auction '%s' registered as '%d'" % (auction["ItemID"], self.auction_id))
 
         if self.downloader:
 
@@ -253,11 +246,11 @@ class Generator:
 
                 except connector.errors.DatabaseError as error:
 
-                    print("[Generator] Failed to insert (%d, %s) into table 'Image'" % (self.auction_id, path))
+                    self.logger.log("Failed to insert (%d, %s) into table 'Image'" % (self.auction_id, path))
 
                     if self.verbose:
 
-                        print(str(error))
+                        self.logger.log(str(error))
 
                     pass
 

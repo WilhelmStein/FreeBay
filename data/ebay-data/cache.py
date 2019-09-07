@@ -1,6 +1,10 @@
 
 from mysql import connector
 
+from timer import Timer
+
+from logger import Logger
+
 
 class Cache:
 
@@ -74,7 +78,8 @@ class Cache:
     def __init__(
         self,
         verbose=True,
-        size=4096,
+        logger=Logger("Cache"),
+        bucket_size=4096,
         tables_to_drop=[
             "Auction_has_Category",
             "Bid",
@@ -90,9 +95,9 @@ class Cache:
         views_to_drop=[]
     ):
 
-        self.verbose = verbose
+        self.verbose, self.logger = verbose, logger
 
-        self.size = size
+        self.bucket_size = bucket_size
 
         self.cnx = connector.connect(**Cache.config)
 
@@ -102,7 +107,7 @@ class Cache:
 
             for view in views_to_drop:
 
-                print("[Cache] Dropping view '%s'" % view)
+                self.logger.log("Dropping view '%s'" % view)
 
                 self.cur.execute("DROP VIEW IF EXISTS {}".format(view))
 
@@ -110,7 +115,7 @@ class Cache:
 
             for table in tables_to_drop:
 
-                print("[Cache] Deleting all rows from table '%s'" % table)
+                self.logger.log("Deleting all rows from table '%s'" % table)
 
                 self.cur.execute("DELETE FROM {}".format(table))
 
@@ -122,6 +127,11 @@ class Cache:
         for table in Cache.queries.keys():
 
             self.cache[table] = []
+
+
+        self.timer = Timer()
+
+        self.timer.start()
 
 
     def __del__(self):
@@ -139,12 +149,14 @@ class Cache:
 
         self.cnx.close()
 
+        self.timer.stop("Done")
+
 
     def __flush__(self, table):
 
         if self.verbose:
 
-            print("[Cache] Flushing %d entries to table '%s'" % (len(self.cache[table]), table))
+            self.logger.log("Flushing %d entries to table '%s'" % (len(self.cache[table]), table))
 
         try:
 
@@ -176,7 +188,7 @@ class Cache:
             raise TypeError("'" + str(entry) + "' is not a dictionary")
 
 
-        if len(self.cache[table]) < self.size:
+        if len(self.cache[table]) < self.bucket_size:
 
             self.cache[table].append(entry)
 
