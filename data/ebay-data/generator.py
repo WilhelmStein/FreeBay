@@ -240,19 +240,7 @@ class Generator:
 
             for path in self.downloader.download(auction["Name"]):
 
-                try:
-
-                    self.cache.register("Image", self.__generate_image__(self.auction_id, path))
-
-                except connector.errors.DatabaseError as error:
-
-                    self.logger.log("Failed to insert (%d, %s) into table 'Image'" % (self.auction_id, path))
-
-                    if self.verbose:
-
-                        self.logger.log(str(error))
-
-                    pass
+                self.cache.register("Image", self.__generate_image__(self.auction_id, path))
 
         for bid in auction["Bids"]:
 
