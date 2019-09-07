@@ -14,8 +14,9 @@ class Downloader:
 
     def __init__(
         self,
+        verbose=True,
         logger=Logger("Downloader"),
-        no_download=False,
+        max_path_len=256,
         format="jpg",
         min_limit=0, max_limit=3,
         size=">400*300",
@@ -24,12 +25,14 @@ class Downloader:
         max_size=(640, 640)
     ):
 
-        self.logger = logger
+        self.verbose, self.logger = verbose, logger
+
+        self.max_path_len = max_path_len
 
         self.min_limit, self.max_limit = min_limit, max_limit
 
         self.parameters = {
-            "no_download": no_download,
+            "no_download": self.max_path_len is not None,
             "print_paths": True,
             "format": format,
             "size": size,
@@ -41,7 +44,7 @@ class Downloader:
 
         self.underlying = google_images_download.googleimagesdownload()
 
-        self.max_size = None if no_download else max_size
+        self.max_size = None if self.max_path_len is not None else max_size
 
 
     def download(self, keywords):
@@ -50,7 +53,9 @@ class Downloader:
 
             limit = randrange(self.min_limit, self.max_limit) if self.min_limit < self.max_limit else self.max_limit
 
-            self.logger.log("Limit set to %d" % limit)
+            if self.verbose:
+
+                self.logger.log("Limit set to %d" % limit)
 
 
             paths = []
@@ -65,11 +70,27 @@ class Downloader:
 
                 paths = list(self.underlying.download(search_args)[0].values())[0]
 
+                if self.max_path_len:
+
+                    accepted = list(filter(lambda path: len(path) <= self.max_path_len, paths))
+
+                    if self.verbose:
+
+                        rejected = set(paths).difference(set(accepted))
+
+                        if rejected:
+
+                            self.logger.log(*[(len(path), path) for path in rejected], sep='\n')
+
+                    paths = accepted
+
             if self.max_size:
 
                 for path in paths:
 
-                    self.logger.log("Resizing '{}' to {}".format(relpath(path), self.max_size))
+                    if self.verbose:
+
+                        self.logger.log("Resizing '{}' to {}".format(relpath(path), self.max_size))
 
                     image = Image.open(path)
 

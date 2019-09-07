@@ -1,9 +1,7 @@
 
-import json
+from argparse import ArgumentParser
 
 from os import path
-
-from timer import Timer
 
 from parser import Parser
 
@@ -14,41 +12,31 @@ from generator import Generator
 from cache import Cache
 
 
-partial_timer = Timer()
+argparser = ArgumentParser()
 
-partial_timer.start("Initializing the 'Parser'...")
+argparser.add_argument("-t", "--targets",  help="specify any target files", nargs='+')
+argparser.add_argument("-c", "--crawl",    help="enable image crawling",    action="store_true")
+argparser.add_argument("-d", "--download", help="enable image downloading", action="store_true")
 
-parser = Parser()
+args = argparser.parse_args()
 
-example_id = -1 # 1045310980
+parser = Parser(args.targets) if args.targets else Parser()
 
-if example_id in parser.auctions:
+if args.crawl:
 
-    print(parser.dumps(example_id), sep='\n')
+    downloader = Downloader()
 
-partial_timer.stop("The 'Parser' has been initialized")
+elif args.download:
 
+    downloader = Downloader(max_path_len=None)
 
-# partial_timer.start("Initializing the 'Downloader'...")
+else:
 
-# downloader = Downloader(no_download=True)
-
-# partial_timer.stop("The 'Downloader' has been initialized")
-
-
-partial_timer.start("Initializing the 'Cache'...")
+    downloader = None
 
 cache = Cache()
 
-partial_timer.stop("The 'Cache' has been initialized")
-
-
-partial_timer.start("Initializing the 'Generator'...")
-
-generator = Generator(cache)
-
-partial_timer.stop("The 'Generator' has been initialized")
-
+generator = Generator(cache, downloader)
 
 for auction in parser.auctions.values():
 
