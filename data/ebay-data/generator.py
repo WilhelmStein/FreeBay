@@ -238,7 +238,7 @@ class Generator:
 
         if self.downloader:
 
-            for path in self.downloader.download(auction["Name"]):
+            for path in self.downloader.download(self.auction_id, auction["Name"]):
 
                 self.cache.register("Image", self.__generate_image__(self.auction_id, path))
 
