@@ -22,16 +22,28 @@ class Messages extends Component
     {
         super(props);
 
+        let editorProps = {to: "", subject: ""}
+        let editor = false;
+        
+        if (this.props.action)
+        {
+            const keywords = this.props.action.split('&');
+
+            if (keywords[0] && keywords[0] === "new") editor = true;
+            if (keywords[1] && keywords[1] !== "") editorProps.to = keywords[1].split('=')[1];
+            if (keywords[2] && keywords[2] !== "") editorProps.subject = keywords[2].split('=')[1]
+        }
+
+
         this.state = {
             active: null,
-            editor: this.props.action && this.props.action === "new" ? true : false,
+            editor: editor,
             editorProps: {
-                to: "",
-                subject: "",
+                to: editorProps.to,
+                subject: editorProps.subject,
                 prev: [],
                 reply: false
             },
-            messages: [],
             openSnackbar: false
         }
 
@@ -61,7 +73,7 @@ class Messages extends Component
                     return;
                 }
 
-                this.getMessages();
+                this.props.onUpdate();
             })
             .catch( err => console.error(err))
         }
@@ -92,7 +104,7 @@ class Messages extends Component
 
     sendMessage()
     {
-        this.getMessages();
+        this.props.onUpdate();
     }
 
     deleteMessage(message)
@@ -118,40 +130,9 @@ class Messages extends Component
                 openSnackbar: true
             })
 
-            this.getMessages();
+            this.props.onUpdate();
         })
         .catch( err => console.error(err));
-    }
-
-    componentDidMount()
-    {
-        this.getMessages();
-    }
-
-    componentWillReceiveProps(nextProps)
-    {
-        // if (this.props.user.Id !== nextProps.user.Id || this.state.messages.length === 0)
-        //     this.getMessages();
-    }
-
-    getMessages(callback)
-    {
-        console.log(this.props.user.Password)
-
-        axios.post("/api/messages", {username: this.props.user.Username, password: this.props.user.Password})
-        .then((res) => {
-
-            if (res.data.error)
-            {
-                console.error(res.data.message)
-                return;
-            }
-
-            this.setState({
-                messages: res.data.data,
-            }, callback)
-        })
-        .catch(err => console.error(err));
     }
 
     closeSnackbar()
@@ -185,7 +166,7 @@ class Messages extends Component
                     ]}
                 />
 
-                <MessageList user={this.props.user} messages={this.state.messages} messageClick={this.readMessage} userClick={this.userClick} newMessage={this.newMessage}/>
+                <MessageList user={this.props.user} messages={this.props.messages} messageClick={this.readMessage} userClick={this.userClick} newMessage={this.newMessage}/>
                 {
                     this.state.editor ?
                     <MessageEditor user={this.props.user} {...this.state.editorProps} send={this.sendMessage}/>

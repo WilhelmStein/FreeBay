@@ -73,11 +73,11 @@
   - [x] Link handling
 - [ ] Account Page
   * Everybody
-    - [ ] Profile
-    - [ ] Posted Auctions
+    - [x] Profile
+    - [x] Posted Auctions
   * Logged User
     - [ ] Post Auction
-    - [ ] Active Auctions
+    - [x] Active Auctions
     - [x] Messages
       - [x] DB redo -header -body
       - [x] Backend queries
@@ -88,8 +88,8 @@
       - [x] Delete
       - [x] Read / Unread Styling
       - [x] Send Notification
-      - [ ] Integrate with user page
-    - [ ] Settings
+      - [x] Integrate with user page
+    - [x] Settings
 - [ ] Auction Page
   - [ ] View - Bid Auction
   - [x] Export to XML by admin

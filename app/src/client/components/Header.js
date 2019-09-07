@@ -9,7 +9,7 @@ import Logo from '../images/Logo2.png';
 
 import SearchIcon from '@material-ui/icons/Search'
 import {Button, Avatar, Typography, IconButton, Badge, Paper, Card, CardHeader, Fade} from '@material-ui/core'
-import MailIcon from '@material-ui/icons/Mail'
+import NotificationsIcon from '@material-ui/icons/Notifications'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
 
 import Popup from 'reactjs-popup';
@@ -348,7 +348,7 @@ class Notifications extends Component
                 trigger = {
                     <IconButton className="Button">
                         <Badge badgeContent={this.state.notifications.length} className="Badge" color="primary">
-                            <MailIcon/>
+                            <NotificationsIcon/>
                         </Badge>
                     </IconButton>
                 }
