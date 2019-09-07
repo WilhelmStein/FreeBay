@@ -250,7 +250,7 @@ class Generator:
 
                     if self.verbose:
 
-                        print(str(error))
+                        self.logger.log(str(error))
 
                     pass
 

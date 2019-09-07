@@ -182,7 +182,7 @@ class Parser:
 
                     logger.log("Skipping file '%s'" % filename)
 
-        print('[Parser] %d auctions were processed' % len(self.auctions))
+        logger.log("%d auctions were processed" % len(self.auctions))
 
 
     def dumps(self, id):
