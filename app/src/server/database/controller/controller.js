@@ -68,47 +68,58 @@ class DBController
 
     signup(data, res)
     {
-        let query = {
-            string: "Insert Into User Values ( (Select max(Id) + 1 From (Select * From User) as u), ?, ?, ? )",
-            escape: [data.username, data.password, data.email]
-        }
+        this.sql.beginTransaction(err => {
 
-        this.query(query, res,
-            (rows) => {
-                query = {
-                    string: "Insert Into Address Values ( (Select max(Id) + 1 From (Select * From Address) as a), ?, ?, ?, ?, ? )",
-                    escape: [data.street, data.number, data.zipcode, data.country, data.city]
+            if (err) 
+            {
+                console.error(err);
+                return;
+            }
+
+            const query = {
+                string: "Insert Into User (Username, Password, Email) Values ( ?, ?, ? )",
+                escape: [data.username, data.password, data.email]
+            }
+
+            this.query(query, res, (result) => {
+    
+                const userInsertId = result.insertId;
+                const query = {
+                    string: "Insert Into Address Values ( ?, ?, ?, ?, ?, ? )",
+                    escape: [userInsertId, data.street, data.number, data.zipcode, data.country, data.city]
                 }
 
-                this.query(query, res,
-                    (rows) => {
-                        query = {
-                            string: "Insert Into General_User Values ( (Select max(Id) From User), 0.0, 0.0, ?, ?, ?, (Select max(Id) From Address), 0 )",
-                            escape: [data.name, data.surname, data.phone]
+                this.query(query, res, (result) => {
+
+                    const addressInsertId = result.insertId;
+                    const query = {
+                        string: "Insert Into General_User Values (?, 0.0, 0.0, ?, ?, ?, ?, 0 )",
+                        escape: [userInsertId, data.name, data.surname, data.phone, addressInsertId]
+                    }
+
+                    this.query(query, res, (result) => {
+
+                        const query = {
+                            string: "Select * From User Where Username = ?",
+                            escape: [data.username]
                         }
 
-                        this.query(query, res,
-                            (rows) => {
-                                query = {
-                                    string: "Select * From User Where Username = ?",
-                                    escape: [data.username]
-                                }
-                                this.query(query, res,
-                                    (rows) => {
-                                        res.send({
-                                            error: false,
-                                            message: "OK",
-                                            // rows[0] because there should be ONLY 1 user with those credentials
-                                            data: rows[0]
-                                        });
-                                    }
-                                )
-                            }
-                        )
-                    }
-                )
-            }
-        )
+                        this.query(query, res, (rows) => {
+                            res.send({
+                                error: false,
+                                message: "OK",
+                                // rows[0] because there should be ONLY 1 user with those credentials
+                                data: rows[0]
+                            });
+
+                            this.sql.commit(err => {if (err) console.error(err)});
+                        }, null, true)
+                    }, null, true)
+                }, null, true)
+            }, null, true)
+        })
+
+        
     }
 
     admin_permission(username, password, res, callback)
