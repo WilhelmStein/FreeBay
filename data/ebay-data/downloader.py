@@ -3,7 +3,8 @@ from google_images_download import google_images_download
 
 from PIL import Image
 
-from os.path import relpath
+from os import remove
+from os.path import relpath, join
 
 from random import randrange
 
@@ -17,24 +18,29 @@ class Downloader:
         verbose=True,
         logger=Logger("Downloader"),
         max_path_len=256,
-        format="jpg",
+        max_size=(640, 640),
+        fmt="jpg",
         min_limit=0, max_limit=3,
         size=">400*300",
         aspect_ratio="panoramic",
-        output_directory="auction_images",
-        max_size=(640, 640)
+        output_directory="images"
     ):
 
         self.verbose, self.logger = verbose, logger
 
-        self.max_path_len = max_path_len
+        self.max_path_len, self.max_size = max_path_len, max_size
+
+        if self.max_path_len is None and self.max_size is None:
+
+            raise ValueError("Downloading images requires 'max_size' to be non 'None'")
 
         self.min_limit, self.max_limit = min_limit, max_limit
 
         self.parameters = {
+            "no_directory": True,
             "no_download": self.max_path_len is not None,
             "print_paths": True,
-            "format": format,
+            "format": fmt,
             "size": size,
             "aspect_ratio": aspect_ratio,
             "output_directory": output_directory,
@@ -44,10 +50,8 @@ class Downloader:
 
         self.underlying = google_images_download.googleimagesdownload()
 
-        self.max_size = None if self.max_path_len is not None else max_size
 
-
-    def download(self, keywords):
+    def download(self, id, keywords):
 
         try:
 
@@ -84,19 +88,23 @@ class Downloader:
 
                     paths = accepted
 
-            if self.max_size:
+                else:
 
-                for path in paths:
+                    for index, path in enumerate(paths):
 
-                    if self.verbose:
+                        if self.verbose:
 
-                        self.logger.log("Resizing '{}' to {}".format(relpath(path), self.max_size))
+                            self.logger.log("Resizing '{}' to {}".format(relpath(path), self.max_size))
 
-                    image = Image.open(path)
+                        image = Image.open(path)
 
-                    image.thumbnail(self.max_size, Image.ANTIALIAS)
+                        image.thumbnail(self.max_size, Image.ANTIALIAS)
 
-                    image.save(path)
+                        filename = "{}_{}.{}".format(id, index, self.parameters["format"])
+
+                        image.save(join(self.parameters["output_directory"], filename))
+
+                        remove(path)
 
             return paths
 
