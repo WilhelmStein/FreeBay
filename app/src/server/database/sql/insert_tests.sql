@@ -83,16 +83,16 @@ Values  (1, "You won 10000000 euro."),
         (2, "Welcome to Olympus delivery services");
 
 Insert into Message (Id, Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status, Sender_Deleted, Receiver_Deleted)
-Values  (1, 1, "# Congratulations! \n* You won 100000 euro by doing absoluteley nothing. \n* In order to claim your prize please give us your personal life and credit card info! \n* Thanks in advance", NOW(), 1, 1010, 'Read', FALSE, FALSE),
-        (2, 1, "Greetings, \n What in the living hell are you talking about? I did not sign up for any prize", NOW() + 1, 1010, 1, 'Read', FALSE, FALSE),
-        (3, 1, "Perhaps you did not quite understand what's going on here... Please reply with your credit card information at once!", NOW() + 2, 1, 1010, 'Unread', FALSE, FALSE),
-        (4, 1, "I would like to commence a bank transfer or paypal payment instead of providing you my credit card information. What can we do about it?", NOW() + 3, 1010, 1, 'Unread', FALSE, FALSE),
+Values  (1, 1, "# Congratulations! \n* You won 100000 euro by doing absoluteley nothing. \n* In order to claim your prize please give us your personal life and credit card info! \n* Thanks in advance", NOW(), 1, @dummy_user_id, 'Read', FALSE, FALSE),
+        (2, 1, "Greetings, \n What in the living hell are you talking about? I did not sign up for any prize", NOW() + 1, @dummy_user_id, 1, 'Read', FALSE, FALSE),
+        (3, 1, "Perhaps you did not quite understand what's going on here... Please reply with your credit card information at once!", NOW() + 2, 1, @dummy_user_id, 'Unread', FALSE, FALSE),
+        (4, 1, "I would like to commence a bank transfer or paypal payment instead of providing you my credit card information. What can we do about it?", NOW() + 3, @dummy_user_id, 1, 'Unread', FALSE, FALSE),
         (5, 2, "Olymnpu1 101", NOW() - 1, 3, 1010, 'Unread', FALSE, FALSE);
 
 Insert into Notification (User_Id, Content, Link, Status, Type, Time)
-Values  (1010, "rulabula sent you a message!", "/user/user/messages", "Unread", "Message", NOW()),
-        (1010, "egw outbed you on: Your Mother", "/auction/1", "Unread", "Auction", NOW()),
-        (1010, "esy sent you a message!", "/user/user/messages", "Unread", "Message", NOW()),
+Values  ( @dummy_user_id, "rulabula sent you a message!", "/user/user/messages", "Unread", "Message", NOW()),
+        ( @dummy_user_id, "egw outbed you on: Your Mother", "/auction/1", "Unread", "Auction", NOW()),
+        ( @dummy_user_id, "esy sent you a message!", "/user/user/messages", "Unread", "Message", NOW()),
         ( (SELECT Id FROM User WHERE Username = "rulabula"), "user sent you a message!", "/user/rulabula/messages", "Unread", "Message", NOW());
 
 Update User Set Password = 'password' Where Username = 'rulabula';
