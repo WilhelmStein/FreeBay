@@ -134,26 +134,26 @@ class Parser:
         return auction
 
 
-    def __init__(self, target=os.path.curdir, verbose=True, logger=Logger("Parser")):
+    def __init__(self, targets=os.path.curdir, verbose=True, logger=Logger("Parser")):
 
-        if isinstance(target, list):
+        if isinstance(targets, list):
 
-            self.filenames = [filename for filename in target if os.path.isfile(filename)]
+            self.filenames = [filename for filename in targets if os.path.isfile(filename)]
 
         else:
 
-            if os.path.isfile(target):
+            if os.path.isfile(targets):
 
-                self.filenames = [target]
+                self.filenames = [targets]
 
-            elif os.path.isdir(target):
+            elif os.path.isdir(targets):
 
-                self.filenames = [filename for filename in os.listdir(target)]
+                self.filenames = [filename for filename in os.listdir(targets)]
                 self.filenames = sorted(self.filenames, key=lambda filename: (len(filename), filename))
 
             else:
 
-                raise ValueError("'{}' does not name an existing file or directory".format(target))
+                raise ValueError("'{}' does not name an existing file or directory".format(targets))
 
 
         self.auctions = {}
