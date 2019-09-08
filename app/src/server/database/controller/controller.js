@@ -299,7 +299,7 @@ class DBController
             string: "Select 1 From User Where Username = ? And Password = ?",
             escape: [username, password]
         }
-        console.log(query.escape);
+
         this.query(query, res, (rows) => {
             if (rows.length !== 1)
             {
@@ -480,8 +480,6 @@ class DBController
 
     updateUser(body, res)
     {
-        // console.log(body)
-
         this.user_permission(body.oldUsername, body.oldPassword, res, () => {
             let string = `UPDATE 
             (
@@ -564,7 +562,6 @@ class DBController
             }
 
             string = string.slice(0, -1);
-            // console.log(string);
 
             const query = {
                 string: string,
@@ -603,7 +600,6 @@ class DBController
         };
 
         this.query(query, res, (rows) => {
-            // console.log(rows)
 
             if(rows.length !== 0 && rows[0].Id === null)
                 rows = [];
@@ -645,7 +641,6 @@ class DBController
         };
 
         this.query(query, res, (rows) => {
-            // console.log(rows)
 
             if(rows.length !== 0 && rows[0].Id === null)
                 rows = [];
@@ -717,8 +712,6 @@ class DBController
             item.User = JSON.parse(item.User);
             item.Images = item.Images === null ? [] : JSON.parse(item.Images);
             item.Bids = JSON.parse(item.Bids);
-
-            console.log(item)
 
             res.send({
                 error: false,
@@ -907,19 +900,31 @@ class DBController
 
     image(path, res)
     {
-
-        const fullPath = p.join(__dirname, '../images', path);
-        if(fs.existsSync(fullPath))
+        if (path.startsWith("http://") || path.startsWith("https://"))
         {
-            res.sendFile(fullPath);
+            res.redirect(path);
         }
         else
         {
-            res.send({
-                error: true,
-                message: "Image Not Found"
-            });
+            const fullPath = p.join(__dirname, '../images', path);
+
+            if(fs.existsSync(fullPath))
+            {
+                res.sendFile(fullPath);
+            }
+            else
+            {
+                res.send({
+                    error: true,
+                    message: "Image Not Found"
+                });
+            }
         }
+            
+            
+
+        
+
     }
 
     notifications(username, password, res)
