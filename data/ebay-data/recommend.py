@@ -16,8 +16,9 @@ np.seterr(all='raise')
 
 parser = ArgumentParser()
 
-parser.add_argument("-v", "--verbose",   help="print useful debugging messages",                   action="store_true")
-parser.add_argument("-o", "--overwrite", help="re-train the model and overwrite the previous one", action="store_true")
+parser.add_argument("-t", "--top",       help="return the top TOP candidates", type=int, default=10)
+parser.add_argument("-v", "--verbose",   help="explain what is being done",    action="store_true")
+parser.add_argument("-o", "--overwrite", help="re-train the model",            action="store_true")
 
 args = parser.parse_args()
 
@@ -48,7 +49,7 @@ while query is None:
                     {
                         "id": candidate[0],
                         "score": candidate[1]
-                    } for candidate in model.top(loads(query[0]))
+                    } for candidate in model.top(loads(query[0]), args.top)
                 ],
                 "error": False,
                 "message": "OK"

@@ -165,7 +165,7 @@ class Loader(CFiltering):
         return query / np.linalg.norm(query)
 
 
-    def top(self, user_id, limit=10):
+    def top(self, user_id, top=10):
 
         query = self.__fetch_query_vector__({ "User_Id": user_id })
 
@@ -173,7 +173,7 @@ class Loader(CFiltering):
 
             self.logger.log("Query:", query)
 
-        prediction = CFiltering.predict(self, query.copy(), self.precision)
+        prediction = self.predict(query.copy(), self.precision)
 
         if self.verbose:
 
@@ -183,5 +183,11 @@ class Loader(CFiltering):
 
         candidates = sorted([(self.auctions[i], prediction[i]) for i in range(len(self.auctions)) if query[i] < self.precision], reverse=True, key=lambda candidate: candidate[1])
 
-        return candidates[:limit]
+        candidates = candidates[:top]
+
+        if self.verbose:
+
+            self.logger.log("Top {} candidates:\n{}".format(top, '\n'.join(map(str, candidates))))
+
+        return candidates
 
