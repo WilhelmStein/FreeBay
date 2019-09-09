@@ -14,9 +14,16 @@ from cfiltering import CFiltering
 
 class Loader(CFiltering):
 
-    def __load_view_matrix__():
+    def __init__(
+        self,
+        precision=1e-09,
+        verbose=False,
+        logger=Logger("Loader"),
+        filename="model.pkl",
+        overwrite=False
+    ):
 
-        cnx = connector.connect(
+        self.cnx = connector.connect(
             user="root",
             password="password",
             host="127.0.0.1",
@@ -24,19 +31,80 @@ class Loader(CFiltering):
             raise_on_warnings=True
         )
 
-        cur = cnx.cursor()
+        self.cur = self.cnx.cursor()
 
-        cur.execute("""
+        self.precision = precision
+
+        self.verbose, self.logger = verbose, logger
+
+        if isinstance(filename, str) and exists(filename):
+
+            if overwrite:
+
+                if self.verbose:
+
+                    self.logger.log("Skipped loading pickled file '%s'" % filename)
+
+            else:
+
+                if self.verbose:
+
+                    self.logger.log("Loading '%s'" % filename)
+
+                with open(filename, 'rb') as file:
+
+                    self.underlying, self.auctions = load(file)
+
+                return
+
+        matrix, self.auctions = self.__fetch_views_matrix__()
+
+        CFiltering.__init__(self, matrix)
+
+        if isinstance(filename, str):
+
+            if exists(filename):
+
+                if overwrite:
+
+                    if self.verbose:
+
+                        self.logger.log("Overwriting model '%s'" % filename)
+
+                else:
+
+                    if self.verbose:
+
+                        self.logger.log("Skipped overwriting model '%s'" % filename)
+
+                    return
+            else:
+
+                if self.verbose:
+
+                    self.logger.log("Saving to '%s'" % filename)
+
+            with open(filename, 'wb') as file:
+
+                dump((self.underlying, self.auctions), file)
+
+
+    def __del__(self):
+
+        self.cur.close()
+
+        self.cnx.close()
+
+
+    def __fetch_views_matrix__(self):
+
+        self.cur.execute("""
             SELECT User_Id, Auction_Id
             FROM Views
             ORDER BY User_Id, Auction_Id
         """)
 
-        views = cur.fetchall()
-
-        cur.close()
-
-        cnx.close()
+        views = self.cur.fetchall()
 
 
         rated = {}
@@ -77,99 +145,43 @@ class Loader(CFiltering):
         return matrix, auctions
 
 
-    def __init__(
-        self,
-        precision=1e-09,
-        verbose=False,
-        logger=Logger("Loader"),
-        filename="model.pkl",
-        overwrite=False
-    ):
+    def __fetch_query_vector__(self, user_id):
 
-        self.precision = precision
+        self.cur.execute("""
+            SELECT Auction_Id
+            FROM Views
+            WHERE User_Id = %(User_Id)s
+            ORDER BY Auction_Id
+        """, user_id)
 
-        self.verbose, self.logger = verbose, logger
+        views = set(map(lambda t: t[0], self.cur.fetchall()))
 
-        if isinstance(filename, str) and exists(filename):
+        query = []
 
-            if overwrite:
+        for auction_id in self.auctions:
 
-                if self.verbose:
+            query.append(1 if auction_id in views else 0)
 
-                    self.logger.log("Skipped loading pickled file '%s'" % filename)
-
-            else:
-
-                if self.verbose:
-
-                    self.logger.log("Loading '%s'" % filename)
-
-                with open(filename, 'rb') as file:
-
-                    self.underlying, self.auctions = load(file)
-
-                return
-
-        matrix, self.auctions = Loader.__load_view_matrix__()
-
-        CFiltering.__init__(self, matrix)
-
-        if isinstance(filename, str):
-
-            if exists(filename):
-
-                if overwrite:
-
-                    if self.verbose:
-
-                        self.logger.log("Overwriting model '%s'" % filename)
-
-                else:
-
-                    if self.verbose:
-
-                        self.logger.log("Skipped overwriting model '%s'" % filename)
-
-                    return
-            else:
-
-                if self.verbose:
-
-                    self.logger.log("Saving to '%s'" % filename)
-
-            with open(filename, 'wb') as file:
-
-                dump((self.underlying, self.auctions), file)
+        return query / np.linalg.norm(query)
 
 
-    def top(self, query, limit=10):
+    def top(self, user_id, limit=10):
 
-        try:
+        query = self.__fetch_query_vector__({ "User_Id": user_id })
 
-            if self.verbose:
+        if self.verbose:
 
-                self.logger.log("Query:", query)
+            self.logger.log("Query:", query)
 
-            prediction = CFiltering.predict(self, query.copy(), self.precision)
+        prediction = CFiltering.predict(self, query.copy(), self.precision)
 
-            if self.verbose:
+        if self.verbose:
 
-                self.logger.log("Prediction:", prediction)
+            self.logger.log("Prediction:", prediction)
 
-                self.logger.log("Query != Prediction:", any(abs(x - y) > self.precision for x, y in zip(query, prediction)))
+            self.logger.log("Query != Prediction:", any(abs(x - y) > self.precision for x, y in zip(query, prediction)))
 
-            candidates = sorted([(self.auctions[i], prediction[i]) for i in range(len(self.auctions)) if query[i] < self.precision], reverse=True, key=lambda candidate: candidate[1])
+        candidates = sorted([(self.auctions[i], prediction[i]) for i in range(len(self.auctions)) if query[i] < self.precision], reverse=True, key=lambda candidate: candidate[1])
 
-            return candidates[:limit]
-
-        except ValueError as error:
-
-            if self.verbose:
-
-                self.logger.log(str(error))
-
-
-    def dimension(self):
-
-        return len(self.auctions)
+        return candidates[:limit]
 
