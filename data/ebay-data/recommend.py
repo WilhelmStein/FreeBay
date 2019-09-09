@@ -3,32 +3,66 @@
 
 import numpy as np
 
-from json import dumps
+from sys import stdin
+
+from json import loads, dumps
 
 from argparse import ArgumentParser
 
 from loader import Loader
 
+
+np.seterr(all='raise')
+
 parser = ArgumentParser()
 
-parser.add_argument("-q", "--query",     help="specify the query vector", nargs='+', required=True)
-parser.add_argument("-v", "--verbose",   help="print useful debugging messages", action="store_true")
+parser.add_argument("-v", "--verbose",   help="print useful debugging messages",                   action="store_true")
 parser.add_argument("-o", "--overwrite", help="re-train the model and overwrite the previous one", action="store_true")
 
 args = parser.parse_args()
 
-query = args.query
-
 model = Loader(verbose=args.verbose, overwrite=args.overwrite)
 
-query = np.random.randint(2, size=model.dimension())
-query = query / np.linalg.norm(query)
+query = None
 
-response = {
-    "recommended" : [
-        { "id": candidate[0], "score": candidate[1] } for candidate in model.top(query)
-    ]
-}
+while query is None:
 
-print(dumps(response, indent=4))
+    try:
+
+        query = stdin.readlines()
+
+    except:
+
+        continue
+
+    if query:
+
+        try:
+
+            if len(query) > 1:
+
+                raise ValueError("Multiple arguements are not supported")
+
+            response = {
+                "data" : [
+                    {
+                        "id": candidate[0],
+                        "score": candidate[1]
+                    } for candidate in model.top(loads(query[0]))
+                ],
+                "error": False,
+                "message": "OK"
+            }
+
+        except Exception as e:
+
+            response = {
+                "data": [],
+                "error": True,
+                "message": str(e)
+            }
+
+        query = None
+
+        print(dumps(response, indent=4))
 

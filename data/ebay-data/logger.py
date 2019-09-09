@@ -1,6 +1,9 @@
 
 from datetime import datetime
 
+from sys import stderr
+
+
 class Logger:
 
     def __init__(self, name, fmt="%H:%M:%S"):
@@ -20,9 +23,9 @@ class Logger:
 
         if self.fmt:
 
-            print("[{}] [{}]".format(self.name, datetime.now().strftime(self.fmt)), *args, **kwargs)
+            print("[{}] [{}]".format(self.name, datetime.now().strftime(self.fmt)), file=stderr, *args, **kwargs)
 
         else:
 
-            print("[{}]".format(self.name), *args, **kwargs)
+            print("[{}]".format(self.name), file=stderr, *args, **kwargs)
 
