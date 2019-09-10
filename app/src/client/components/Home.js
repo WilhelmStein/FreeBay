@@ -14,7 +14,6 @@ class Home extends Component
         super(props);
 
         this.state = {
-            // user: this.props.user,
             recommended: [],
             history: props.history
         };
@@ -37,14 +36,14 @@ class Home extends Component
 
     getRecommended(user)
     {
-        axios.post('/api/recommended', {username: user === null ? null : user.Username})
+        axios.post('/api/recommended', {username: user === null ? null : user.User_Id})
         .then( res => {
             if (res.data.error)
             {
                 console.error(res.data.message);
                 return;
             }
-            
+
             this.setState({
                 recommended: res.data.data
             });
@@ -126,7 +125,7 @@ class RecommendedItem extends Component
                                 <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick} noWrap>
                                     &nbsp; &nbsp;{this.state.item.User.Username}
                                 </Typography>
-                                    
+
                                 <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
                             </Box>
 
