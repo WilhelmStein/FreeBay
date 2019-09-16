@@ -94,7 +94,7 @@
 
             .Description
             {
-                max-height: 135px;
+                max-height: 103px;
                 overflow-y: scroll;
 
                 padding: 10px 0;
@@ -146,7 +146,6 @@
     
             .ItemBody
             {
-                margin-left: 30px;
                 overflow: hidden;
 
                 .Title
@@ -206,9 +205,12 @@
         .ItemBody
         {
             overflow: auto;
+            background-color: $not-white;
 
             >.Title
             {
+                font-size: 1.4em;
+                text-overflow: ellipsis;
                 transition: 200ms;
 
                 cursor: pointer;

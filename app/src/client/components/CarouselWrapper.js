@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import Carousel from './Carousel';
-import { Card, CardContent, CardMedia, Typography, Grid, Button } from '@material-ui/core';
+import { Card, CardContent, CardMedia, Typography, Grid, Button, Link } from '@material-ui/core';
 
 import autoBind from 'auto-bind';
 import axios from 'axios';
@@ -133,18 +133,21 @@ function CategoryBanner(props)
 
         const media = (
             <Grid item xs={12 / totalItems} key={auction.Name}>
-                <CardMedia
-                    onClick={() => {props.pressImage(auction);}}
-                    className="Media"
-                    image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : 
-                            "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                    title={auction.Name}
-                    
-                >
-                    <Typography className="MediaCaption">
-                        {auction.Name}
-                    </Typography>
-                </CardMedia>
+                <Link href={`/auction/${auction.Id}`} className="Link">
+                    <CardMedia
+                        onClick={() => {props.pressImage(auction);}}
+                        className="Media"
+                        image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : 
+                                "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                        title={auction.Name}
+                        
+                    >
+                        <Typography className="MediaCaption">
+                            {auction.Name}
+                        </Typography>
+                    </CardMedia>
+                </Link>
+                
             </Grid>
         )
 

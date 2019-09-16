@@ -6,7 +6,7 @@ import { withRouter } from 'react-router-dom'
 
 import {
     Avatar, Card, CardHeader, CardMedia, CardContent,
-    Grid, Typography, Box,
+    Grid, Typography, Box, Link,
     Button, Tab, Tabs, TextField,
     Dialog, DialogActions, DialogContent
 } from "@material-ui/core";
@@ -363,18 +363,18 @@ function AuctionGrid(props) {
                             />
                         </Grid>
 
-                        <Grid item className="Details">
-                            <CardContent>
-                                <Typography className="Title">{auction.Name}</Typography>
-                                {
-                                    (auction.Description === "")
-                                    ?
-                                    (<Typography className="Description Empty">No Description.</Typography>)
-                                    :
-                                    (<Typography className="Description">{auction.Description}</Typography>)
-                                }               
-                            </CardContent>
-                        </Grid>
+                        <Link href={`/auction/${auction.Id}`} className="Link">
+                            <Grid item className="Details">
+                                
+                                    <CardContent>
+                                        <Typography className="Title" noWrap>{auction.Name}</Typography>
+
+                                        <Typography className={`Description ${auction.Description === "" ? " Empty" : ""}`} variant="body2">
+                                            {auction.Description !== "" ? auction.Description : "No Description."}
+                                        </Typography>              
+                                    </CardContent>
+                            </Grid>
+                        </Link>
 
                         <Grid item className="Prices">
                             <CardContent>

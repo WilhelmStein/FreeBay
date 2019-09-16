@@ -3,7 +3,7 @@ import autoBind from 'auto-bind';
 import { withRouter } from 'react-router-dom';
 import axios from "axios";
 
-import {Fade, Typography, Box, Grid, Button, Select, MenuItem, Card, CardMedia, CardContent} from '@material-ui/core';
+import { Fade, Typography, Box, Grid, Button, Select, MenuItem, Card, CardMedia, CardContent, Link } from '@material-ui/core';
 import Pagination from 'material-ui-flat-pagination';
 
 
@@ -190,8 +190,10 @@ function DetailedAuctionItem(props)
                 />
                 <CardContent className="ItemBody">
 
-                    <Typography variant="h2" className="Title" onClick={(e) => {props.auctionClick(e, props.item.Id)}}>
-                        {props.item.Name}
+                    <Typography variant="body1" className="Title" noWrap title={props.item.Name}>
+                        <Link href={`/auction/${props.item.Id}`} color="inherit" className="Link">
+                            {props.item.Name}
+                        </Link>
                     </Typography>
 
                     <Box mb={2} className="SellerBox">
@@ -205,7 +207,9 @@ function DetailedAuctionItem(props)
                     </Box>
                     
                     <Box className="Description">
-                        {props.item.Description ? props.item.Description : "No Description."}
+                        <Typography variant="body2">
+                            {props.item.Description ? props.item.Description : "No Description."}
+                        </Typography>
                     </Box>
                     
                 </CardContent>
@@ -269,8 +273,10 @@ function CollapsedAuctionItem(props)
                     title="Generic placeholder"
                 />
                 <CardContent className="ItemBody">
-                    <Typography variant="h2" noWrap className="Title"  onClick={(e) => {props.auctionClick(e, props.item.Id)}}>
-                        {props.item.Name}
+                    <Typography variant="body1" className="Title" noWrap title={props.item.Name}>
+                        <Link href={`/auction/${props.item.Id}`} color="inherit" className="Link">
+                            {props.item.Name}
+                        </Link>
                     </Typography>
 
                     <Box className="SellerBox">

@@ -133,7 +133,7 @@ class SearchBar extends Component
                     {categories}
                 </select>
                 <input placeholder="Search..." value={this.state.text} onChange={this.inputChange}/>
-                <Button color="secondary"  variant="contained" type="submit" aria-label="search" onClick={this.submit}>
+                <Button color="secondary" variant="contained" type="submit" aria-label="search" onClick={this.submit}>
                     <SearchIcon/>
                 </Button>
             </div>

@@ -89,14 +89,10 @@ body, #root, .App
     width: 100vw;
 }
 
-.link
+.link, .Link
 {
     text: {
         decoration: none !important;
-    }
-
-    font: {
-        size: 18px;
     }
 
     border: none;
