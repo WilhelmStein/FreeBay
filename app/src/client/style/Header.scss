@@ -174,6 +174,10 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
             .Login
             {
+                font: {
+                    size: 18px;
+                }
+
                 transition: 200ms;
                 &:hover
                 {
@@ -184,15 +188,12 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
         &.Full
         {
-            padding: 20px 0;
-            display: grid;
-            grid-template-columns: 100px auto;
 
+            padding: 20px 0;
             .Avatar
             {
+                margin: 0;
                 cursor: pointer;
-
-                padding: 10px;
 
                 text-transform: capitalize;
 
@@ -202,42 +203,56 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
                 transition: 200ms;
 
-                margin-left: 30px;
-
                 &:hover
                 {
                     filter: brightness(120%);
                 }
             }
-    
-            .Username
+
+            .Button
             {
-                cursor: pointer;
-
-                font-size: $bigger-font-size;
-
-                transition: 200ms;
-                &:hover
-                {
-                    color: $less-white;
-                }
+                color: white;
             }
-    
-            .Logout
-            {
-                cursor: pointer;
-                font-size: $small-font-size;
-                color: $grey;
-                text-transform: capitalize;
+        }  
+    }
+}
 
-                transition: 200ms;
-                &:hover
-                {
-                    filter: brightness(120%);
-                }
-            }
-        }
-        
+
+.Notifications-content
+{
+    z-index: 2;
+    padding: 0 !important;
+    border-radius: 5px;
+
+    width: 300px !important;
+
+    .Empty
+    {
+        padding: 20px;
+    }
+}
+
+.Notification
+{
+    &.odd
+    {
+        background-color: $almost-white;
+    }
+
+    .Action
+    {
+        padding: 10px;
+        font-size: $small-font-size;
+
+        color: $mui-secondary;
+    }
+
+    cursor: pointer;
+    transition: 200ms !important;
+
+    &:hover
+    {
+        background-color: $less-white;
     }
 }
 

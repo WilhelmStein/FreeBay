@@ -1,0 +1,230 @@
+@import 'global';
+
+.Messages
+{
+    .Toolbar
+    {
+        background-color: $blue !important;
+
+        .Search
+        {
+            margin-right: 10px;
+        }
+
+        .Search, .Select
+        {
+            font-size: $small-font-size;
+            border-radius: 5px;
+            
+            padding: 4px;
+            padding-left: 10px;
+        }
+
+        .Search, .Select, .Button
+        {
+            color: white;
+            transition: 200ms;
+            background-color: $white-blue;
+            &:hover, &:active, &:focus
+            {
+                background-color: $whiter-blue;
+            }
+        }
+
+        ::-webkit-scrollbar 
+        {
+            width: 0.4em;
+            height: 0.4em;
+        }
+
+        ::-webkit-scrollbar-track
+        {
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+        }
+
+        ::-webkit-scrollbar-thumb
+        {
+            background-color: rgba(0,0,0,.1);
+            outline: 1px solid slategrey
+        }
+
+        ::-webkit-scrollbar-thumb:hover
+        {
+            background: $lesser-white;
+        }
+    }
+
+    .Paper
+    {
+        height: 65vh;
+        overflow-y: auto;
+
+       
+    }
+
+    .MessageList
+    {
+        background-color: $less-white;
+        height: 100%;
+        padding: 0;
+
+        .ListItem
+        {
+            padding: 0;
+
+            &.odd
+            {
+                .MessageCard
+                {
+                    background-color: $almost-white;
+                }
+            }
+
+            
+            cursor: pointer;
+            &:hover, &:active
+            {
+                .MessageCard
+                {
+                    background-color: $lesser-white;
+                }
+            }
+
+            .MessageCard
+            {
+                width: 100%;
+                border-radius: 0;
+                padding-left: 10px;
+
+                transition: 200ms;
+
+                .CardContent
+                {
+                    padding:
+                    {
+                        top: 0;
+                        left: 50px;
+                    }
+                }
+
+                &.Unread
+                {
+                    font-weight: 500;
+                }
+            }
+        }
+        
+    }
+
+    .CardHeader
+    {
+        .Avatar
+        {
+            cursor: pointer;
+            transition: 200ms;
+            
+            &:hover, &:active
+            {
+                filter: brightness(110%);
+            }
+        }
+
+        .Action
+        {
+            padding: 10px;
+            font-size: $small-font-size;
+
+            &.Status
+            {
+                color: $mui-secondary;
+            }
+        }
+    }
+
+    .MessageRenderer
+    {
+        .Toolbar
+        {
+            .Button
+            {
+                color: white;
+
+                margin-right: 10px;
+                transition: 200ms;
+
+                &.Delete
+                {
+                    background-color: $red;
+                    &:hover, &:active
+                    {
+                        background-color: $red-hover;
+                    }
+                }
+
+                &.Reply
+                {
+                    background-color: $white-blue;
+                    &:hover, &:active
+                    {
+                        background-color: $blue;
+                    }
+                }
+
+                &.disabled
+                {
+                    color: $lesser-white;
+                }
+            }
+        }
+
+        
+    }
+
+    .MessageRenderer, .MessageEditor
+    {
+        .Messages
+        {
+            padding: 10px;
+
+            .Message
+            {
+                margin-bottom: 10px;
+            }
+        }
+    }
+
+    .MessageEditor
+    {
+        .Title
+        {
+            font-size: $bigger-font-size;
+        }
+
+        .to, .subject
+        {
+            width: 100%;
+        }
+
+        .NewMessage
+        {
+            padding: 10px;
+        }
+
+        .Message:not(.New)
+        {
+            background-color: $not-white;
+        }
+
+        .New.Message
+        {
+            cursor: pointer;
+            transition: 200ms;
+
+            &:hover
+            {
+                background-color: $not-white;
+            }
+        }
+    }
+}

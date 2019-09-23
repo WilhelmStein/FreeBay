@@ -3,29 +3,44 @@ from google_images_download import google_images_download
 
 from PIL import Image
 
-from os.path import relpath
+from os import remove
+from os.path import relpath, join
 
 from random import randrange
+
+from logger import Logger
 
 
 class Downloader:
 
     def __init__(
         self,
-        no_download=False,
-        format="jpg",
+        verbose=True,
+        logger=Logger("Downloader"),
+        max_path_len=256,
+        max_size=(640, 640),
+        fmt="jpg",
         min_limit=0, max_limit=3,
         size=">400*300",
         aspect_ratio="panoramic",
-        output_directory="auction_images",
-        max_size=(640, 640)):
+        output_directory="images"
+    ):
+
+        self.verbose, self.logger = verbose, logger
+
+        self.max_path_len, self.max_size = max_path_len, max_size
+
+        if self.max_path_len is None and self.max_size is None:
+
+            raise ValueError("Downloading images requires 'max_size' to be non 'None'")
 
         self.min_limit, self.max_limit = min_limit, max_limit
 
         self.parameters = {
-            "no_download": no_download,
+            "no_directory": True,
+            "no_download": self.max_path_len is not None,
             "print_paths": True,
-            "format": format,
+            "format": fmt,
             "size": size,
             "aspect_ratio": aspect_ratio,
             "output_directory": output_directory,
@@ -35,16 +50,17 @@ class Downloader:
 
         self.underlying = google_images_download.googleimagesdownload()
 
-        self.max_size = None if no_download else max_size
 
-
-    def download(self, keywords):
+    def download(self, id, keywords):
 
         try:
 
-            limit = randrange(self.max_limit - self.min_limit)
+            limit = randrange(self.min_limit, self.max_limit) if self.min_limit < self.max_limit else self.max_limit
 
-            print("[Downloader] Downloading %d image(s) at most" % limit)
+            if self.verbose:
+
+                self.logger.log("Limit set to %d" % limit)
+
 
             paths = []
 
@@ -58,17 +74,37 @@ class Downloader:
 
                 paths = list(self.underlying.download(search_args)[0].values())[0]
 
-            if self.max_size:
+                if self.max_path_len:
 
-                for path in paths:
+                    accepted = list(filter(lambda path: len(path) <= self.max_path_len, paths))
 
-                    print("[Downloader] Resizing '{}' to {}".format(relpath(path), self.max_size))
+                    if self.verbose:
 
-                    image = Image.open(path)
+                        rejected = set(paths).difference(set(accepted))
 
-                    image.thumbnail(self.max_size, Image.ANTIALIAS)
+                        if rejected:
 
-                    image.save(path)
+                            self.logger.log(*[(len(path), path) for path in rejected], sep='\n')
+
+                    paths = accepted
+
+                else:
+
+                    for index, path in enumerate(paths):
+
+                        if self.verbose:
+
+                            self.logger.log("Resizing '{}' to {}".format(relpath(path), self.max_size))
+
+                        image = Image.open(path)
+
+                        image.thumbnail(self.max_size, Image.ANTIALIAS)
+
+                        filename = "{}_{}.{}".format(id, index, self.parameters["format"])
+
+                        image.save(join(self.parameters["output_directory"], filename))
+
+                        remove(path)
 
             return paths
 

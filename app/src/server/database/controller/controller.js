@@ -1,11 +1,33 @@
 const p = require('path');
 const fs = require('fs');
+const mysql = require('mysql');
 
 class DBController
 {
-    constructor(sql)
+    constructor(connectionOptions, options)
     {
-        this.sql = sql;
+        this.connectionOptions = connectionOptions;
+
+        this.onError = (err) => {
+            console.error(err);
+        }
+
+        this.onSuccess = (queries, data) => {
+            console.log(`Successfully executed ${queries.length} queries.`);
+        }
+
+        this.sql = null;
+    }
+
+    connect()
+    {
+        this.sql = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: 'password',
+            database: 'freebay',
+            multipleStatements: true
+        })
     }
 
     login(username, password, res)
@@ -44,69 +66,60 @@ class DBController
         )
     }
 
-    admin_users(username, password, res)
-    {
-        this.admin_permission(username, password, res, () => {
-            const query = {
-                string: `Select Concat(gu.Name, ' ', gu.Surname) as Name,
-                                gu.Phone,
-                                u.Username,
-                                u.Email,
-                                gu.Validated,
-                                Concat(a.Street, ' ', a.Number, ', ', a.ZipCode, ' ', a.City) as Address,
-                                a.Country
-                            From General_User as gu, User as u, Address as a
-                            Where u.Id = gu.User_Id and gu.Address_Id = a.Id Order By gu.Validated`,
-                escape: []
-            }
-
-            this.query(query, res)
-        })
-    }
-
     signup(data, res)
     {
-        let query = {
-            string: "Insert Into User Values ( (Select max(Id) + 1 From (Select * From User) as u), ?, ?, ? )",
-            escape: [data.username, data.password, data.email]
-        }
+        this.sql.beginTransaction(err => {
 
-        this.query(query, res,
-            (rows) => {
-                query = {
-                    string: "Insert Into Address Values ( (Select max(Id) + 1 From (Select * From Address) as a), ?, ?, ?, ?, ? )",
-                    escape: [data.street, data.number, data.zipcode, data.country, data.city]
+            if (err) 
+            {
+                console.error(err);
+                return;
+            }
+
+            const query = {
+                string: "Insert Into User (Username, Password, Email) Values ( ?, ?, ? )",
+                escape: [data.username, data.password, data.email]
+            }
+
+            this.query(query, res, (result) => {
+    
+                const userInsertId = result.insertId;
+                const query = {
+                    string: "Insert Into Address Values ( ?, ?, ?, ?, ?, ? )",
+                    escape: [userInsertId, data.street, data.number, data.zipcode, data.country, data.city]
                 }
 
-                this.query(query, res,
-                    (rows) => {
-                        query = {
-                            string: "Insert Into General_User Values ( (Select max(Id) From User), 0.0, 0.0, ?, ?, ?, (Select max(Id) From Address), 0 )",
-                            escape: [data.name, data.surname, data.phone]
+                this.query(query, res, (result) => {
+
+                    const addressInsertId = result.insertId;
+                    const query = {
+                        string: "Insert Into General_User Values (?, 0.0, 0.0, ?, ?, ?, ?, 0 )",
+                        escape: [userInsertId, data.name, data.surname, data.phone, addressInsertId]
+                    }
+
+                    this.query(query, res, (result) => {
+
+                        const query = {
+                            string: "Select * From User Where Username = ?",
+                            escape: [data.username]
                         }
 
-                        this.query(query, res,
-                            (rows) => {
-                                query = {
-                                    string: "Select * From User Where Username = ?",
-                                    escape: [data.username]
-                                }
-                                this.query(query, res,
-                                    (rows) => {
-                                        res.send({
-                                            error: false,
-                                            message: "OK",
-                                            // rows[0] because there should be ONLY 1 user with those credentials
-                                            data: rows[0]
-                                        });
-                                    }
-                                )
-                            }
-                        )
-                    }
-                )
-            }
-        )
+                        this.query(query, res, (rows) => {
+                            res.send({
+                                error: false,
+                                message: "OK",
+                                // rows[0] because there should be ONLY 1 user with those credentials
+                                data: rows[0]
+                            });
+
+                            this.sql.commit(err => {if (err) console.error(err)});
+                        }, null, true)
+                    }, null, true)
+                }, null, true)
+            }, null, true)
+        })
+
+        
     }
 
     admin_permission(username, password, res, callback)
@@ -128,6 +141,26 @@ class DBController
             }
 
             if (callback) callback();
+        })
+    }
+
+    admin_users(username, password, res)
+    {
+        this.admin_permission(username, password, res, () => {
+            const query = {
+                string: `Select Concat(gu.Name, ' ', gu.Surname) as Name,
+                                gu.Phone, 
+                                u.Username, 
+                                u.Email, 
+                                gu.Validated,
+                                Concat(a.Street, ' ', a.Number, ', ', a.ZipCode, ' ', a.City) as Address,
+                                a.Country
+                            From General_User as gu, User as u, Address as a 
+                            Where u.Id = gu.User_Id and gu.Address_Id = a.Id Order By gu.Validated`,
+                escape: []
+            }
+
+            this.query(query, res)
         })
     }
 
@@ -260,6 +293,28 @@ class DBController
         })
     }
 
+    user_permission(username, password, res, callback)
+    {
+        const query = {
+            string: "Select 1 From User Where Username = ? And Password = ?",
+            escape: [username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            if (rows.length !== 1)
+            {
+                res.send({
+                    error: true,
+                    message: "Permission Denied",
+                })
+
+                return;
+            }
+
+            if (callback) callback();
+        })
+    }
+
     categories(res)
     {
         const query = {
@@ -274,11 +329,23 @@ class DBController
     {
         // Check username existence
         const query = {
-            string: `Select * From User Where Username = ?`,
+            string: `Select Id From User Where Username = ?`,
             escape: [username]
         }
 
         this.query(query, res);
+    }
+
+    usernames(username, password, res)
+    {
+        this.user_permission(username, password, res, () => {
+            const query = {
+                string: "Select u.Username From User as u, General_User as gu Where u.Id = gu.User_Id",
+                escape: []
+            }
+
+            this.query(query, res);
+        });
     }
 
     email(email, res)
@@ -388,25 +455,7 @@ class DBController
     getUser(username, password, res)
     {
 
-        const query = {
-            string: "SELECT 1 FROM User WHERE Username=? AND Password=?",
-            escape: [username, password]
-        }
-
-        this.query(query, res, (rows) => {
-
-            // console.log(rows)
-            // console.log(username + " : " + password)
-            if(rows.length !== 1)
-            {
-                res.send({
-                    error: true,
-                    message: "Authentication Failed.",
-                    data: false
-                });
-
-                return;
-            }
+        this.user_permission(username, password, res, () => {
 
             const query = {
                 string: `SELECT *
@@ -419,59 +468,39 @@ class DBController
             };
 
             this.query(query, res, (rows) => {
+
                 res.send({
                     error: false,
                     message: "OK",
                     data: rows[0]
                 });
             });
-        });
+        })
     }
 
     updateUser(body, res)
     {
-        // console.log(body)
-
-        const query = {
-            string: "SELECT 1 FROM User WHERE Username=? AND Password=?",
-            escape: [body.oldUsername, body.oldPassword]
-        }
-
-        this.query(query, res, (rows) => {
-            // console.log("Authentication Result:");
-            // console.log(rows);
-            
-            if(rows.length !== 1)
-            {
-                res.send({
-                    error: true,
-                    message: "Authentication Failed.",
-                    data: false
-                });
-
-                return;
-            }
-
-
+        this.user_permission(body.oldUsername, body.oldPassword, res, () => {
             let string = `UPDATE 
-                            (
-                                (
-                                    User u 
-                                    JOIN
-                                    General_User gu ON u.Username = ? AND u.Id = gu.User_Id
-                                )
-                                LEFT JOIN 
-                                Address a ON a.Id = gu.Address_Id
-                            )
-                            SET `;
+            (
+                (
+                    User u 
+                    JOIN
+                    General_User gu ON u.Username = ? AND u.Id = gu.User_Id
+                )
+                LEFT JOIN 
+                Address a ON a.Id = gu.Address_Id
+            )
+            SET `;
+
             let escape = [body.oldUsername];
-            
+
             if(body.username)
             {
                 string += `u.Username = ?,`
                 escape.push(body.username);
             }
-            
+
             if(body.email)
             {
                 string += `u.Email = ?,`;
@@ -525,7 +554,7 @@ class DBController
                 string += `a.Country = ?,`;
                 escape.push(body.country);
             }
-            
+
             if(body.city)
             {
                 string += `a.City = ?,`;
@@ -533,13 +562,12 @@ class DBController
             }
 
             string = string.slice(0, -1);
-            // console.log(string);
 
             const query = {
                 string: string,
                 escape: escape
             }
-    
+
             this.query(query, res, (err, rows) => {
 
                 res.send({
@@ -548,15 +576,14 @@ class DBController
                     data: true
                 });
             });
-
         });
     }
 
     userAuctions(username, res)
     {
         const query = {
-            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
-                            a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
+                            a.Started, a.Ends, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                      FROM 
                         (
                             SELECT u.Id
@@ -573,13 +600,13 @@ class DBController
         };
 
         this.query(query, res, (rows) => {
-            // console.log(rows)
 
             if(rows.length !== 0 && rows[0].Id === null)
                 rows = [];
             
             rows = rows.map((item) => {
-                item.Images = item.Images === null ? [] : JSON.parse(item.Images)
+                let parsedImages = JSON.parse(item.Images);
+                item.Images = parsedImages[0].Id === null ? [] : parsedImages
                 return item;
             });
 
@@ -591,11 +618,11 @@ class DBController
         });
     }
 
-    userWatchedAuctions(username, password)
+    userWatchedAuctions(username, password, res)
     {
         const query = {
-            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
-                            a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+            string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
+                            a.Started, a.Ends, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                      FROM 
                         (
                             SELECT u.Id
@@ -603,7 +630,9 @@ class DBController
                             WHERE u.Username = ?
                         ) as u
                         LEFT JOIN
-                        Auction a ON a.Seller_Id = u.Id
+                        Bid b ON b.User_Id = u.Id
+                        LEFT JOIN
+                        Auction a ON a.Id = b.Auction_Id
                         LEFT JOIN
                         Image i ON i.Auction_Id = a.Id
                      GROUP BY a.Id
@@ -612,13 +641,13 @@ class DBController
         };
 
         this.query(query, res, (rows) => {
-            // console.log(rows)
 
             if(rows.length !== 0 && rows[0].Id === null)
                 rows = [];
             
             rows = rows.map((item) => {
-                item.Images = item.Images === null ? [] : JSON.parse(item.Images)
+                let parsedImages = JSON.parse(item.Images);
+                item.Images = parsedImages[0].Id === null ? [] : parsedImages
                 return item;
             });
 
@@ -683,8 +712,6 @@ class DBController
             item.User = JSON.parse(item.User);
             item.Images = item.Images === null ? [] : JSON.parse(item.Images);
             item.Bids = JSON.parse(item.Bids);
-
-            console.log(item)
 
             res.send({
                 error: false,
@@ -873,22 +900,270 @@ class DBController
 
     image(path, res)
     {
-
-        const fullPath = p.join(__dirname, '../images', path);
-        if(fs.existsSync(fullPath))
+        if (path.startsWith("http://") || path.startsWith("https://"))
         {
-            res.sendFile(fullPath);
+            res.redirect(path);
         }
         else
         {
-            res.send({
-                error: true,
-                message: "Image Not Found"
-            });
+            const fullPath = p.join(__dirname, '../images', path);
+
+            if(fs.existsSync(fullPath))
+            {
+                res.sendFile(fullPath);
+            }
+            else
+            {
+                res.send({
+                    error: true,
+                    message: "Image Not Found"
+                });
+            }
         }
+            
+            
+
+        
+
     }
 
-    query(query, res, callback = null, check = null)
+    notifications(username, password, res)
+    {
+        const query = {
+            string: "SELECT n.* FROM Notification as n, User as u WHERE n.User_Id = u.Id AND u.Username = ? AND u.Password = ? AND n.Status = 'Unread'",
+            escape: [username, password]
+        }
+
+        this.query(query, res);
+    }
+
+    readNotification(username, password, notification, res)
+    {
+        this.user_permission(username, password, res, () => {
+            const query = {
+                string: "UPDATE Notification SET Status = 'Read' WHERE Id = ?",
+                escape: [notification] 
+            }
+    
+            this.query(query, res);
+        })
+        
+    }
+
+    messages(username, password, res)
+    {
+        const query = {
+            string: `SELECT mh.Id as Header_Id, mh.Subject, 
+                            JSON_ARRAYAGG(JSON_OBJECT(  "Subject", mh.Subject, "Header_Id", mh.Id, "Id", m.Id, "Body", m.Body, 
+                                                        "Status", m.Status, "Time", m.Time, "Sender", su.Username, "Receiver", ru.Username,
+                                                        "Sender_Deleted", m.Sender_Deleted, "Receiver_Deleted", m.Receiver_Deleted)) as Messages
+                    FROM 
+                        (
+                            SELECT * FROM Message Where Time ORDER BY Time Asc
+                        ) as m, 
+                        User as ru, 
+                        User as su, 
+                        Message_Header as mh
+                    WHERE   mh.Id = m.Message_Header_Id AND
+                            su.Id = m.Sender_Id AND
+                            ru.Id = m.Receiver_Id AND
+                            ((ru.Username = ? AND ru.Password = ?) OR (su.Username = ? AND su.Password = ?))
+                    GROUP BY mh.Id`,
+            escape: [username, password, username, password]
+        }
+
+        this.query(query, res, (rows) => {
+            
+            const Messages = rows.map( (row) => {
+                row.Messages = JSON.parse(row.Messages);
+                return row;
+            })
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: Messages
+            });
+        });
+    }
+
+    readMessage(username, password, message, res)
+    {
+        const query = {
+            string: "Update Message Set Status = 'Read' Where Id = ?",
+            escape: [message.Id]
+        }
+
+        this.query(query, res);
+    }
+
+    sendMessage(username, password, recipient, subject, text, reply, res)
+    {
+        this.user_permission(username, password, res, () => {
+
+            this.sql.beginTransaction(err => {
+
+                if (err) 
+                {
+                    console.error(err);
+                    return;
+                }
+
+                const checkRecipient = (callback) => {
+                    const query = {
+                        string: "Select 1 From User as u, General_User as gu Where u.Username = ? AND gu.User_Id = u.Id",
+                        escape: [recipient]
+                    }
+            
+                    this.query(query, res, (rows) => {
+                        if (rows.length !== 1)
+                        {
+                            res.send({
+                                error: true,
+                                message: `User does not exist`,
+                            })
+            
+                            return;
+                        }
+
+                        return callback();
+                    })
+                }
+
+                const insertHeader = (reply, callback) => {
+                    if (!reply)
+                    {
+                        const query = {
+                            string: `INSERT INTO Message_Header (Subject) VALUES (?)`,
+                            escape: [subject]
+                        }
+        
+                        this.query(query, res, (result) => {
+                            callback(result.insertId);
+                        }, null, true)
+                    }
+                    else
+                    {
+                        callback(reply);
+                    }
+                }
+
+                const sendNotification = () => {
+                    const query = {
+                        string: `INSERT INTO Notification (User_Id, Content, Link, Status, Type, Time)
+                        Values ( (SELECT Id FROM User WHERE Username = ?), "${username} sent you a message!", "/user/${recipient}/messages", "Unread", "Message", NOW())`,
+                        escape: [recipient, username]
+                    }
+
+                    this.query(query, res, (result) => {
+                        res.send({
+                            error: false,
+                            message: "Sent"
+                        });
+
+                        this.sql.commit(err => {if (err) console.error(err)})
+                    })
+                }
+
+                const insertMessage = (message_header_id) => {
+                    const query = {
+                        string: `   INSERT INTO Message (Message_Header_Id, Body, Time, Sender_Id, Receiver_Id, Status, Sender_Deleted, Receiver_Deleted)
+                                    VALUES (?, ?, NOW(), (SELECT Id FROM User Where Username = ?), (SELECT Id FROM User WHERE Username = ?), 'Unread', FALSE, FALSE)`,
+                        escape: [message_header_id, text, username, recipient]
+                    }
+
+                    this.query(query, res, (result) => {
+
+                        return sendNotification();
+
+                    }, null, true)
+                }
+
+                return checkRecipient( () => {insertHeader (reply, insertMessage)} );
+            })
+        });
+    }
+
+    deleteMessage(username, password, message, who, res)
+    {
+        this.user_permission(username, password, res, () => {
+
+            const query = {
+                string: `UPDATE Message SET ${who}_Deleted = TRUE WHERE Id = ?`,
+                escape: [message.Id]
+            }
+
+            this.query(query, res, (result) => {
+
+                const query = {
+                    string: "SELECT 1 From Message Where Id = ? AND Sender_Deleted = TRUE AND Receiver_Deleted = TRUE",
+                    escape: [message.Id]
+                }
+
+                this.query(query, res, (rows) => {
+
+                    if (rows.length !== 0)
+                    {
+                        this.banishMessage(message, res, () => {
+                            res.send({
+                                error: false,
+                                message: "Deleted"
+                            })
+                        })
+
+                        return;
+                    }
+
+                    res.send({
+                        error: false,
+                        message: "Deleted"
+                    })
+                })
+            })
+        });
+    }
+
+    banishMessage(message, res, callback)
+    {
+        this.sql.beginTransaction(err => {
+
+            if (err) 
+            {
+                console.error(err);
+                return;
+            }
+
+            const query = {
+                string: "SELECT mh.Id FROM Message_Header as mh WHERE mh.Id = ? AND EXISTS (SELECT m.Id FROM Message as m WHERE m.Message_Header_Id = mh.Id AND m.Id != ?)",
+                escape: [message.Header_Id, message.Id]
+            }
+
+            this.query(query, res, (rows) => {
+
+                let query = {
+                    string: "DELETE FROM Message WHERE Id = ?;",
+                    escape: [message.Id]
+                }
+
+                if (rows.length === 0)
+                {
+                    query.string += " DELETE FROM Message_Header Where Id = ?;";
+                    query.escape.push(message.Header_Id);
+                }
+
+                this.query(query, res, (result) => {
+
+                    this.sql.commit(err => {if (err) console.error(err)});
+
+                    callback();
+
+                }, null, true)
+
+            }, null, true)
+        });
+    }
+
+    query(query, res, callback = null, check = null, transaction=false)
     {
         this.sql.query(query.string, query.escape, function(err, rows)
         {
@@ -899,6 +1174,10 @@ class DBController
                     error: true,
                     message: "Something went wrong in database retrieval. Please try again."
                 });
+                
+                if (transaction)
+                    return this.sql.rollback();
+
                 return;
             }
 
@@ -924,6 +1203,68 @@ class DBController
                 message: "OK",
                 data: rows
             });
+        })
+    }
+
+    transaction(queries, onError, onSuccess)
+    {
+        this.sql.beginTransaction(err => {
+            if (err)
+            {
+                return this.onError(err);
+            }
+
+            return this.__transactionQuery(queries, 0, null, onError, onSuccess);
+        })
+        
+    }
+
+    __transactionQuery(queries, index, data, onError, onSuccess)
+    {
+        if (index === queries.length)
+        {
+            this.sql.commit(err => {
+                if (err)
+                {
+                    this.onError(err);
+                    return this.sql.rollback();
+                }
+            })
+
+            if (onSuccess)
+                return onSuccess(queries, data);
+            else
+                return this.onSuccess(queries, data);
+        }
+
+        const query = queries[index];
+        let toExecute = query;
+
+        if (query.hasOwnProperty("prepare") && data)
+        {
+            toExecute = query.prepapre(data)
+        }
+
+        this.sql.query(toExecute.string, toExecute.escape, (err, rows) => {
+            if (err)
+            {
+                if (query.hasOwnProperty("onError"))
+                {
+                    query.onError(err);
+                }
+                else if (onError)
+                {
+                    onError(err);
+                }
+                else
+                {
+                    this.onError(err);
+                }
+
+                return this.sql.rollback();
+            }
+
+            this.__transactionQuery(queries, index + 1, rows, onSuccess)
         })
     }
 }

@@ -7,97 +7,28 @@ from datetime import datetime
 
 import random
 
-import json
-
 import os
+
+from logger import Logger
 
 
 class Generator:
 
-    config = {
-        "user": "root",
-        "password": "password",
-        "host": "127.0.0.1",
-        "database": "freebay",
-        "raise_on_warnings": False
-    }
-
-    queries = {
-        "User": (
-            "INSERT INTO User"
-            "(Id, Username, Password, Email)"
-            "VALUES (%(Id)s, %(Username)s, %(Password)s, %(Email)s)"
-        ),
-        "General_User": (
-            "INSERT INTO General_User"
-            "(User_Id, Seller_Rating, Bidder_Rating, Name, Surname, Phone, Address_Id, Validated)"
-            "VALUES (%(User_Id)s, %(Seller_Rating)s, %(Bidder_Rating)s, %(Name)s, %(Surname)s, %(Phone)s, %(Address_Id)s, %(Validated)s)"
-        ),
-        "Admin": (
-            "INSERT INTO Admin"
-            "(User_Id)"
-            "VALUES (%(User_Id)s)"
-        ),
-        "Address": (
-            "INSERT INTO Address"
-            "(Id, Street, Number, ZipCode, Country, City)"
-            "VALUES (%(Id)s, %(Street)s, %(Number)s, %(ZipCode)s, %(Country)s, %(City)s)"
-        ),
-        "Category": (
-            "INSERT INTO Category"
-            "(Id, Name, Caption)"
-            "VALUES (%(Id)s, %(Name)s, %(Caption)s)"
-        ),
-        "Auction_has_Category": (
-            "INSERT INTO Auction_has_Category"
-            "(Auction_Id, Category_Id)"
-            "VALUES (%(Auction_Id)s, %(Category_Id)s)"
-        ),
-        "Auction": (
-            "INSERT INTO Auction"
-            "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description)"
-            "VALUES (%(Id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s)"
-        ),
-        "Bid": (
-            "INSERT INTO Bid"
-            "(Id, User_id, Auction_Id, Amount, Time)"
-            "VALUES (%(Id)s, %(User_id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
-        ),
-        "Image": (
-            "INSERT INTO Image"
-            "(Id, Path, Auction_Id)"
-            "VALUES (%(Id)s, %(Path)s, %(Auction_Id)s)"
-        )
-    }
-
     def __init__(
         self,
-        admin={
-            "Username": "admin",
-            "Password": "admin",
-            "Email": "admin@admin.admin"
-        },
+        cache,
         downloader=None,
         seed=123456789,
         verbose=True,
-        tables_to_drop=[
-            "Auction_has_Category",
-            "Bid",
-            "Image",
-            "Views",
-            "Auction",
-            "General_User",
-            "Admin",
-            "User",
-            "Address",
-            "Category"
-            ],
-        views_to_drop=[],
+        logger=Logger("Generator"),
         rating_lower=0.0, rating_upper=58823.0, rating_digits=1,
         dollar_digits=2,
-        validated_percentage=0.7):
+        validated_percentage=0.7
+    ):
 
-        self.verbose = verbose
+        self.cache = cache
+
+        self.verbose, self.logger = verbose, logger
 
         self.rating_lower, self.rating_upper, self.rating_digits = rating_lower, rating_upper, rating_digits
 
@@ -107,27 +38,6 @@ class Generator:
 
 
         self.downloader = downloader
-
-
-        self.cnx = connector.connect(**Generator.config)
-
-        self.cur = self.cnx.cursor()
-
-        if isinstance(views_to_drop, list) and views_to_drop:
-
-            for view in views_to_drop:
-
-                print("[Generator] Dropping view '%s'" % view)
-
-                self.cur.execute("DROP VIEW IF EXISTS {}".format(view))
-
-        if isinstance(tables_to_drop, list) and tables_to_drop:
-
-            for table in tables_to_drop:
-
-                print("[Generator] Deleting all rows from table '%s'" % table)
-
-                self.cur.execute("DELETE FROM {}".format(table))
 
 
         self.random = random.Random(seed)
@@ -148,23 +58,6 @@ class Generator:
         self.bid_id = 0
 
         self.image_id = 0
-
-        self.__register__("User",
-            self.__generate_user__(
-                username=admin["Username"],
-                password=admin["Password"],
-                email=admin["Email"]
-            )
-        )
-
-        self.__register__("Admin", self.__generate_admin__(self.users[admin["Username"]]))
-
-
-    def __del__(self):
-
-        self.cur.close()
-
-        self.cnx.close()
 
 
     def __normalize_rating__(self, decimal, dst_lower=0.0, dst_upper=100.0):
@@ -236,7 +129,7 @@ class Generator:
         return {
             "Id": len(self.categories),
             "Name": name,
-            "Caption": "Lorem ispum solor sit amet! Sit ipsum De lora.."
+            "Caption": self.generator.text(50)
         }
 
 
@@ -302,59 +195,32 @@ class Generator:
         }
 
 
-    def __register__(self, table, entry):
+    def __generate_view__(self, user_id, auction_id, time):
 
-        if table is None or not isinstance(table, str):
-
-            raise TypeError("'" + str(table) + "' is not a string")
-
-        if table not in self.queries:
-
-            raise ValueError("'" + str(table) + "' is not a valid table name")
-
-        if entry is None or not isinstance(entry, dict):
-
-            raise TypeError("'" + str(entry) + "' is not a dictionary")
-
-        try:
-
-            self.cur.execute(self.queries[table], entry)
-
-        except connector.errors.DatabaseError as error:
-
-            dump = json.dumps(
-                entry,
-                sort_keys=True,
-                indent=4,
-                separators=(",", ": "),
-                default=lambda d: d.strftime("%Y-%m-%d %H:%M:%S"))
-
-            code, message = str(error).split(": ")
-
-            print("[Generator] [ERROR {}] {}".format(code, message), dump, sep='\n\n')
-
-            exit(1)
-
-        self.cnx.commit()
+        return {
+            "User_Id": user_id,
+            "Auction_Id": auction_id,
+            "Time": time
+        }
 
 
     def register(self, auction):
 
         if self.verbose:
 
-            print("[Generator] Processing auction '%s'" % auction["ItemID"])
+            self.logger.log("Processing auction '%s'" % auction["ItemID"])
 
         seller = auction["Seller"]
 
         if seller["UserID"] not in self.users:
 
-            self.__register__("Address", self.__generate_address__())
+            self.cache.register("Address", self.__generate_address__())
 
-            self.__register__("User", self.__generate_user__(username=seller["UserID"]))
+            self.cache.register("User", self.__generate_user__(username=seller["UserID"]))
 
-            self.__register__("General_User", self.__generate_general_user__(user_id=self.users[seller["UserID"]], seller_rating=seller["Rating"]))
+            self.cache.register("General_User", self.__generate_general_user__(user_id=self.users[seller["UserID"]], seller_rating=seller["Rating"]))
 
-        self.__register__("Auction",
+        self.cache.register("Auction",
             self.__generate_auction__(
                 seller_id=self.users[seller["UserID"]],
                 name=auction.get("Name"),
@@ -368,11 +234,13 @@ class Generator:
             )
         )
 
+        self.logger.log("Auction '%s' registered as '%d'" % (auction["ItemID"], self.auction_id))
+
         if self.downloader:
 
-            for path in self.downloader.download(auction["Name"]):
+            for path in self.downloader.download(self.auction_id, auction["Name"]):
 
-                self.__register__("Image", self.__generate_image__(self.auction_id, path))
+                self.cache.register("Image", self.__generate_image__(self.auction_id, path))
 
         for bid in auction["Bids"]:
 
@@ -380,19 +248,27 @@ class Generator:
 
             if bidder["UserID"] not in self.users:
 
-                self.__register__("Address", self.__generate_address__())
+                self.cache.register("Address", self.__generate_address__())
 
-                self.__register__("User", self.__generate_user__(username=bidder["UserID"]))
+                self.cache.register("User", self.__generate_user__(username=bidder["UserID"]))
 
-                self.__register__("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]], bidder_rating=bidder["Rating"]))
+                self.cache.register("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]], bidder_rating=bidder["Rating"]))
 
-                self.__register__("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=self.auction_id, amount=bid["Amount"], time=bid["Time"]))
+                self.cache.register("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=self.auction_id, amount=bid["Amount"], time=bid["Time"]))
+
+            self.cache.register("Views",
+                self.__generate_view__(
+                    user_id=self.users[bidder["UserID"]],
+                    auction_id=self.auction_id,
+                    time=bid["Time"]
+                )
+            )
 
         for category in auction["Category"]:
 
             if category not in self.categories:
 
-                self.__register__("Category", self.__generate_category__(category))
+                self.cache.register("Category", self.__generate_category__(category))
 
-                self.__register__("Auction_has_Category", self.__generate_auction_has_category__(self.auction_id, self.categories[category]))
+                self.cache.register("Auction_has_Category", self.__generate_auction_has_category__(self.auction_id, self.categories[category]))
 

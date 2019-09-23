@@ -1,5 +1,5 @@
 
-import json
+from argparse import ArgumentParser
 
 from os import path
 
@@ -9,18 +9,34 @@ from downloader import Downloader
 
 from generator import Generator
 
+from cache import Cache
 
-parser = Parser(target='./items-0.xml')
 
-example_id = -1 # 1045310980
+argparser = ArgumentParser()
 
-if example_id in parser.auctions:
+argparser.add_argument("-t", "--targets",  help="specify any target files", nargs='+')
+argparser.add_argument("-c", "--crawl",    help="enable image crawling",    action="store_true")
+argparser.add_argument("-d", "--download", help="enable image downloading", action="store_true")
 
-    print(parser.dumps(example_id), sep='\n')
+args = argparser.parse_args()
 
-# downloader = Downloader()
+parser = Parser(args.targets) if args.targets else Parser()
 
-generator = Generator()
+if args.crawl:
+
+    downloader = Downloader()
+
+elif args.download:
+
+    downloader = Downloader(max_path_len=None)
+
+else:
+
+    downloader = None
+
+cache = Cache()
+
+generator = Generator(cache, downloader)
 
 for auction in parser.auctions.values():
 

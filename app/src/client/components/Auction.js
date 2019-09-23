@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import autoBind from 'auto-bind';
 import { withRouter } from 'react-router-dom';
 import axios from "axios";

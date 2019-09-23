@@ -1,11 +1,20 @@
 #!/bin/bash
 
-mysql -u root -ppassword < ./app/src/server/database/sql/create.sql
+if [[ "$*" =~ .*-h|--help.* ]]
+then
+    cd ./data/ebay-data > /dev/null || exit 1
 
-cd ./data/ebay-data
+    python3 xml_to_db.py "$@"; exit 1
 
-python3 xml_to_db.py
+    cd - > /dev/null || exit 1
+fi
 
-cd -
+mysql -uroot -ppassword < ./app/src/server/database/sql/create.sql
 
-mysql -u root -ppassword < ./app/src/server/database/sql/insert_tests.sql
+cd ./data/ebay-data > /dev/null || exit 1
+
+python3 xml_to_db.py "$@"
+
+cd - > /dev/null || exit 1
+
+mysql -uroot -ppassword < ./app/src/server/database/sql/insert_tests.sql

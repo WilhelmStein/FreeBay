@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Fade, Card, Grid, CardMedia, CardContent, Typography, Box} from '@material-ui/core';
+import { Fade, Card, Grid, CardMedia, CardContent, Typography, Box, Link } from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating'
 import Carousel from './CarouselWrapper';
 import '../style/Home.scss';
@@ -109,29 +109,34 @@ class RecommendedItem extends Component
         return (
             <Fade in={true}>
                 <Grid key={this.state.item.Id} item className = "Wrapper">
-                    <Card raised className="Item" onClick={this.onItemClick}>
-                        <CardMedia className="Media"
-                            image={this.state.item.Images && this.state.item.Images.length ? `/api/image?path=${this.state.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
-                            title={this.state.item.Name}
-                        />
+                    <Link href={`/auction/${this.state.item.Id}`} className="Link">
+                        <Card raised className="Item" onClick={this.onItemClick}>
+                            <CardMedia className="Media"
+                                image={this.state.item.Images && this.state.item.Images.length ? `/api/image?path=${this.state.item.Images[0].Path}` : "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
+                                title={this.state.item.Name}
+                            />
 
-                        <CardContent className="ItemBody">
-                            <Typography className="Title" variant="h4" title={this.state.item.Name} noWrap>
-                                {this.state.item.Name}
-                            </Typography>
-
-                            <Box className="SellerBox">
-                                <Typography display="inline" noWrap> Sold By:</Typography>
-
-                                <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick} noWrap>
-                                    &nbsp; &nbsp;{this.state.item.User.Username}
+                            <CardContent className="ItemBody">
+                                <Typography className="Title" variant="h4" title={this.state.item.Name} noWrap>
+                                <Link href={`/auction/${this.state.item.Id}`} color="inherit" className="Link">
+                                    {this.state.item.Name}
+                                </Link>
                                 </Typography>
-                                    
-                                <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
-                            </Box>
 
-                        </CardContent>
-                    </Card>
+                                <Box className="SellerBox">
+                                    <Typography display="inline" noWrap> Sold By:</Typography>
+
+                                    <Typography className="Seller" display="inline" variant="h5" onClick={this.onSellerClick} noWrap>
+                                        &nbsp; &nbsp;{this.state.item.User.Username}
+                                    </Typography>
+                                        
+                                    <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
+                                </Box>
+
+                            </CardContent>
+                        </Card>
+                    </Link>
+                    
                 </Grid>
             </Fade>
         )
