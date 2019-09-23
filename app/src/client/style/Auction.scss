@@ -67,4 +67,20 @@
             }
         }
     }
+
+    .Images
+    {
+        padding: 0;
+        .Image
+        {
+            height: 400px;
+
+            .Media
+            {
+                height: 100%;
+                background-color: white;
+                overflow: hidden;
+            }
+        }
+    }
 }

@@ -140,7 +140,6 @@ function CategoryBanner(props)
                         image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : 
                                 "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                         title={auction.Name}
-                        
                     >
                         <Typography className="MediaCaption">
                             {auction.Name}
