@@ -3,9 +3,22 @@
 
 .AuctionPage
 {
+    &.Ended
+    {
+        * {
+            opacity: 0.95;
+        }
+    }
+
     background-color: $less-white;
 
-    padding-top: 10px;
+    padding:
+    {
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+    }
 
     ::-webkit-scrollbar
     {
@@ -28,6 +41,12 @@
     ::-webkit-scrollbar-thumb:hover
     {
         background: $lesser-white;
+    }
+
+    h2
+    {
+        font-weight: 400;
+        color: $graphite;
     }
 
     .bids
@@ -68,6 +87,22 @@
         }
     }
 
+    .AuctionHeader
+    {
+        .Seller
+        {
+            color: $blue;
+            
+            transition: 200ms;
+            cursor: pointer;
+
+            &:hover, &:active
+            {
+                color: $white-blue;
+            }
+        }
+    }
+
     .Images
     {
         padding: 0;
@@ -80,6 +115,65 @@
                 height: 100%;
                 background-color: white;
                 overflow: hidden;
+            }
+        }
+    }
+
+    .Pricing
+    {
+        background-color: $almost-white;
+
+        #PricingTitle
+        {
+            padding:
+            {
+                top: 20px;
+                right: 20px;
+                left: 20px;
+            }
+        }
+
+        .Prices
+        {
+            padding:
+            {
+                top: 10px;
+                right: 20px;
+                left: 20px;
+                bottom: 20px;
+            }
+
+            .Title
+            {
+                font-weight: 300;
+            }
+
+            .Starting
+            {
+                color: $blue;
+            }
+
+            .Current
+            {
+                color: $green;
+            }
+
+            .Buyout
+            {
+                color: $red;
+            }
+        }
+
+        .Buttons
+        {
+            .Bid
+            {
+                background-color: $blue;
+            }
+    
+            .Buyout
+            {
+                background-color: $red;
             }
         }
     }

@@ -77,7 +77,7 @@ class CarouselWrapper extends Component {
 
         return (
             // <div style={{padding: "20px 100px", backgroundColor: "rgb(235, 235, 235)"}}>
-                <Carousel className="Carousel">
+                <Carousel className="HomeCarousel">
                 {
                     this.state.categories.map((category, index) => {
                         const props = this.getProps(index)

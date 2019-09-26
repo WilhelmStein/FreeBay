@@ -590,12 +590,12 @@ class DBController
         const query = {
 
             string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Rating', a.Seller_Rating) as User,
-                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
+                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends, a.has_Ended,
                                 a.Description, i.Images, b.Bids
                         FROM
                         (
                             SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating, IF(a.Ends >= NOW(), FALSE, TRUE) as has_Ended
                             FROM    Auction a,
                                     User u,
                                     General_User gu

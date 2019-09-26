@@ -1,6 +1,6 @@
 @import "global";
 
-$Header-height: 100px;
+$Header-height: 80px;
 $Search-height: calc(#{$Header-height} / 2.2);
 
 .Header
@@ -8,7 +8,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
     display: grid;
     grid-template-columns: 250px 5fr 250px;
     
-    background-color: $main-color;
+    background-color: $secondary-color;
     height: $Header-height;
 
     color: white;
@@ -140,7 +140,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
         button
         {
             font-size: $small-font-size;
-            background-color: $secondary-color;
+            background-color: $main-color;
 
             border:none;
             border-top-right-radius: 5px;
@@ -153,7 +153,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
             &:hover, &:active
             {
-                background-color: $secondary-hover;
+                background-color: $main-hover;
             }
         }
     }
