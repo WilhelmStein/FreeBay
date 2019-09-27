@@ -51,7 +51,9 @@ app.post('/api/userWatchedAuctions', function(req, res) { controller.userWatched
 
 app.get('/api/featured', function(req, res) { controller.featured(res); });
 
-app.post('/api/recommended', function(req, res) { controller.recommended(req.body.username, res); });
+app.post('/api/recommended', function(req, res) { controller.recommended(req.body.user_id, res); });
+
+app.post('/api/recommended/specific', function(req, res) { controller.recommended(res, true, req.body.ids)})
 
 app.get('/api/image', function(req, res) { controller.image(req.query.path, res); });
 
@@ -59,7 +61,7 @@ app.get('/api/image', function(req, res) { controller.image(req.query.path, res)
 const options = {
     key: fs.readFileSync(path.join(__dirname, 'encryption/server.key'), 'utf8'),
     cert: fs.readFileSync(path.join(__dirname, 'encryption/server.cert'), 'utf8')
-  };
+};
 
 https.createServer(options, app).listen(8080, () => {
     console.log("server starting on port 8080")

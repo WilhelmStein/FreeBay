@@ -25,15 +25,14 @@ model = Loader(verbose=args.verbose, overwrite=args.overwrite)
 
 server = Flask(__name__)
 
-@server.route('/')
+@server.route('/python')
 def index():
 
     return "Recommendation Server\n\n" + parser.format_help()
 
 
-@server.route('/<user_id>')
+@server.route('/python/<user_id>')
 def parse_request(user_id):
-
     try:
 
         response = {

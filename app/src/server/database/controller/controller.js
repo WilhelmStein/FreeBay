@@ -808,62 +808,73 @@ class DBController
         });
     }
 
-    recommended(username, res)
+    recommended(res, specific = false, ids = null)
     {
-        if (username)
+        let specific_ids = ""
+        if (specific)
         {
-            res.redirect(`localhost:8000/${username}`)
-        }
-        else
-        {
-            const query = {
-                string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
-                                    t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude,
-                                    DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends,
-                                    t.Description, Count(v.User_Id) AS Times_Viewed, i.Images
-                            FROM
-                            (
-                                SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                                        a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
-                                FROM    Auction a,
-                                        User u,
-                                        General_User gu
-                                WHERE   a.Seller_Id = u.Id AND
-                                        u.Id = gu.User_Id
-                            ) as t
-                                LEFT JOIN
-                                (
-                                    SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
-                                    FROM    Image i,
-                                            Auction a
-                                    WHERE   i.Auction_Id = a.Id
-                                    GROUP BY a.Id
-                                ) as i ON t.Id = i.Auction_Id
-                                LEFT JOIN
-                                (
-                                    Views v
-                                ) ON v.Auction_Id = t.Id
-                            GROUP BY t.Id
-                            ORDER BY Times_Viewed DESC
-                            LIMIT 14`,
-                escape: []
+            specific_ids = " AND ("
+            for (let i = 0; i < ids.length; i++)
+            {
+                specific_ids += `a.Id = ${ids[i]} `;
+
+                if (i < ids.length - 1)
+                {
+                    specific_ids += "OR "
+                }
             }
 
-            this.query(query, res, (rows) => {
-
-                rows = rows.map( (item) => {
-                    item.User = JSON.parse(item.User);
-                    item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-                    return item;
-                });
-
-                res.send({
-                    error: false,
-                    message: "OK",
-                    data: rows
-                });
-            });
+            specific_ids += ") "
         }
+
+        const query = {
+            string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
+                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude,
+                                DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends,
+                                t.Description, Count(v.User_Id) AS Times_Viewed, i.Images
+                        FROM
+                        (
+                            SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
+                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                            FROM    Auction a,
+                                    User u,
+                                    General_User gu
+                            WHERE   a.Seller_Id = u.Id AND
+                                    u.Id = gu.User_Id
+                                    ${specific ? specific_ids : ""}
+                        ) as t
+                            LEFT JOIN
+                            (
+                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+                                FROM    Image i,
+                                        Auction a
+                                WHERE   i.Auction_Id = a.Id
+                                GROUP BY a.Id
+                            ) as i ON t.Id = i.Auction_Id
+                            LEFT JOIN
+                            (
+                                Views v
+                            ) ON v.Auction_Id = t.Id
+                        GROUP BY t.Id
+                        ORDER BY Times_Viewed DESC
+                        LIMIT 14`,
+            escape: []
+        }
+
+        this.query(query, res, (rows) => {
+
+            rows = rows.map( (item) => {
+                item.User = JSON.parse(item.User);
+                item.Images = item.Images === null ? [] : JSON.parse(item.Images);
+                return item;
+            });
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows
+            });
+        });
     }
 
     image(path, res)
