@@ -166,14 +166,10 @@
 
         .Buttons
         {
-            .Bid
+            .Button
             {
-                background-color: $blue;
-            }
-    
-            .Buyout
-            {
-                background-color: $red;
+                color: white;
+                z-index: 1;
             }
         }
     }

@@ -79,6 +79,10 @@ app.post('/api/sendMessage', function (req, res) { controller.sendMessage(req.bo
 
 app.post('/api/deleteMessage', function (req, res) { controller.deleteMessage(req.body.username, req.body.password, req.body.message, req.body.who, res); });
 
+app.post('/api/placeBid', function(req, res) { controller.placeBid(req.body.username, req.body.password, req.body.auction_id, req.body.amount, res); });
+
+app.post('/api/buyout', function(req, res) { controller.buyout(req.body.username, req.body.password, req.body.auction_id, res) })
+
 const options = {
     key: fs.readFileSync(path.join(__dirname, 'encryption/server.key'), 'utf8'),
     cert: fs.readFileSync(path.join(__dirname, 'encryption/server.cert'), 'utf8')

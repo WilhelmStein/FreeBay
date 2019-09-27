@@ -5,7 +5,9 @@ import axios from "axios";
 
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet'
 import Carousel from './Carousel'
-import { Paper, Grid, Button, ButtonGroup, Box, Dialog } from '@material-ui/core';
+import { Paper, Grid, Button, ButtonGroup, Box, TextField, InputAdornment, Snackbar, IconButton } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
+import { Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText } from '@material-ui/core';
 import { Rating } from '@material-ui/lab';
 import { Card, CardHeader, CardMedia, CardContent, CardActions } from '@material-ui/core';
 import { Typography } from '@material-ui/core'
@@ -28,6 +30,11 @@ class AuctionPage extends Component
             bidDialogOpen: false,
             buyoutDialogOpen: false,
             imageDialogOpen: false,
+
+            bid: 0,
+            bidError: "",
+
+            openSnackbar: false
         };
 
         autoBind(this);
@@ -42,6 +49,8 @@ class AuctionPage extends Component
                 console.error(res.data.message);
                 return;
             }
+
+            console.log(res.data.data)
 
             this.setState({
                 auction: res.data.data
@@ -59,22 +68,184 @@ class AuctionPage extends Component
         );
     }
 
+    userClick(user)
+    {
+        this.props.history.push(`/user/${user.Username}`);
+    }
+
     openBidDialog()
     {
+        if (!this.props.user)
+        {
+            alert("You have to login in order to place a bid.")
+            return;
+        }
+
         this.setState({
-            bidDialogOpen: true
+            bidDialogOpen: true,
+            bid: this.calculateNextBid(),
+            bidError: ""
         })
     }
 
     closeBidDialog()
     {
         this.setState({
-            bidDialogOpen: false
+            bidDialogOpen: false,
+            bid: 0,
+            bidError: ""
         })
+    }
+
+    closeSnackbar(event, reason)
+    {
+        if (reason === 'clickaway') {
+            return;
+        }
+      
+        this.setState({
+            openSnackbar: false
+        });
+    }
+
+    calculateNextBid()
+    {
+        if (this.state.auction.Bids.length === 0) return (this.state.auction.First_Bid + 1.00).toFixed(2);
+
+        let MDelta = 0
+        for (let i = 1; i < this.state.auction.Bids.length; i++)
+        {
+            MDelta += this.state.auction.Bids[i].Amount - this.state.auction.Bids[i-1].Amount;
+        }
+
+        MDelta = (MDelta / this.state.auction.Bids.length)
+
+        const bid = this.state.auction.Bids[this.state.auction.Bids.length - 1].Amount + MDelta;
+
+        return bid.toFixed(2)
+    }
+
+    changeBid(event)
+    {
+        this.setState({
+            bid: event.target.value
+        })
+    }
+
+    placeBid()
+    {
+        if (this.state.bid <= this.state.auction.Bids[this.state.auction.Bids.length - 1].Amount)
+        {
+            this.setState({
+                bidError: "Too low price"
+            })
+
+            return;
+        }
+        
+        axios.post("/api/placeBid", {username: this.props.user.Username, password: this.props.user.Password, auction_id: this.state.auction.Id, amount: parseFloat(this.state.bid).toFixed(2)})
+        .then( res => {
+            if (res.data.error)
+            {
+                console.error(res.data.message);
+                return;
+            }
+
+            this.setState({
+                openSnackbar: true
+            })
+        })
+        .catch(err => console.error(err))
+
+        this.closeBidDialog();
+    }
+
+    BidDialog(props)
+    {
+        return (
+            <Dialog open={this.state.bidDialogOpen} onClose={this.closeBidDialog}>
+                <DialogTitle>Place Bid</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Please place your bid.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="Bid"
+                        type="Number"
+                        value={this.state.bid}
+                        onChange={this.changeBid}
+                        error={this.state.bidError !== ""}
+                        title={this.state.bidError}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">EUR</InputAdornment>,
+                        }}
+                        fullWidth
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.closeDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={this.placeBid} color="primary">
+                        Place Bid
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        )
+    }
+
+    buyout()
+    {
+        axios.post("/api/buyout", {username: this.props.user.Username, password: this.props.user.Password, auction_id: this.state.auction.Id})
+        .then( res => {
+            if (res.data.error)
+            {
+                alert(res.data.message);
+                console.error(res.data.message);
+                return;
+            }
+
+            console.log(res.data)
+        })
+        .catch(err => console.error(err))
+
+        this.closeBuyoutDialog();
+    }
+
+    BuyoutDialog(props)
+    {
+        return (
+            <Dialog open={this.state.buyoutDialogOpen} onClose={this.closeBuyoutDialog} fullWidth>
+                <DialogTitle>Buyout</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Confirm Buyout?
+                    </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={this.closeBuyoutDialog} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={this.buyout} color="primary">
+                        Buyout
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        )
     }
 
     openBuyoutDialog()
     {
+        if (!this.props.user)
+        {
+            alert("You have to login in order to place a bid.")
+            return;
+        }
+
         this.setState({
             buyoutDialogOpen: true
         })
@@ -87,32 +258,10 @@ class AuctionPage extends Component
         })
     }
 
-    userClick(user)
-    {
-        this.props.history.push(`/user/${user.Username}`);
-    }
-
-    BidDialog(props)
-    {
-        return (
-            <Dialog open={this.state.bidDialogOpen} onClose={this.closeBidDialog}>
-                Bid
-            </Dialog>
-        )
-    }
-
-    BuyoutDialog(props)
-    {
-        return (
-            <Dialog open={this.state.buyoutDialogOpen} onClose={this.closeBuyoutDialog}>
-                Buyout
-            </Dialog>
-        )
-    }
-
     render()
     {
-        const ended = this.state.auction ? (this.state.auction.has_Ended === 0 ? 0 : 1) : false;
+        let ended = this.state.auction ? (this.state.auction.Ended === 0 ? false : true) : false;
+        // ended = false;
 
         if (this.state.auction === null)
             return null;
@@ -122,12 +271,6 @@ class AuctionPage extends Component
         rating  = 3.5;
 
         return (
-            // this.state.auction.has_Ended
-            false ?
-            <Paper className="AuctionPage">
-                <h2>This auction has ended...</h2>
-            </Paper>  
-            :
             <Paper className={`AuctionPage ${ended ? "Ended" : ""}`}>
                 <div className="Details">
                     <Grid container spacing={2}>
@@ -174,7 +317,7 @@ class AuctionPage extends Component
                         </Grid>
 
                         <Grid item xs={2} /*Pricing*/>
-                            <Paper className="Pricing" elevation={2}>
+                            <Paper className="Pricing">
                                 <h2 id="PricingTitle">Pricing</h2>
                                 
                                 <Grid container className="Prices" spacing={1}>
@@ -200,9 +343,16 @@ class AuctionPage extends Component
                                     </Grid>
                                 </Grid>
 
-                                <ButtonGroup className="Buttons" fullWidth color="primary" variant="contained">
+                                <ButtonGroup className="Buttons" fullWidth color="primary" variant="contained" style={{zIndex: 1}}>
                                     <Button className="Bid Button" onClick={this.openBidDialog} disabled={ended}>Bid</Button>
-                                    <Button className="Buyout Button" onClick={this.openBuyoutDialog} disabled={ended}>Buyout</Button>
+                                    <Button 
+                                        className="Buyout Button"
+                                        onClick={this.openBuyoutDialog}
+                                        disabled={ended || this.state.auction.Currently >= this.state.auction.Buy_Price}
+                                        title={this.state.auction.Currently >= this.state.auction.Buy_Price ? "Cannot buyout: Current bid is higher than Buyout price." : ""}
+                                    >
+                                        Buyout
+                                    </Button>
                                 </ButtonGroup>
                             </Paper>
                         </Grid>
@@ -212,7 +362,7 @@ class AuctionPage extends Component
                 <div className="Location">
                     <h2>Location: {this.state.auction.Location}</h2>
                     {position ? (
-                        <Paper elevation={10} style={{width: "100%"}}>
+                        <Paper style={{width: "100%"}}>
                             <Map center={position} zoom={8} style={{height: "500px", width:"100%"}}>
                                 <TileLayer
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -227,6 +377,25 @@ class AuctionPage extends Component
                 </div>
 
                 <this.BidDialog/>
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left'
+                    }}
+                    open={this.state.openSnackbar}
+                    autoHideDuration={3000}
+                    message={<span>Bid placed!</span>}
+                    onClose={this.closeSnackbar}
+                    action={[
+                        <IconButton
+                            key="close"
+                            color="inherit"
+                            onClick={this.closeSnackbar}
+                        >
+                            <CloseIcon/>
+                        </IconButton>
+                    ]}
+                />
                 <this.BuyoutDialog/>
             </Paper>
             );

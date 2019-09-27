@@ -13,7 +13,9 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
     color: white;
 
-    box-shadow: 1px 1px 20px $graphite;
+    // box-shadow: 1px 1px 20px $graphite;
+
+    filter: drop-shadow(1px 1px 10px $graphite);
     
     #Logo
     {
@@ -140,7 +142,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
         button
         {
             font-size: $small-font-size;
-            background-color: $main-color;
+            background-color: $secondary-color;
 
             border:none;
             border-top-right-radius: 5px;
@@ -153,7 +155,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
             &:hover, &:active
             {
-                background-color: $main-hover;
+                background-color: $secondary-hover;
             }
         }
     }
@@ -189,7 +191,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
         &.Full
         {
 
-            padding: 20px 0;
+            padding: 7px 0;
             .Avatar
             {
                 margin: 0;
@@ -229,6 +231,10 @@ $Search-height: calc(#{$Header-height} / 2.2);
     .Empty
     {
         padding: 20px;
+    }
+
+    * {
+        z-index: 2 !important;
     }
 }
 
