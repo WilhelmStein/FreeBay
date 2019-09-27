@@ -9,7 +9,7 @@ import { Paper, Grid, Button, ButtonGroup, Box, TextField, InputAdornment, Snack
 import CloseIcon from '@material-ui/icons/Close';
 import { Dialog, DialogActions, DialogTitle, DialogContent, DialogContentText } from '@material-ui/core';
 import { Rating } from '@material-ui/lab';
-import { Card, CardHeader, CardMedia, CardContent, CardActions } from '@material-ui/core';
+import { CardHeader, CardMedia, CardContent } from '@material-ui/core';
 import { Typography } from '@material-ui/core'
 import { Table, TableHead, TableBody, TableRow, TableCell } from '@material-ui/core'
 import { ExpansionPanel, ExpansionPanelSummary, ExpansionPanelDetails } from '@material-ui/core'
@@ -81,6 +81,12 @@ class AuctionPage extends Component
             return;
         }
 
+        if (this.props.user.Username === this.state.auction.User.Username)
+        {
+            alert("You cannot bid on your own auction.");
+            return;
+        }
+
         this.setState({
             bidDialogOpen: true,
             bid: this.calculateNextBid(),
@@ -120,7 +126,7 @@ class AuctionPage extends Component
 
         MDelta = (MDelta / this.state.auction.Bids.length)
 
-        const bid = this.state.auction.Bids[this.state.auction.Bids.length - 1].Amount + MDelta;
+        const bid = this.state.auction.Currently + MDelta;
 
         return bid.toFixed(2)
     }
@@ -134,7 +140,7 @@ class AuctionPage extends Component
 
     placeBid()
     {
-        if (this.state.bid <= this.state.auction.Bids[this.state.auction.Bids.length - 1].Amount)
+        if (this.state.bid <= this.state.auction.Currently)
         {
             this.setState({
                 bidError: "Too low price"
@@ -186,7 +192,7 @@ class AuctionPage extends Component
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.closeDialog} color="primary">
+                    <Button onClick={this.closeBidDialog} color="primary">
                         Cancel
                     </Button>
                     <Button onClick={this.placeBid} color="primary">
@@ -243,6 +249,12 @@ class AuctionPage extends Component
         if (!this.props.user)
         {
             alert("You have to login in order to place a bid.")
+            return;
+        }
+
+        if (this.props.user.Username === this.state.auction.User.Username)
+        {
+            alert("You cannot bid on your own auction.");
             return;
         }
 

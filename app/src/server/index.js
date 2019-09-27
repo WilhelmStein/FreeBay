@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const https = require('https');
 const fs = require('fs');
+const multer = require('multer');
+const upload = multer({dest: 'src/server/database/images/'}).single('file');
 
 const app = express();
 
@@ -67,6 +69,34 @@ app.post('/api/recommended', function (req, res) { controller.recommended(req.bo
 
 app.get('/api/image', function (req, res) { controller.image(req.query.path, res); });
 
+app.post('/api/uploadImage', function (req, res) { 
+    upload(req, res, (err) => {
+        
+        if (err) 
+        {
+            console.error(err)
+            res.send({
+                error: true,
+                message: "Something went wrong with uploading middleware"
+            })
+        }
+        
+        const filename = `${__dirname}/database/images/${req.file.filename}`
+        fs.rename(filename, `${filename}.${req.file.mimetype.split("/")[1]}`, (err) => {
+            if (err)
+            {
+                console.error(err);
+                res.send({
+                    error: true,
+                    message: "Something went wrong with uploading middleware"
+                })
+            }
+        });
+
+        controller.uploadImage(req.body.auction_id, `${req.file.filename}.${req.file.mimetype.split("/")[1]}`, res);
+    })
+})
+
 app.post('/api/notifications', function (req, res) { controller.notifications(req.body.username, req.body.password, res); });
 
 app.post('/api/readNotification', function (req, res) { controller.readNotification(req.body.username, req.body.password, req.body.notification, res); });
@@ -82,6 +112,8 @@ app.post('/api/deleteMessage', function (req, res) { controller.deleteMessage(re
 app.post('/api/placeBid', function(req, res) { controller.placeBid(req.body.username, req.body.password, req.body.auction_id, req.body.amount, res); });
 
 app.post('/api/buyout', function(req, res) { controller.buyout(req.body.username, req.body.password, req.body.auction_id, res) })
+
+app.post('/api/postAuction', function(req, res) { controller.postAuction(req.body, res); });
 
 const options = {
     key: fs.readFileSync(path.join(__dirname, 'encryption/server.key'), 'utf8'),
