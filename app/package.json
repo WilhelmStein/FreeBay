@@ -11,24 +11,32 @@
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
         "http-proxy-middleware": "^0.20.0",
+        "leaflet": "^1.5.1",
         "material-ui-carousel": "^1.0.0",
         "material-ui-flat-pagination": "^3.2.0",
+        "multer": "^1.4.2",
         "mysql": "^2.17.1",
         "react": "^16.8.6",
+        "react-amazon-gallery": "^0.3.0",
         "react-awesome-slider": "^1.0.1",
         "react-bootstrap": "^1.0.0-beta.10",
         "react-countdown-now": "^2.1.1",
         "react-dom": "^16.8.6",
+        "react-leaflet": "^2.4.0",
+        "react-markdown-renderer": "^1.4.0",
         "react-router-dom": "^5.0.1",
         "react-scripts": "3.0.1",
-        "reactjs-popup": "^1.4.1"
+        "reactjs-popup": "^1.4.1",
+        "xml-formatter": "^1.1.0"
     },
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "server": "nodemon src/server/index.js"
+        "server": "nodemon src/server/index.js",
+        "watcher": "nodemon src/server/watcher.js",
+        "python-server": "python3 data/ebay-data/recommend.py"
     },
     "eslintConfig": {
         "extends": "react-app"

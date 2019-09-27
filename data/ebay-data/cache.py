@@ -49,15 +49,15 @@ class Cache:
         ),
         "Auction": (
             "INSERT INTO Auction "
-                "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description) "
+                "(Id, Seller_id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description, Ended) "
             "VALUES "
-                "(%(Id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s)"
+                "(%(Id)s, %(Seller_id)s, %(Name)s, %(Currently)s, %(First_Bid)s, %(Buy_Price)s, %(Location)s, %(Latitude)s, %(Longitude)s, %(Started)s, %(Ends)s, %(Description)s, %(Ended)s)"
         ),
         "Bid": (
             "INSERT INTO Bid "
-                "(Id, User_id, Auction_Id, Amount, Time) "
+                "(Id, User_Id, Auction_Id, Amount, Time) "
             "VALUES "
-                "(%(Id)s, %(User_id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
+                "(%(Id)s, %(User_Id)s, %(Auction_Id)s, %(Amount)s, %(Time)s)"
         ),
         "Image": (
             "INSERT INTO Image "

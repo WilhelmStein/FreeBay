@@ -1,13 +1,23 @@
 @import 'global';
 
-h1
+.UserCard
 {
-    font-weight: 400;
-    color: $red;
-
-    padding: 50px;
+    .User.CardHeader
+    {
+        .Action
+        {
+            background-color: $blue;
+    
+            margin: 10px;
+    
+            &:hover
+            {
+                background-color: $white-blue
+            }
+        }
+    }
+    
 }
-
 .UserForm
 {
     .DialogText
@@ -25,6 +35,8 @@ h1
 
     h6
     {
+        font-size: $small-font-size;
+        color: $blue;
         margin-top: 35px;
     }
 
@@ -35,99 +47,183 @@ h1
 }  
 
 
-.UserGrid
-{
-    padding-left: 3%;
-    padding-right: 3%;
-
-    padding-top: 2%; 
-
-    .UserData
+.UserMenu
+{   
+    .UserAvatar
     {
-        width: 320px;
-
-        .UserMedia
-        {
-            height: 320px;
-            object-fit: contain;
-            &:hover {
-                cursor: pointer;
-            }
-        }
-
-        .UserDetails
-        {
-            .Title
-            {
-                color: $graphite;
-                font-size: 1em;
-            }
-
-            .Data
-            {
-                color: $blue;
-                font-size: 1.2em;
-            }
-
-            .Validated
-            {
-                color: green;
-            }
-
-            .Invalidated
-            {
-                color: red;
-            }
-
-            .Submit
-            {
-                color: white;
-                background: $blue;
-            }
+        &:hover {
+            cursor: pointer;
         }
     }
 
-    .UserMenu
+    .SettingsIcon
     {
-        .UserTabs
+        color: $almost-white;
+        background-color: $blue;
+        transition: 300ms;
+        &:hover {
+            color: $blue;
+            background-color: white;
+            cursor: pointer;
+        }
+    }
+
+    .UserDetails
+    {
+        .Title
         {
-            .Tab
+            color: $graphite;
+            font-size: 1em;
+        }
+
+        .Data
+        {
+            color: $blue;
+            font-size: 1.2em;
+        }
+    }
+}
+
+.UserContent
+{
+    .Tabs
+    {
+        color: white;
+        background-color: $blue;
+    }
+}
+
+.AuctionGrid
+{
+    padding: 20px;
+    background-color: $almost-white;
+
+    .AuctionCard
+    {
+        
+        ::-webkit-scrollbar 
+        {
+            width: 0.4em;
+            height: 0.4em;
+        }
+
+        ::-webkit-scrollbar-track
+        {
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.00);
+        }
+
+        ::-webkit-scrollbar-thumb
+        {
+            background-color: rgba(0,0,0,.1);
+            outline: 1px solid slategrey;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover
+        {
+            background: $lesser-white;
+        }
+
+        height: 200px;
+        width: 900px;
+        display: grid;
+        grid-template-columns: 200px auto 300px;
+
+        transition: 200ms;
+        cursor: pointer;
+        background-color: $almost-white;
+
+        &:hover
+        {
+            background-color: $less-white;
+        }
+
+        .Media
+        {
+            height: 200px;
+        }
+        
+        .Details
+        {
+            color: $graphite;
+
+            .Title
             {
-                font-size: $normal-font-size;
+                text-overflow: ellipsis;
+                font-size: 1.4em;
+                
+                &:hover
+                {
+                    color: $graphite;
+                }
+            }
+
+            .Description
+            {
+                margin-top: 20px;
+                color: $graphite;
+
+                max-height: 100px;
+                overflow-y: scroll;
+
+                &.Empty
+                {
+                    font-style: italic;
+                }
             }
         }
 
-        .AuctionGrid
+        .Prices
         {
-            margin-top: 10px;
-
-            .AuctionCard
+            color: $graphite;
+            background-color: $lesser-white;
+    
+            .Title
             {
-                transition: 200ms;
-                overflow: auto;
-
-                cursor: pointer;
-
-                background-color: $almost-white;
-
-                &:hover
+                font-size: $small-font-size;
+                font-weight: 300;
+            }
+    
+            .Price
+            {
+                font-size: $normal-font-size;
+                &.Starting
                 {
-                    background-color: $less-white;
+                    color: $blue;
                 }
-
-                .Media
+    
+                &.Current
                 {
-                    height: 250px;
+                    color: $green;
                 }
-
-                .Title
+    
+                &.Buyout
                 {
-                    font-size: 1.6em;
-                    
-                    &:hover
-                    {
-                        color: $graphite;
-                    }
+                    color: $red;
+                }
+            }
+        }
+    
+        .Dates
+        {
+            p
+            {
+                font-size: $smaller-font-size !important;
+                font-weight: 300;
+            }
+    
+            .Date
+            {
+                font-weight: 400;
+                &.Started
+                {
+                    color: $green;
+                }
+    
+                &.Ends
+                {
+                    color: $red;
                 }
             }
         }

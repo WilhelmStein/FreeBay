@@ -52,7 +52,6 @@
 - [x] Home Page
   - [x] Carousel
     - [x] Create custom carousel component
-    - [ ] Experiment with colouring
   - [x] General Styling
   - [x] Popular / Recommended Grid
   - [x] Carousel Items Query
@@ -68,21 +67,37 @@
   - [x] Square Grid (Scrapped)
   - [x] Pagination
   - [x] Redo with one button
+- [x] Notification System
+  - [x] Database Tweak
+  - [x] Backend query
+  - [x] Link handling
 - [ ] Account Page
   * Everybody
-    - [ ] Profile
-    - [ ] Posted Auctions
+    - [x] Profile
+    - [x] Posted Auctions
   * Logged User
     - [ ] Post Auction
-    - [ ] Active Auctions
-    - [ ] Messages
-      - [ ] Notifications
-      - [ ] Received / Sent Sorting
-      - [ ] Delete Message
-    - [ ] Settings
+    - [x] Active Auctions
+    - [x] Messages
+      - [x] DB redo -header -body
+      - [x] Backend queries
+      - [x] Received / Sent Sorting
+      - [x] History management
+      - [x] Send
+      - [x] Reply
+      - [x] Delete
+      - [x] Read / Unread Styling
+      - [x] Send Notification
+      - [x] Integrate with user page
+    - [x] Settings
 - [ ] Auction Page
-  - [ ] View - Bid Auction
+  - [x] Image Gallery
+  - [x] Show faded out if ended
   - [x] Export to XML by admin
+  - [x] Bid Dialog
+    - [ ] Send notifications to all distinct users
+  - [x] Buyout Dialog
+  - [x] General Styling
 - [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing

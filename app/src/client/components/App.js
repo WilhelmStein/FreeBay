@@ -41,7 +41,6 @@ class App extends React.Component {
                 {
                     this.props.history.push("/admin");
                 }
-
             }
             else
             {
@@ -61,8 +60,8 @@ class App extends React.Component {
             if (res.data.error)
                 console.error(res.data.message);
                 
-            this.setState({user: res.data.data});
-            sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data));
+            this.setState({user: res.data.data}, () => sessionStorage.setItem('LoggedUser', JSON.stringify(res.data.data)));
+            
         })
         .catch(err => console.log(err));
     }
@@ -73,17 +72,21 @@ class App extends React.Component {
             <div className="App">
                 {/* Header is here because it will always render in the website. It also gives login status to every other page */}
                 <Header user={this.state.user} loginHandler={this.loginHandler}/>
-                <Menu active={this.props.location.pathname}/>
+                {/* <Menu active={this.props.location.pathname}/> */}
                 <Switch>
                     <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
-                    <Route path='/auction/:id' component={AuctionPage} />
-                    <Route path='/user/:username' render={(props) => <UserPage user={this.state.user}
-                                                                               username={props.match.params.username}
-                                                                               updateHandler={(username, password) => this.updateHandler(username, password)}
-                                                                     />
-                                                         }
-                    />
+                    <Route path='/auction/:id' render= { () => <AuctionPage user={this.state.user}/> } />
+                    <Route path='/user/:username/:tab?/:action?' render={ (props) => {
+                        return (
+                            <UserPage user={this.state.user}
+                                username={props.match.params.username}
+                                tab={props.match.params.tab}
+                                action={props.match.params.action}
+                                updateHandler={this.updateHandler}
+                            />
+                        )
+                    }}/>
                     <Route path='/admin' render={ () => <AdminPage user={this.state.user}/>} />
                     <Route path='*' component={NotFound} />
                 </Switch>

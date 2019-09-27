@@ -139,6 +139,7 @@ export class LoginForm extends Component
                 <header>Log in</header>
                     <TextField
                         className="TextField"
+                        autoFocus
                         required
                         error={this.state.wrong}
                         label="Username"

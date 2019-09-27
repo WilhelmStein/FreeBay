@@ -3,7 +3,7 @@ import autoBind from 'auto-bind';
 import { withRouter } from 'react-router-dom';
 import axios from "axios";
 
-import {Fade, Typography, Box, Container, Grid, Button, Select, MenuItem, Card, CardMedia, CardContent} from '@material-ui/core';
+import { Fade, Typography, Box, Grid, Button, Select, MenuItem, Card, CardMedia, CardContent, Link } from '@material-ui/core';
 import Pagination from 'material-ui-flat-pagination';
 
 
@@ -178,7 +178,8 @@ class SearchResults extends Component
 
 function DetailedAuctionItem(props)
 {
-    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+    let rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+    rating = 3.5;
 
     return (
         <Fade in={true}>
@@ -190,27 +191,32 @@ function DetailedAuctionItem(props)
                 />
                 <CardContent className="ItemBody">
 
-                    <Typography variant="h2" className="Title" onClick={(e) => {props.auctionClick(e, props.item.Id)}}>
-                        {props.item.Name}
+                    <Typography variant="body1" className="Title" noWrap title={props.item.Name}>
+                        <Link href={`/auction/${props.item.Id}`} color="inherit" className="Link">
+                            {props.item.Name}
+                        </Link>
                     </Typography>
 
                     <Box mb={2} className="SellerBox">
-                        <Typography display="inline"> Sold By:</Typography>
+                        <Typography display="inline">by</Typography>
 
                         <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
-                            &nbsp; &nbsp;{props.item.User.Username}
+                            &nbsp; {props.item.User.Username}
                         </Typography>
                             
                         <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
                     </Box>
                     
                     <Box className="Description">
-                        {props.item.Description ? props.item.Description : "No Description."}
+                        <Typography color="textSecondary" variant="body2">
+                            {props.item.Description ? props.item.Description : "No Description."}
+                        </Typography>
                     </Box>
                     
                 </CardContent>
 
                 <CardContent className="Pricing">
+                    <h2 id="PricingTitle">Pricing</h2>
                     <Grid container className="Prices" spacing={1}>
                         <Grid item >
                             <Typography variant="h5" className="Title">Starting Price:</Typography>
@@ -234,14 +240,14 @@ function DetailedAuctionItem(props)
                         </Grid>
                     </Grid>
 
-                    <Box className="Dates" mt={2}>
+                    {/* <Box className="Dates" mt={2}>
                         <Typography>
                             Started in: <span className="Started Date">{props.item.Started}</span>
                         </Typography>
                         <Typography>
                             Ends in: <span className="Ends Date">{props.item.Ends}</span>
                         </Typography>
-                    </Box>
+                    </Box> */}
 
                     <Box className="Buttons" mt={3}>
                         <Button className="Buy Button" variant="contained" onClick={(e) => {props.auctionClick(e, props.item.Id)}}>
@@ -269,8 +275,10 @@ function CollapsedAuctionItem(props)
                     title="Generic placeholder"
                 />
                 <CardContent className="ItemBody">
-                    <Typography variant="h2" noWrap className="Title"  onClick={(e) => {props.auctionClick(e, props.item.Id)}}>
-                        {props.item.Name}
+                    <Typography variant="body1" className="Title" noWrap title={props.item.Name}>
+                        <Link href={`/auction/${props.item.Id}`} color="inherit" className="Link">
+                            {props.item.Name}
+                        </Link>
                     </Typography>
 
                     <Box className="SellerBox">
