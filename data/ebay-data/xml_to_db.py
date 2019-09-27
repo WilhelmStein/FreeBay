@@ -37,7 +37,23 @@ else:
 
 cache = Cache()
 
-generator = Generator(cache, downloader)
+categories = [
+    ("Health & Fitness",       "Your body is your temple. Respect it as you should."),
+    ("Clothing",               "Be fashionable, be alluring."),
+    ("Home",                   "Home sweet home."),
+    ("CDs & Vinyl",            "Kick back and relax to the sound of music."),
+    ("Digital Music",          "All the newest tracks are here."),
+    ("Computer & Accessories", "The best computers money can buy."),
+    ("Jewellery",              "Treat yourself to something glamorous and exquisite."),
+    ("Garden & Outdoors",      "Take a breath of fresh air."),
+    ("Kitchen",                "Cooking has never been easier!"),
+    ( "Pet Supplies",          "Because your small furry friend deserves only the best."),
+    ( "Sports",                "Live life to the fullest!"),
+    ( "Toys & Games",          "From miniatures to videogames."),
+    ( "Electronics",           "For all your electronics needs.")
+]
+
+generator = Generator(cache, categories, downloader)
 
 for auction in parser.auctions.values():
 

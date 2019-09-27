@@ -4,7 +4,7 @@ USE freebay;
 SET @max_user_id      := (SELECT MAX(Id) FROM User);
 SET @max_address_id   := (SELECT MAX(Id) FROM Address);
 SET @max_auction_id   := (SELECT MAX(Id) FROM Auction);
-SET @max_category_id  := (SELECT MAX(Id) FROM Category);
+SET @max_category_id  := 0;
 
 SET @dummy_admin_id   := @max_user_id + 1;
 SET @dummy_user_id    := @max_user_id + 2;
@@ -51,21 +51,6 @@ VALUES  (@max_auction_id + 1, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500
 
 
 -- Categories --
-
-INSERT INTO Category (Id, Name, Caption)
-VALUES (@category_1, "Health & Fitness",            "Your body is your temple. Respect it as you should."),
-       (@category_2, "Clothing",                    "Be fashionable, be alluring."),
-       (@category_3, "Home",                        "Home sweet home."),
-       (@category_4, "CDs & Vinyl",                 "Kick back and relax to the sound of music."),
-       (@category_5, "Digital Music",               "All the newest tracks are here."),
-       (@category_6, "Computer & Accessories",      "The best computers money can buy."),
-       (@category_7, "Jewellery",                   "Treat yourself to something glamorous and exquisite."),
-       (@category_8, "Garden & Outdoors",           "Take a breath of fresh air."),
-       (@category_9, "Kitchen",                     "Cooking has never been easier!"),
-       (@category_10, "Pet Supplies",               "Because your small furry friend deserves only the best."),
-       (@category_11, "Sports",                     "Live life to the fullest!"),
-       (@category_12, "Toys & Games",               "From miniatures to videogames."),
-       (@category_13, "Electronics",                "For all your electronics needs.");
 
 INSERT INTO Auction_has_Category (Auction_Id, Category_Id)
 VALUES (@max_auction_id + 1, @category_1),

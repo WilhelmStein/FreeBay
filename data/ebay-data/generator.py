@@ -17,6 +17,7 @@ class Generator:
     def __init__(
         self,
         cache,
+        categories,
         downloader=None,
         seed=123456789,
         verbose=True,
@@ -51,7 +52,19 @@ class Generator:
 
         self.users = {}
 
-        self.categories = {}
+        self.categories = categories
+
+        for category_index, category_data in enumerate(categories):
+
+            category_name, category_caption = category_data
+
+            self.cache.register("Category",
+                self.__generate_category__(
+                    id=category_index + 1,
+                    name=category_name,
+                    caption=category_caption
+                )
+            )
 
         self.views = {}
 
@@ -129,14 +142,12 @@ class Generator:
         }
 
 
-    def __generate_category__(self, name):
-
-        self.categories[name] = len(self.categories) + 1
+    def __generate_category__(self, id, name, caption=None):
 
         return {
-            "Id": len(self.categories),
+            "Id": id,
             "Name": name,
-            "Caption": self.generator.text(50)
+            "Caption": caption if caption else self.generator.text(50)
         }
 
 
@@ -278,13 +289,10 @@ class Generator:
                 )
             )
 
-        for category in auction["Category"]:
 
-            if category not in self.categories:
+        for category_index in self.random.sample(range(len(self.categories)), self.__lower_end_biased_random__(1, len(self.categories))):
 
-                self.cache.register("Category", self.__generate_category__(category))
-
-                self.cache.register("Auction_has_Category", self.__generate_auction_has_category__(self.auction_id, self.categories[category]))
+            self.cache.register("Auction_has_Category", self.__generate_auction_has_category__(self.auction_id, category_index + 1))
 
 
     def generate_views(
