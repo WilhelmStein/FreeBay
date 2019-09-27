@@ -359,80 +359,6 @@ class DBController
         this.query(query, res);
     }
 
-    search(category, text, res)
-    {
-        let escape = [text, text]
-        if (category !== '0')
-        {
-            escape.unshift(category);
-        }
-
-        const query = {
-            string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Seller_Rating', a.Seller_Rating) as User, 
-                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
-                                DATE_FORMAT(a.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y %H:%i") as Ends,
-                                a.Description, i.Images, b.Bids
-                        FROM
-                        (
-                            SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
-                            FROM    Auction a,
-                                    User u,
-                                    General_User gu
-                                    ${category !== '0' ? ", Category as c, Auction_has_Category as ahc" : ""}
-                            WHERE   a.Seller_Id = u.Id AND
-                                    u.Id = gu.User_Id
-                                    ${category !== '0' ? "AND ahc.Category_Id = ? AND ahc.Auction_Id = a.Id AND ahc.Category_Id = c.Id" : ""}
-                                    ${text ? `
-                                    AND
-                                    (
-                                        MATCH(a.Name) AGAINST (? IN NATURAL LANGUAGE MODE) OR
-                                        MATCH(a.Description) AGAINST (? IN NATURAL LANGUAGE MODE)
-                                    )
-                                    ` : ""}
-                        ) as a
-                            LEFT JOIN
-                            (
-                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
-                                FROM    Image i,
-                                        Auction a
-                                WHERE   i.Auction_Id = a.Id
-                                GROUP BY a.Id
-                            ) as i ON a.Id = i.Auction_Id
-                            LEFT JOIN
-                            (
-                                SELECT  b.Auction_Id, JSON_ARRAYAGG(
-                                                        JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User',
-                                                        JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating),
-                                                        'Amount', b.Amount, 'Time', b.Time)) as Bids
-                                FROM    Bid b,
-                                        User u,
-                                        General_User gu
-                                WHERE   b.User_Id = gu.User_Id AND
-                                        gu.User_Id = u.Id
-                                GROUP BY b.Auction_Id
-                            ) as b ON b.Auction_Id = a.Id`,
-
-            escape: escape
-        }
-
-        this.query(query, res, (rows) => {
-
-            rows = rows.map( (item) => {
-                    item.User = JSON.parse(item.User);
-                    item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-                    item.Bids = item.Bids === null ? [] : JSON.parse(item.Bids);
-                    return item;
-                });
-
-                res.send({
-                    error: false,
-                    message: "OK",
-                    data: rows
-                });
-        });
-    }
-
     publicUserDetails(username, res)
     {
         const query = {
@@ -664,12 +590,12 @@ class DBController
         const query = {
 
             string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Rating', a.Seller_Rating) as User,
-                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
+                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends, a.has_Ended,
                                 a.Description, i.Images, b.Bids
                         FROM
                         (
                             SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating, IF(a.Ends >= NOW(), FALSE, TRUE) as has_Ended
                             FROM    Auction a,
                                     User u,
                                     General_User gu
@@ -711,7 +637,7 @@ class DBController
 
             item.User = JSON.parse(item.User);
             item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-            item.Bids = JSON.parse(item.Bids);
+            item.Bids = item.Bids === null ? [] : JSON.parse(item.Bids);
 
             res.send({
                 error: false,
@@ -766,65 +692,6 @@ class DBController
                 })
                 
                 return category;
-            });
-
-            res.send({
-                error: false,
-                message: "OK",
-                data: rows
-            });
-        });
-    }
-
-    scrapped_featured(res)
-    {   // Change cost function
-        const query = {
-            string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
-                                t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude,
-                                t.Started, t.Ends,
-                                t.Description, (Count(v.User_Id) * t.Seller_Rating) AS Cost, i.Images, b.Bids
-                        FROM 
-                        (
-                            SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
-                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
-                            FROM    Auction a,
-                                    User u, 
-                                    General_User gu
-                            WHERE   a.Seller_Id = u.Id AND 
-                                    u.Id = gu.User_Id
-                        ) as t
-                            LEFT JOIN
-                            (
-                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images 
-                                FROM    Image i, 
-                                        Auction a 
-                                WHERE   i.Auction_Id = a.Id 
-                                GROUP BY a.Id
-                            ) as i ON t.Id = i.Auction_Id 
-                            LEFT JOIN
-                            (
-                                Views v
-                            ) ON v.Auction_Id = t.Id
-                            LEFT JOIN 
-                            (
-                                SELECT  b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User', JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating), 'Amount', b.Amount, 'Time', b.Time)) as Bids
-                                FROM    Bid b,
-                                        User u,
-                                        General_User gu
-                                WHERE   b.User_Id = gu.User_Id AND gu.User_Id = u.Id GROUP BY b.Auction_Id
-                            ) as b ON b.Auction_Id = t.Id
-                        GROUP BY t.Id
-                        ORDER BY Cost DESC
-                        LIMIT 5`,
-            escape: []
-        }
-
-        this.query(query, res, (rows) => {
-            rows = rows.map( (item) => {
-                item.User = JSON.parse(item.User);
-                item.Bids = JSON.parse(item.Bids);
-                item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-                return item;
             });
 
             res.send({
@@ -896,6 +763,81 @@ class DBController
                 });
             });
         }
+    }
+
+    search(category, text, res)
+    {
+        let escape = [text, text]
+        if (category !== '0')
+        {
+            escape.unshift(category);
+        }
+
+        const query = {
+            string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Seller_Rating', a.Seller_Rating) as User, 
+                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
+                                DATE_FORMAT(a.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y %H:%i") as Ends,
+                                a.Description, i.Images, b.Bids
+                        FROM
+                        (
+                            SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
+                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                            FROM    Auction a,
+                                    User u,
+                                    General_User gu
+                                    ${category !== '0' ? ", Category as c, Auction_has_Category as ahc" : ""}
+                            WHERE   a.Seller_Id = u.Id AND
+                                    u.Id = gu.User_Id
+                                    ${category !== '0' ? "AND ahc.Category_Id = ? AND ahc.Auction_Id = a.Id AND ahc.Category_Id = c.Id" : ""}
+                                    ${text ? `
+                                    AND
+                                    (
+                                        MATCH(a.Name) AGAINST (? IN NATURAL LANGUAGE MODE) OR
+                                        MATCH(a.Description) AGAINST (? IN NATURAL LANGUAGE MODE)
+                                    )
+                                    ` : ""}
+                        ) as a
+                            LEFT JOIN
+                            (
+                                SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+                                FROM    Image i,
+                                        Auction a
+                                WHERE   i.Auction_Id = a.Id
+                                GROUP BY a.Id
+                            ) as i ON a.Id = i.Auction_Id
+                            LEFT JOIN
+                            (
+                                SELECT  b.Auction_Id, JSON_ARRAYAGG(
+                                                        JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User',
+                                                        JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Seller_Rating', gu.Seller_Rating),
+                                                        'Amount', b.Amount, 'Time', b.Time)) as Bids
+                                FROM    Bid b,
+                                        User u,
+                                        General_User gu
+                                WHERE   b.User_Id = gu.User_Id AND
+                                        gu.User_Id = u.Id
+                                GROUP BY b.Auction_Id
+                            ) as b ON b.Auction_Id = a.Id`,
+
+            escape: escape
+        }
+
+        this.query(query, res, (rows) => {
+
+            rows = rows.map( (item) => {
+                item.User = JSON.parse(item.User);
+                item.Images = item.Images === null ? [] : JSON.parse(item.Images);
+                item.Bids = item.Bids === null ? [] : JSON.parse(item.Bids);
+                return item;
+            });
+
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows
+            });
+        });
     }
 
     image(path, res)

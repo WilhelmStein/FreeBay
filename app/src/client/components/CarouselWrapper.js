@@ -77,7 +77,7 @@ class CarouselWrapper extends Component {
 
         return (
             // <div style={{padding: "20px 100px", backgroundColor: "rgb(235, 235, 235)"}}>
-                <Carousel className="Carousel">
+                <Carousel className="HomeCarousel">
                 {
                     this.state.categories.map((category, index) => {
                         const props = this.getProps(index)
@@ -140,7 +140,6 @@ function CategoryBanner(props)
                         image={auction.Images && auction.Images.length ? `/api/image?path=${auction.Images[0].Path}` : 
                                 "https://dummyimage.com/250x250/ffffff/4a4a4a.png&text=No+Image"}
                         title={auction.Name}
-                        
                     >
                         <Typography className="MediaCaption">
                             {auction.Name}

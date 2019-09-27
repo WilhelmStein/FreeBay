@@ -10,14 +10,17 @@
         "axios": "^0.19.0",
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
+        "leaflet": "^1.5.1",
         "material-ui-carousel": "^1.0.0",
         "material-ui-flat-pagination": "^3.2.0",
         "mysql": "^2.17.1",
         "react": "^16.8.6",
+        "react-amazon-gallery": "^0.3.0",
         "react-awesome-slider": "^1.0.1",
         "react-bootstrap": "^1.0.0-beta.10",
         "react-countdown-now": "^2.1.1",
         "react-dom": "^16.8.6",
+        "react-leaflet": "^2.4.0",
         "react-markdown-renderer": "^1.4.0",
         "react-router-dom": "^5.0.1",
         "react-scripts": "3.0.1",
@@ -29,7 +32,8 @@
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "server": "nodemon src/server/index.js"
+        "server": "nodemon src/server/index.js",
+        "python-server": "python3 data/ebay-data/recommend.py"
     },
     "eslintConfig": {
         "extends": "react-app"
