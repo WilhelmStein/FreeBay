@@ -819,9 +819,25 @@ class DBController
         });
     }
 
-    recommended(user_id, res)
+    recommended(res, specific = false, ids = null)
     {
+        let specific_ids = ""
+        if (specific)
+        {
+            specific_ids = " AND ("
+            for (let i = 0; i < ids.length; i++)
+            {
+                specific_ids += `a.Id = ${ids[i]} `;
+                
+                if (i < ids.length - 1)
+                {
+                    specific_ids += "OR "
+                }
+            }
 
+            specific_ids += ") "
+        }
+        
         const query = {
             string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
                                 t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, 
@@ -836,6 +852,7 @@ class DBController
                                     General_User gu
                             WHERE   a.Seller_Id = u.Id AND 
                                     u.Id = gu.User_Id
+                                    ${specific ? specific_ids : ""}
                         ) as t
                             LEFT JOIN
                             (

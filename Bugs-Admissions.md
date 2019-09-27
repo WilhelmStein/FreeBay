@@ -8,3 +8,4 @@
 ## Admissions done
 
 * Whenever an auction ends and a user wins said auction, the auction can no longer be meddled with. A notification is sent to the winning user, that when pressed redirects the user to their messaging page with pre-chosen Receiver and Subject (aka the seller and the auction name).
+* As it stands, a user cannot modify his auctions (did not have time to implement)

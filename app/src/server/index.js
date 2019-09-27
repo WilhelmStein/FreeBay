@@ -67,7 +67,9 @@ app.get('/api/featured', function(req, res) { controller.featured(res); });
 
 app.get('/api/featured', function (req, res) { controller.featured(res); });
 
-app.post('/api/recommended', function (req, res) { controller.recommended(req.body.user_id, res); });
+app.post('/api/recommended', function (req, res) { controller.recommended(res); });
+
+app.post('/api/recommended/specific', function(req, res) {controller.recommended(res, true, req.body.ids)} )
 
 app.get('/api/image', function (req, res) { controller.image(req.query.path, res); });
 

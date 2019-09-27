@@ -73,6 +73,12 @@ npm run server
 
 # From another terminal
 npm start
+
+# From another terminal
+npm run watcher # a program that ends auctions asynchronously when their time comes
+
+# From another terminal
+npm run python-server
 ```
 
 ## Test Users
