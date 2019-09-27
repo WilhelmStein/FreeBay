@@ -296,7 +296,7 @@ class DBController
     user_permission(username, password, res, callback)
     {
         const query = {
-            string: "Select 1 From User Where Username = ? And Password = ?",
+            string: "Select Id From User Where Username = ? And Password = ?",
             escape: [username, password]
         }
 
@@ -306,6 +306,7 @@ class DBController
                 res.send({
                     error: true,
                     message: "Permission Denied",
+                    data: rows[0]
                 })
 
                 return;
@@ -558,7 +559,9 @@ class DBController
                         LEFT JOIN
                         Bid b ON b.User_Id = u.Id
                         LEFT JOIN
-                        Auction a ON a.Id = b.Auction_Id
+                        (
+                            SELECT * From Auction a Where Ended = FALSE
+                        ) as a ON a.Id = b.Auction_Id
                         LEFT JOIN
                         Image i ON i.Auction_Id = a.Id
                      GROUP BY a.Id
@@ -970,11 +973,16 @@ class DBController
                 });
             }
         }
-            
-            
+    }
 
-        
+    uploadImage(auction_id, file, res)
+    {
+        const query = {
+            string: "INSERT INTO Image (Path, Auction_Id) VALUES (?, ?)",
+            escape: [file, auction_id]
+        }
 
+        this.query(query, res);
     }
 
     sendNotifications(notifications, callback = null)
@@ -1336,8 +1344,61 @@ class DBController
         })
     }
 
+    postAuction(body, res)
+    {
+        this.user_permission(body.username, body.password, res, () => {
+            const query = {
+                string: `INSERT INTO Auction (Seller_Id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description, Ended)
+                        VALUES( (Select Id From User Where Username = ? AND Password = ?), ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, FALSE)`,
+                escape: [body.username, body.password, body.name, body.first_bid, body.first_bid, body.buy_price ? body.buy_price: null,
+                        body.location ? body.location: null, body.latitude ? body.latitude : null, body.longitude ? body.longitude : null,
+                        body.ends, body.description ? body.description : null]
+            }
+
+            this.query(query, res, (result) => {
+
+                const end = () => {
+                    res.send({
+                        error: false,
+                        message: "OK",
+                        data: result.insertId
+                    })
+                    
+                    this.sql.commit(err => console.error(err));
+                }
+
+                if (body.categories.length === 0) 
+                {
+                    end()
+                    return;
+                }
+                
+                const query = {
+                    string: "INSERT INTO Auction_has_Category (Auction_Id, Category_Id) VALUES",
+                    escape: []
+                }
+
+                for (let i = 0; i < body.categories.length; i++)
+                {
+                    query.string += " (?, (SELECT Id From Category Where Name = ?))"
+                    query.escape.push(result.insertId);
+                    query.escape.push(body.categories[i])
+
+                    if ( i !== body.categories.length - 1)
+                        query.string += ", "
+                }
+
+                this.query(query, res, () => {
+                    end();
+                })
+            }, null, true)
+        })
+    }
+
     query(query, res, callback = null, check = null, transaction=false)
     {
+        const controller = this;
+
         this.sql.query(query.string, query.escape, function(err, rows)
         {
             if (err)
@@ -1349,7 +1410,7 @@ class DBController
                 });
                 
                 if (transaction)
-                    return this.sql.rollback();
+                    return controller.sql.rollback();
 
                 return;
             }

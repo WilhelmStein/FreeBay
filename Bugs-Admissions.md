@@ -3,6 +3,7 @@
 ## Known Bugs
 
 * Sometimes the notifications popup does not render over certain elements (did not have the time to solve)
+* While posting, only one Image can be uploaded. Database and front-end have been designed to work with multiple images. Posting just does not support it at the moment
 
 ## Admissions done
 

@@ -96,6 +96,7 @@ Values  ( @dummy_user_id, "rulabula sent you a message!", "/user/user/messages",
         ( (SELECT Id FROM User WHERE Username = "rulabula"), "user sent you a message!", "/user/rulabula/messages", "Unread", "Message", NOW());
 
 Update User Set Password = 'password' Where Username = 'rulabula';
+Update General_User Set Validated = TRUE Where User_Id = (SELECT Id From User Where Username = 'user');
 
 Update Auction Set Ended = TRUE Where Ends < NOW();
 

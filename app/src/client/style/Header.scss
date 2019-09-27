@@ -1,6 +1,6 @@
 @import "global";
 
-$Header-height: 80px;
+$Header-height: 100px;
 $Search-height: calc(#{$Header-height} / 2.2);
 
 .Header
@@ -191,7 +191,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
         &.Full
         {
 
-            padding: 7px 0;
+            padding: 15px 0;
             .Avatar
             {
                 margin: 0;
@@ -222,7 +222,7 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
 .Notifications-content
 {
-    z-index: 2;
+    z-index: 100;
     padding: 0 !important;
     border-radius: 5px;
 
