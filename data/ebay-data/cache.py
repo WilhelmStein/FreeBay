@@ -101,6 +101,8 @@ class Cache:
 
         self.cnx = connector.connect(**Cache.config)
 
+        self.cnx.autocommit = False
+
         self.cur = self.cnx.cursor()
 
         if isinstance(views_to_drop, list) and views_to_drop:
@@ -136,18 +138,20 @@ class Cache:
 
     def __del__(self):
 
-        for table, entries in self.cache.items():
+        if self.cnx.is_connected():
 
-            if entries:
+            for table, entries in self.cache.items():
 
-                self.__flush__(table)
+                if entries:
+
+                    self.__flush__(table)
 
 
-        self.cur.execute("SET FOREIGN_KEY_CHECKS=1;")
+            self.cur.execute("SET FOREIGN_KEY_CHECKS=1;")
 
-        self.cur.close()
+            self.cur.close()
 
-        self.cnx.close()
+            self.cnx.close()
 
         self.timer.stop("Done")
 
@@ -166,7 +170,9 @@ class Cache:
 
             self.cache[table].clear()
 
-        except connector.errors.DatabaseError as error:
+        except connector.Error as error:
+
+            self.cnx.rollback()
 
             code, message = str(error).split(": ")
 
