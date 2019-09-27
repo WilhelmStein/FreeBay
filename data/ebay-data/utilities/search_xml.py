@@ -15,8 +15,8 @@ directory = os.pardir
 
 # target = re.compile(r"Rating=\"([0-9]+)\"")
 # modifier = int
-target = re.compile(r"<Description>(.*)</Description>")
-modifier = len
+target = re.compile(r"<Bidder.*Rating=\"([^\"]*)\".*>")
+modifier = float
 
 results = []
 
@@ -41,5 +41,5 @@ for filename in filenames:
 
 for metric, method in metrics.items():
 
-    print(metric, ":", method(results))
+    print("{}: {}".format(metric, method(results)))
 

@@ -14,7 +14,6 @@ class Home extends Component
         super(props);
 
         this.state = {
-            // user: this.props.user,
             recommended: [],
             history: props.history
         };
@@ -37,14 +36,57 @@ class Home extends Component
 
     getRecommended(user)
     {
-        axios.post('/api/recommended', {username: user === null ? null : user.Username})
-        .then( res => {
+        let request = undefined;
+        let after = undefined;
+
+        if (user !== null)
+        {
+            request = axios.get(`/python/${user.Id}`);
+            after = (data) => {
+                axios.post('/api/recommended/specific', {ids: data.map( (row) => row.id)})
+                .then( res => {
+                    if (res.data.error)
+                    {
+                        console.error(res.data.message)
+                        return;
+                    }
+
+                    const recommended = res.data.data.sort((a, b) => {
+                        return parseInt(a.Id) - parseInt(b.Id)
+                    })
+                    .map ((item, index) => {
+                        item.index = index;
+                        return item;
+                    })
+
+                    this.setState({
+                        recommended: recommended.sort((a, b) => {
+                            return data[a.index].score - data[b.index].score;
+                        })
+                    })
+                })
+            }
+        }
+        else
+        {
+            request = axios.post('/api/recommended', {user_id: null})
+        }
+
+        if (!request) return;
+
+        request.then( res => {
             if (res.data.error)
             {
                 console.error(res.data.message);
                 return;
             }
-            
+
+            if (after) 
+            {
+                after(res.data.data);
+                return;
+            }
+
             this.setState({
                 recommended: res.data.data
             });

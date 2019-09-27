@@ -254,36 +254,36 @@ class DBController
                                 SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
                                         a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating, a.Ended
                                 FROM    Auction a,
-                                        User u, 
+                                        User u,
                                         General_User gu
-                                WHERE   a.Seller_Id = u.Id AND 
+                                WHERE   a.Seller_Id = u.Id AND
                                         u.Id = gu.User_Id
                             ) as a
-                                LEFT JOIN 
+                                LEFT JOIN
                                 (
                                     SELECT  b.Auction_Id, JSON_ARRAYAGG(
-                                                            JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User', 
-                                                            JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Bidder_Rating', gu.Bidder_Rating), 
+                                                            JSON_OBJECT('Id', b.Id, 'Auction_Id', b.Auction_Id, 'User',
+                                                            JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Bidder_Rating', gu.Bidder_Rating),
                                                             'Amount', b.Amount, 'Time', b.Time)) as Bids
                                     FROM    Bid b,
                                             User u,
                                             General_User gu
-                                    WHERE   b.User_Id = gu.User_Id AND 
-                                            gu.User_Id = u.Id 
+                                    WHERE   b.User_Id = gu.User_Id AND
+                                            gu.User_Id = u.Id
                                     GROUP BY b.Auction_Id
                                 ) as b ON b.Auction_Id = a.Id`,
-                            
+
                 escape: []
             }
-    
+
             this.query(query, res, (rows) => {
-                
+
                 rows = rows.map( (item) => {
                         item.User = JSON.parse(item.User);
                         item.Bids = item.Bids === null ? [] : JSON.parse(item.Bids);
                         return item;
                     });
-    
+
                     res.send({
                         error: false,
                         message: "OK",
@@ -530,7 +530,7 @@ class DBController
 
             if(rows.length !== 0 && rows[0].Id === null)
                 rows = [];
-            
+
             rows = rows.map((item) => {
                 let parsedImages = JSON.parse(item.Images);
                 item.Images = parsedImages[0].Id === null ? [] : parsedImages
@@ -573,7 +573,7 @@ class DBController
 
             if(rows.length !== 0 && rows[0].Id === null)
                 rows = [];
-            
+
             rows = rows.map((item) => {
                 let parsedImages = JSON.parse(item.Images);
                 item.Images = parsedImages[0].Id === null ? [] : parsedImages
@@ -819,16 +819,23 @@ class DBController
         });
     }
 
-    recommended(username, res)
+    recommended(res, specific = false, ids = null)
     {
-        if(username)
+        let specific_ids = ""
+        if (specific)
         {
-            // LSH Nearest Neighbour Algorithm Here
-            res.send({
-                error: false,
-                message: "OK",
-                data: []
-            })
+            specific_ids = " AND ("
+            for (let i = 0; i < ids.length; i++)
+            {
+                specific_ids += `a.Id = ${ids[i]} `;
+
+                if (i < ids.length - 1)
+                {
+                    specific_ids += "OR "
+                }
+            }
+
+            specific_ids += ") "
         }
         else
         {
@@ -865,21 +872,20 @@ class DBController
                 escape: []
             }
 
-            this.query(query, res, (rows) => {
+        this.query(query, res, (rows) => {
 
-                rows = rows.map( (item) => {
-                    item.User = JSON.parse(item.User);
-                    item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-                    return item;
-                });
-
-                res.send({
-                    error: false,
-                    message: "OK",
-                    data: rows
-                });
+            rows = rows.map( (item) => {
+                item.User = JSON.parse(item.User);
+                item.Images = item.Images === null ? [] : JSON.parse(item.Images);
+                return item;
             });
-        }
+
+            res.send({
+                error: false,
+                message: "OK",
+                data: rows
+            });
+        });
     }
 
     search(category, text, res)

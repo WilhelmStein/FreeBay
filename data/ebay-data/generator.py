@@ -5,9 +5,9 @@ from faker import Faker
 
 from datetime import datetime
 
-import random
+from math import floor
 
-import os
+from random import Random
 
 from logger import Logger
 
@@ -23,7 +23,7 @@ class Generator:
         logger=Logger("Generator"),
         rating_lower=0.0, rating_upper=58823.0, rating_digits=1,
         dollar_digits=2,
-        validated_percentage=0.7
+        validated_users_percentage=0.7
     ):
 
         self.cache = cache
@@ -34,13 +34,13 @@ class Generator:
 
         self.dollar_digits = dollar_digits
 
-        self.validated_percentage = validated_percentage
+        self.validated_users_percentage = validated_users_percentage
 
 
         self.downloader = downloader
 
 
-        self.random = random.Random(seed)
+        self.random = Random(seed)
 
         self.generator = Faker()
 
@@ -53,11 +53,18 @@ class Generator:
 
         self.categories = {}
 
+        self.views = {}
+
         self.address_id = 0
 
         self.bid_id = 0
 
         self.image_id = 0
+
+
+    def __lower_end_biased_random__(self, lower, upper):
+
+        return floor(abs(self.random.random() - self.random.random()) * (1.0 + upper - lower) + lower)
 
 
     def __normalize_rating__(self, decimal, dst_lower=0.0, dst_upper=100.0):
@@ -67,7 +74,7 @@ class Generator:
 
     def __random_rating__(self, lower=0.0, upper=100.0):
 
-        return round(self.random.uniform(lower, upper), self.rating_digits)
+        return round(self.__lower_end_biased_random__(lower, upper), self.rating_digits)
 
 
     def __normalize_dollars__(self, dollars):
@@ -97,7 +104,7 @@ class Generator:
             "Surname": surname if surname else self.generator.last_name(),
             "Phone": phone if phone else self.generator.phone_number(),
             "Address_Id": self.address_id,
-            "Validated": self.random.random() <= self.validated_percentage
+            "Validated": self.random.random() <= self.validated_users_percentage
         }
 
 
@@ -196,12 +203,18 @@ class Generator:
         }
 
 
-    def __generate_view__(self, user_id, auction_id, time):
+    def __generate_view__(self, user_id, auction_id, time=None):
+
+        if user_id not in self.views:
+
+            self.views[user_id] = set()
+
+        self.views[user_id].add(auction_id)
 
         return {
             "User_Id": user_id,
             "Auction_Id": auction_id,
-            "Time": time
+            "Time": self.generator.date_time_this_year() if time is None else time
         }
 
 
@@ -219,7 +232,7 @@ class Generator:
 
             self.cache.register("User", self.__generate_user__(username=seller["UserID"]))
 
-            self.cache.register("General_User", self.__generate_general_user__(user_id=self.users[seller["UserID"]], seller_rating=seller["Rating"]))
+            self.cache.register("General_User", self.__generate_general_user__(user_id=self.users[seller["UserID"]]))
 
         self.cache.register("Auction",
             self.__generate_auction__(
@@ -253,7 +266,7 @@ class Generator:
 
                 self.cache.register("User", self.__generate_user__(username=bidder["UserID"]))
 
-                self.cache.register("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]], bidder_rating=bidder["Rating"]))
+                self.cache.register("General_User", self.__generate_general_user__(user_id=self.users[bidder["UserID"]]))
 
                 self.cache.register("Bid", self.__generate_bid__(user_id=self.users[bidder["UserID"]], auction_id=self.auction_id, amount=bid["Amount"], time=bid["Time"]))
 
@@ -272,4 +285,50 @@ class Generator:
                 self.cache.register("Category", self.__generate_category__(category))
 
                 self.cache.register("Auction_has_Category", self.__generate_auction_has_category__(self.auction_id, self.categories[category]))
+
+
+    def generate_views(
+        self,
+        users_having_views_percentage=0.7,
+        min_views_percentage=0.005,
+        max_views_percentage=0.025
+    ):
+
+        users_having_views_percentage = max(users_having_views_percentage, self.validated_users_percentage)
+
+        total_viewed_percentage = lambda: self.__lower_end_biased_random__(min_views_percentage * 1e+6, max_views_percentage * 1e+6) / 1e+6
+
+        auctions = set(range(0, self.auction_id))
+
+        users_having_views = round(users_having_views_percentage * len(self.users))
+
+        if self.verbose:
+
+            self.logger.log("Generating views for {} users".format(users_having_views))
+
+        for username, user_id in self.random.sample(self.users.items(), users_having_views):
+
+            already_viewed_percentage = len(self.views[user_id]) / self.auction_id if user_id in self.views else 0.0
+
+            generated_views_percentage = max(0.0, total_viewed_percentage() - already_viewed_percentage)
+
+            number_of_views = round(generated_views_percentage * self.auction_id)
+
+            if number_of_views <= 0:
+
+                continue
+
+
+            if self.verbose:
+
+                self.logger.log("Generating {} views for user '{}' [{}]".format(number_of_views, username, user_id))
+
+            for auction_id in self.random.sample(auctions.difference(self.views[user_id]) if user_id in self.views else auctions, number_of_views):
+
+                self.cache.register("Views",
+                    self.__generate_view__(
+                        user_id,
+                        auction_id
+                    )
+                )
 

@@ -3,9 +3,7 @@
 
 import numpy as np
 
-from sys import stdin
-
-from json import loads, dumps
+from flask import Flask, json
 
 from argparse import ArgumentParser
 
@@ -24,46 +22,42 @@ args = parser.parse_args()
 
 model = Loader(verbose=args.verbose, overwrite=args.overwrite)
 
-query = None
 
-while query is None:
+server = Flask(__name__)
 
+@server.route('/python')
+def index():
+
+    return "Recommendation Server\n\n" + parser.format_help()
+
+
+@server.route('/python/<user_id>')
+def parse_request(user_id):
     try:
 
-        query = stdin.readlines()
+        response = {
+            "data" : [
+                {
+                    "id": candidate[0],
+                    "score": candidate[1]
+                } for candidate in model.top(user_id, args.top)
+            ],
+            "error": False,
+            "message": "OK"
+        }
 
-    except:
+    except Exception as error:
 
-        continue
+        response = {
+            "data": [],
+            "error": True,
+            "message": str(error)
+        }
 
-    if query:
+    return json.dumps(response)
 
-        try:
 
-            if len(query) > 1:
+if __name__ == '__main__':
 
-                raise ValueError("Multiple arguements are not supported")
-
-            response = {
-                "data" : [
-                    {
-                        "id": candidate[0],
-                        "score": candidate[1]
-                    } for candidate in model.top(loads(query[0]), args.top)
-                ],
-                "error": False,
-                "message": "OK"
-            }
-
-        except Exception as e:
-
-            response = {
-                "data": [],
-                "error": True,
-                "message": str(e)
-            }
-
-        query = None
-
-        print(dumps(response, indent=4))
+    server.run(port=8000)
 

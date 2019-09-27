@@ -47,13 +47,13 @@ class Loader(CFiltering):
 
             else:
 
-                if self.verbose:
-
-                    self.logger.log("Loading '%s'" % filename)
-
                 with open(filename, 'rb') as file:
 
                     self.underlying, self.auctions = load(file)
+
+                    if self.verbose:
+
+                        self.logger.log("Loaded '%s'" % filename)
 
                 return
 

@@ -6,6 +6,8 @@ const fs = require('fs');
 const multer = require('multer');
 const upload = multer({dest: 'src/server/database/images/'}).single('file');
 
+const spawn = require('child_process').spawn
+
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'build')));
@@ -123,3 +125,4 @@ const options = {
 https.createServer(options, app).listen(8080, () => {
     console.log("server starting on port 8080")
 });
+
