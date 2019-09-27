@@ -32,8 +32,9 @@ async function endAuction(auctions, index)
 
     let timeout = new Date(auction.Ends) - new Date();
     setTimeout(() => {
-        controller.endAuction(auction.Id, auction.Name, auction.Seller_Id, auction.Seller_Name, auction.Bids[0].User.Username, auction.Bids, () => {
-            endAuction(auctions, ++index);
+        // console.log("TCL: auction", auction)
+        controller.endAuction(auction.Id, auction.Name, auction.User.Id, auction.User.Username, auction.Bids, () => {
+            endAuction(auctions, index + 1);
         });
     }, timeout);
 }
@@ -46,8 +47,13 @@ function watchAuctions()
             console.error(payload.message);
             return;
         }
-        console.log(payload.data);
-        endAuction(payload.data, 0);
+        console.log(`Pulling ${payload.data.length} Auctions.`);
+        if(payload.data.length === 0)
+            setTimeout(() => {
+                watchAuctions();
+            }, 60000)
+        else
+            endAuction(payload.data, 0);
     })
 }
 
