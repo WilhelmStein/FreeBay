@@ -91,12 +91,13 @@
       - [x] Integrate with user page
     - [x] Settings
 - [ ] Auction Page
-  - [ ] Image Gallery
-  - [ ] Show faded out if ended
+  - [x] Image Gallery
+  - [x] Show faded out if ended
   - [x] Export to XML by admin
-  - [ ] Bid Dialog
-  - [ ] Buyout Dialog
-  - [ ] General Styling
+  - [x] Bid Dialog
+    - [ ] Send notifications to all distinct users
+  - [x] Buyout Dialog
+  - [x] General Styling
 - [x] Admin Page
   - [x] Dashboard with options
   - [x] Login Routing

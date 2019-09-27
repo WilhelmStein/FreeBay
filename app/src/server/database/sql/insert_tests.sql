@@ -97,3 +97,5 @@ Values  ( @dummy_user_id, "rulabula sent you a message!", "/user/user/messages",
 
 Update User Set Password = 'password' Where Username = 'rulabula';
 
+Update Auction Set Ended = TRUE Where Ends < NOW();
+

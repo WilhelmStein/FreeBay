@@ -191,7 +191,7 @@ class DBController
                             Select a2.Id
                             From Address as a2, General_User as gu2
                             Where   a2.Id = gu2.Address_Id
-                                and gu2.User_id != gu.User_Id
+                                and gu2.User_Id != gu.User_Id
                                 and a.Id = a2.Id
                         )`,
                 escape: [user_username]
@@ -247,12 +247,12 @@ class DBController
             const query = {
                 string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Seller_Rating', a.Seller_Rating) as User, 
                                     a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
-                                    a.Started, a.Ends,
+                                    a.Started, a.Ends, a.Ended
                                     a.Description, b.Bids
                             FROM
                             (
                                 SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
-                                        a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                                        a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating, a.Ended
                                 FROM    Auction a,
                                         User u, 
                                         General_User gu
@@ -509,7 +509,7 @@ class DBController
     {
         const query = {
             string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                            a.Started, a.Ends, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+                            a.Started, a.Ends, a.Ended, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                      FROM 
                         (
                             SELECT u.Id
@@ -548,7 +548,7 @@ class DBController
     {
         const query = {
             string: `SELECT a.Id, a.Name, a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                            a.Started, a.Ends, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+                            a.Started, a.Ends, a.Ended, a.Description, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
                      FROM 
                         (
                             SELECT u.Id
@@ -590,12 +590,12 @@ class DBController
         const query = {
 
             string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Rating', a.Seller_Rating) as User,
-                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends, a.has_Ended,
+                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends, a.Ended,
                                 a.Description, i.Images, b.Bids
                         FROM
                         (
                             SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating, IF(a.Ends >= NOW(), FALSE, TRUE) as has_Ended
+                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating, a.Ended
                             FROM    Auction a,
                                     User u,
                                     General_User gu
@@ -718,12 +718,12 @@ class DBController
             const query = {
                 string: `   SELECT  t.Id, JSON_OBJECT('Id', t.Seller_Id, 'Username', t.Username, 'Seller_Rating', t.Seller_Rating) as User,
                                     t.Name, t.Currently, t.First_Bid, t.Buy_Price, t.Location, t.Latitude, t.Longitude, 
-                                    DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends,
+                                    DATE_FORMAT(t.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(t.Ends, "%d-%m-%Y %H:%i") as Ends, a.Ended
                                     t.Description, Count(v.User_Id) AS Times_Viewed, i.Images
                             FROM 
                             (
                                 SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
-                                        a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                                        a.Started, a.Ends, a.Ended, a.Description, u.Username, gu.Seller_Rating
                                 FROM    Auction a,
                                         User u, 
                                         General_User gu
@@ -776,12 +776,12 @@ class DBController
         const query = {
             string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Seller_Rating', a.Seller_Rating) as User, 
                                 a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, 
-                                DATE_FORMAT(a.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y %H:%i") as Ends,
+                                DATE_FORMAT(a.Started, "%d-%m-%Y %H:%i") as Started, DATE_FORMAT(a.Ends, "%d-%m-%Y %H:%i") as Ends, a.Ended
                                 a.Description, i.Images, b.Bids
                         FROM
                         (
                             SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                                    a.Started, a.Ends, a.Ended a.Description, u.Username, gu.Seller_Rating
                             FROM    Auction a,
                                     User u,
                                     General_User gu
@@ -1103,6 +1103,87 @@ class DBController
 
             }, null, true)
         });
+    }
+
+    placeBid(username, password, auction_id, amount, res)
+    {
+        this.sql.beginTransaction(err => {
+
+            if (err) 
+            {
+                console.error(err);
+                return;
+            }
+
+            const insertBid = (callback) => {
+                const query = {
+                    string: "INSERT INTO Bid (User_Id, Auction_Id, Amount, Time) VALUES ( (SELECT Id FROM User WHERE Username = ? AND Password = ?), ?, ?, NOW() )",
+                    escape: [username, password, auction_id, amount]
+                }
+    
+                return this.query(query, res, callback, null, true);
+            }
+
+            const updateAuction = () => {
+                const query = {
+                    string: "UPDATE Auction SET Currently = ? WHERE Id = ?",
+                    escape: [amount, auction_id]
+                }
+    
+                return this.query(query, res, () => {
+                    res.send({
+                        error: false,
+                        message: "Bid Placed"
+                    });
+
+                    this.sql.commit(err => {if (err) console.error(err)})
+                }, null, true);
+            }
+    
+            return insertBid(updateAuction);
+        })
+    }
+
+    buyout(username, password, auction_id, res)
+    {
+        this.sql.beginTransaction(err => {
+            
+            if (err)
+            {
+                console.error(err);
+                return;
+            }
+
+            const insertBuyoutBid = (callback) => {
+                const query = {
+                    string: `INSERT INTO Bid (User_Id, Auction_Id, Amount, Time) 
+                                VALUES ( (SELECT Id FROM User WHERE Username = ? AND Password = ?), ?, (SELECT Buy_Price FROM Auction WHERE Id = ?), NOW() )`,
+                    escape: [username, password, auction_id, auction_id]
+                }
+
+                this.query(query, res, callback, null, true);
+            }
+
+            const updateAuction = () => {
+                const query = {
+                    string: "UPDATE Auction SET Currently = (SELECT a.Buy_Price FROM (SELECT * FROM Auction) as a WHERE a.Id = ?), Ended = TRUE Where Id = ?",
+                    escape: [auction_id, auction_id]
+                }
+
+                return this.query(query, res, () => {
+                    res.send({
+                        error: false,
+                        message: "Buyout Complete"
+                    });
+
+                    // END AUCTION HERE
+
+                    this.sql.commit(err => {if (err) console.error(err)})
+                }, null, true);
+            }
+
+            return insertBuyoutBid(updateAuction);
+        })
     }
 
     query(query, res, callback = null, check = null, transaction=false)

@@ -76,7 +76,7 @@ class App extends React.Component {
                 <Switch>
                     <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
-                    <Route path='/auction/:id' component={AuctionPage} />
+                    <Route path='/auction/:id' render= { () => <AuctionPage user={this.state.user}/> } />
                     <Route path='/user/:username/:tab?/:action?' render={ (props) => {
                         return (
                             <UserPage user={this.state.user}

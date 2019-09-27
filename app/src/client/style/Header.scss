@@ -13,7 +13,9 @@ $Search-height: calc(#{$Header-height} / 2.2);
 
     color: white;
 
-    box-shadow: 1px 1px 20px $graphite;
+    // box-shadow: 1px 1px 20px $graphite;
+
+    filter: drop-shadow(1px 1px 10px $graphite);
     
     #Logo
     {
@@ -229,6 +231,10 @@ $Search-height: calc(#{$Header-height} / 2.2);
     .Empty
     {
         padding: 20px;
+    }
+
+    * {
+        z-index: 2 !important;
     }
 }
 
