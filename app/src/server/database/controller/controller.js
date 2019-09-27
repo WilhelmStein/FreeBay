@@ -647,6 +647,71 @@ class DBController
         });
     }
 
+    async auctions(callback) {
+        const query = {
+            string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Rating', a.Seller_Rating) as User,
+                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
+                                a.Description, i.Images, b.Bids
+                        FROM
+                        (
+                            SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
+                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
+                            FROM    Auction a,
+                                    User u,
+                                    General_User gu
+                            WHERE   a.Seller_Id = u.Id AND
+                                    u.Id = gu.User_Id
+                        ) as a
+                        LEFT JOIN
+                        (
+                            SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
+                            FROM    Image i,
+                                    Auction a
+                            WHERE   i.Auction_Id = a.Id
+                            GROUP BY a.Id
+                        ) as i ON a.Id = i.Auction_Id
+                        LEFT JOIN
+                        (
+                            SELECT  b.Auction_Id, JSON_ARRAYAGG(
+                                                    JSON_OBJECT('Id', b.Id, 'User',
+                                                    JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Rating', gu.Bidder_Rating),
+                                                    'Amount', b.Amount, 'Time', b.Time)) as Bids
+                            FROM    Bid b,
+                                    User u,
+                                    General_User gu
+                            WHERE   b.User_Id = gu.User_Id AND
+                                    gu.User_Id = u.Id
+                            GROUP BY b.Auction_Id
+                        ) as b ON b.Auction_Id = a.Id
+                        ORDER BY a.Ends DESC`,
+            escape: []
+        }
+
+        this.sql.query(query.string, query.escape, (err, rows) => {
+
+            if(err)
+            {
+                callback({
+                    error: true,
+                    message: 'Could not fetch auctions. Please try again.'
+                });
+                return;
+            }
+
+            rows.forEach(item => {
+                item.User = JSON.parse(item.User);
+                item.Images = item.Images === null ? [] : JSON.parse(item.Images);
+                item.Bids = item.Bids === null ? [] : JSON.parse(item.Bids);
+            });
+
+            callback({
+                error: false,
+                data: rows
+            });
+        
+        });
+    }
+
     featured(res)
     {
         const query = {
