@@ -112,7 +112,7 @@ class AuctionPage extends Component
 
     render()
     {
-        const ended = this.state.auction ? this.state.auction.has_Ended : false;
+        const ended = this.state.auction ? (this.state.auction.has_Ended === 0 ? 0 : 1) : false;
 
         if (this.state.auction === null)
             return null;
