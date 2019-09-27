@@ -20,20 +20,36 @@ const controller = new DBController(
     }
 )
 
-controller.connect();
+async function endAuction(auctions, index)
+{
+    if(auctions.length - 1 < index)
+    {
+        watchAuctions();
+        return;
+    }
 
-// while(true) {
+    let auction = auctions[index];
+
+    let timeout = new Date(auction.Ends) - new Date();
+    setTimeout(() => {
+        controller.endAuction(auction.Id, auction.Name, auction.Seller_Id, auction.Seller_Name, auction.Bids[0].User.Username, auction.Bids, () => {
+            endAuction(auctions, ++index);
+        });
+    }, timeout);
+}
+
+function watchAuctions()
+{
     controller.auctions( function(payload) {
         if(payload.error)
         {
             console.error(payload.message);
             return;
         }
-
-        let auctions = payload.data;
-
-        
+        console.log(payload.data);
+        endAuction(payload.data, 0);
     })
-// }
+}
 
-
+controller.connect();
+watchAuctions();

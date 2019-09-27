@@ -647,43 +647,27 @@ class DBController
         });
     }
 
-    async auctions(callback) {
+    auctions(callback) {
         const query = {
-            string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username, 'Rating', a.Seller_Rating) as User,
-                                a.Name, a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude, a.Started, a.Ends,
-                                a.Description, i.Images, b.Bids
+            string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username) as User,
+                                a.Started, a.Ends, b.Bids
                         FROM
                         (
-                            SELECT  a.Id, a.Seller_Id, a.Name,  a.Currently, a.First_Bid, a.Buy_Price, a.Location, a.Latitude, a.Longitude,
-                                    a.Started, a.Ends, a.Description, u.Username, gu.Seller_Rating
-                            FROM    Auction a,
-                                    User u,
-                                    General_User gu
-                            WHERE   a.Seller_Id = u.Id AND
-                                    u.Id = gu.User_Id
+                            SELECT a.Id, a.Started, a.Ends, a.Seller_Id, u.Username
+                            FROM Auction a,
+                                 User u
+                            WHERE a.Seller_Id = u.Id
                         ) as a
                         LEFT JOIN
                         (
-                            SELECT  i.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', i.Id, 'Path', i.Path)) as Images
-                            FROM    Image i,
-                                    Auction a
-                            WHERE   i.Auction_Id = a.Id
-                            GROUP BY a.Id
-                        ) as i ON a.Id = i.Auction_Id
-                        LEFT JOIN
-                        (
-                            SELECT  b.Auction_Id, JSON_ARRAYAGG(
-                                                    JSON_OBJECT('Id', b.Id, 'User',
-                                                    JSON_OBJECT('Id', gu.User_Id, 'Username', u.Username, 'Rating', gu.Bidder_Rating),
-                                                    'Amount', b.Amount, 'Time', b.Time)) as Bids
+                            SELECT  b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'User', JSON_OBJECT('Id', b.User_Id, 'Username', u.Username), 'Amount', b.Amount)) as Bids
                             FROM    Bid b,
-                                    User u,
-                                    General_User gu
-                            WHERE   b.User_Id = gu.User_Id AND
-                                    gu.User_Id = u.Id
+                                    User u
+                            WHERE b.Id
                             GROUP BY b.Auction_Id
                         ) as b ON b.Auction_Id = a.Id
-                        ORDER BY a.Ends DESC`,
+                        WHERE a.Ends > NOW()
+                        ORDER BY a.Ends ASC LIMIT 500`,
             escape: []
         }
 
@@ -691,6 +675,8 @@ class DBController
 
             if(err)
             {
+                console.error(err);
+
                 callback({
                     error: true,
                     message: 'Could not fetch auctions. Please try again.'
@@ -698,17 +684,74 @@ class DBController
                 return;
             }
 
-            rows.forEach(item => {
-                item.User = JSON.parse(item.User);
-                item.Images = item.Images === null ? [] : JSON.parse(item.Images);
-                item.Bids = item.Bids === null ? [] : JSON.parse(item.Bids);
-            });
+            for(let i = 0; i < rows.length; i++)
+            {
+                rows[i].User = JSON.parse(rows[i].User);
+                rows[i].Bids = rows[i].Bids === null ? [] : JSON.parse(rows[i].Bids);
+            }
 
             callback({
                 error: false,
                 data: rows
             });
         
+        });
+    }
+
+    endAuction(auction_id, auction_name, seller_id, seller_name, winner, bids, callback)
+    {
+        const query = {
+            string: `UPDATE 
+                     (
+                        SELECT *
+                        FROM Auction
+                        WHERE Id = ?
+                     )
+                     SET Ended = TRUE`,
+            escape: [auction_id]
+        }
+
+        this.sql.query(query.string, query.escape, function(err, rows) {
+            if(err)
+            {
+                console.error(err);
+
+                callback({
+                    error: true,
+                    message: 'Could not end auction. Please try again.'
+                });
+                return;
+            }
+
+            let notifications = bids.map((bid) => {
+                return {
+                    User_Id: bid.User.Id,
+                    Content: 
+                                (bid.User.Username === winner)
+                                ?
+                                `You are now the proud owner of "${bid.Auction_Name}". Congratulations!`
+                                :
+                                `Your watched auction with name "${bid.Auction_Name}" has been bought out by user "${winner}".`
+                             ,
+                    Link: 
+                            (bid.User.Username === winner)
+                            ?
+                            `/user/${winner}/messages/new&to=${seller_name}&subject=${`I have won "${auction_name}"`}`
+                            :
+                            `Your watched auction with name "${auction_name}" has been bought out by user "${winner}".`,
+                    Type: 'Auction'
+                }
+            });
+
+            notifications.push({
+                User_Id: seller_id,
+                Content: `Your auction with name "${auction_name}" has ${bids.length === 0 ? `ended with no buyers.` : `been won by user "${winner}".`}`,
+                Link: `${bids.length === 0 ? `` : `/user/${seller_name}/messages/new&to=${winner}&subject=${`You have won "${auction_name}"`}`}`,
+                Type: 'Auction'
+            });
+
+            this.sendNotifications(notifications, callback);
+
         });
     }
 
@@ -932,6 +975,48 @@ class DBController
 
         
 
+    }
+
+    sendNotifications(notifications, callback = null)
+    {
+        const notification_query = {
+            string: `INSERT INTO Notification (User_Id, Content, Link, Status, Type, Time)
+                     VALUES `,
+            escape: []
+        }
+
+        for(let i = 0; i < notifications.length; i++)
+        {
+            let notification = notifications[i];
+
+            notification_query.string += `(?, ?, ?, 'Unread', ?, NOW())`;
+            notification_query.escape.concat([notification.User_Id, notification.Content, notification.Link, notification.Type]);
+
+            if(i !== notifications.length - 1)
+                notification_query.string += `, `
+        }
+
+        this.sql.query(notification_query.string, notification_query.escape, function(err, rows) {
+
+            if(err)
+            {
+                console.error(err);
+
+                if(callback)
+                    callback({
+                        error: true,
+                        message: 'Could not send notification. Please try again.'
+                    });
+
+                return;
+            }
+
+            if(callback)
+                callback({
+                    error: false,
+                    data: rows
+                });
+        })
     }
 
     notifications(username, password, res)
