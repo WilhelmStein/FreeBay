@@ -44,7 +44,7 @@
 {
     ::-webkit-scrollbar 
     {
-        width: 0.4em;
+        width: 0.3em;
         height: 0.4em;
     }
 
@@ -58,7 +58,7 @@
     {
         background-color: rgba(0,0,0,.1);
         outline: 1px solid slategrey;
-        border-radius: 5px;
+        border-radius: 1px;
     }
 
     ::-webkit-scrollbar-thumb:hover
@@ -110,7 +110,7 @@
 
                 .Prices, .Dates
                 {
-                    padding: 10px;
+                    padding: 20px;
                     margin: 0;
                 }
 
@@ -244,6 +244,20 @@
     {
         background-color: $less-white;
         border-left: 0.3px solid $lesser-white;
+
+        #PricingTitle
+        {
+            font-size: 1.3em;
+            font-weight: 400;
+            color: $graphite;
+
+            padding:
+            {
+                top: 20px;
+                right: 20px;
+                left: 20px;
+            }
+        }
     }
 
 

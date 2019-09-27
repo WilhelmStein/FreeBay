@@ -72,11 +72,11 @@ class App extends React.Component {
             <div className="App">
                 {/* Header is here because it will always render in the website. It also gives login status to every other page */}
                 <Header user={this.state.user} loginHandler={this.loginHandler}/>
-                <Menu active={this.props.location.pathname}/>
+                {/* <Menu active={this.props.location.pathname}/> */}
                 <Switch>
                     <Route exact path='/' render={ () => <Home user={this.state.user}/> } />
                     <Route path='/search' component={SearchResults} />
-                    <Route path='/auction/:id' component={AuctionPage} />
+                    <Route path='/auction/:id' render= { () => <AuctionPage user={this.state.user}/> } />
                     <Route path='/user/:username/:tab?/:action?' render={ (props) => {
                         return (
                             <UserPage user={this.state.user}

@@ -167,7 +167,8 @@ class Generator:
             "Longitude": longitude,
             "Started": started,
             "Ends": ends,
-            "Description": description
+            "Description": description,
+            "Ended": False
         }
 
 
@@ -177,7 +178,7 @@ class Generator:
 
         return {
             "Id": self.bid_id,
-            "User_id": user_id,
+            "User_Id": user_id,
             "Auction_Id": auction_id,
             "Amount": self.__normalize_dollars__(amount),
             "Time": time

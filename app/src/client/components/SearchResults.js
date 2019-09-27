@@ -178,7 +178,8 @@ class SearchResults extends Component
 
 function DetailedAuctionItem(props)
 {
-    const rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+    let rating = Math.round((props.item.User.Seller_Rating * 5.0) / 100.0 * 2) / 2;
+    rating = 3.5;
 
     return (
         <Fade in={true}>
@@ -197,17 +198,17 @@ function DetailedAuctionItem(props)
                     </Typography>
 
                     <Box mb={2} className="SellerBox">
-                        <Typography display="inline"> Sold By:</Typography>
+                        <Typography display="inline">by</Typography>
 
                         <Typography onClick={() => {props.userClick(props.item.User)}} className="Seller" display="inline" variant="h5">
-                            &nbsp; &nbsp;{props.item.User.Username}
+                            &nbsp; {props.item.User.Username}
                         </Typography>
                             
                         <Rating className="Rating" display="inline" value={rating} precision={0.5} readOnly />
                     </Box>
                     
                     <Box className="Description">
-                        <Typography variant="body2">
+                        <Typography color="textSecondary" variant="body2">
                             {props.item.Description ? props.item.Description : "No Description."}
                         </Typography>
                     </Box>
@@ -215,6 +216,7 @@ function DetailedAuctionItem(props)
                 </CardContent>
 
                 <CardContent className="Pricing">
+                    <h2 id="PricingTitle">Pricing</h2>
                     <Grid container className="Prices" spacing={1}>
                         <Grid item >
                             <Typography variant="h5" className="Title">Starting Price:</Typography>
@@ -238,14 +240,14 @@ function DetailedAuctionItem(props)
                         </Grid>
                     </Grid>
 
-                    <Box className="Dates" mt={2}>
+                    {/* <Box className="Dates" mt={2}>
                         <Typography>
                             Started in: <span className="Started Date">{props.item.Started}</span>
                         </Typography>
                         <Typography>
                             Ends in: <span className="Ends Date">{props.item.Ends}</span>
                         </Typography>
-                    </Box>
+                    </Box> */}
 
                     <Box className="Buttons" mt={3}>
                         <Button className="Buy Button" variant="contained" onClick={(e) => {props.auctionClick(e, props.item.Id)}}>
