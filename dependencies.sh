@@ -10,3 +10,4 @@ pip3 install google_images_download
 pip3 install faker
 pip3 install mysql-connector
 pip3 install numpy
+pip3 install flask

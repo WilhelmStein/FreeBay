@@ -36,7 +36,7 @@
         "eject": "react-scripts eject",
         "server": "nodemon src/server/index.js",
         "watcher": "nodemon src/server/watcher.js",
-        "python-server": "python3 data/ebay-data/recommend.py"
+        "python-server": "python3 ../data/ebay-data/recommend.py"
     },
     "eslintConfig": {
         "extends": "react-app"

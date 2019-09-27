@@ -998,7 +998,7 @@ class DBController
             if(i !== notifications.length - 1)
                 notification_query.string += `, `
         }
-        //console.log(notification_query.escape)
+
         this.sql.query(notification_query.string, notification_query.escape, function(err, rows) {
 
             if(err)
@@ -1017,6 +1017,7 @@ class DBController
             if(callback)
                 callback({
                     error: false,
+                    message: "OK",
                     data: rows
                 });
         })
@@ -1277,23 +1278,40 @@ class DBController
                 return this.query(query, res, callback, null, true);
             }
 
-            const updateAuction = () => {
+            const updateAuction = (callback) => {
                 const query = {
                     string: "UPDATE Auction SET Currently = ? WHERE Id = ?",
                     escape: [amount, auction_id]
                 }
     
-                return this.query(query, res, () => {
-                    res.send({
-                        error: false,
-                        message: "Bid Placed"
-                    });
+                return this.query(query, res, callback, null, true);
+            }
 
-                    this.sql.commit(err => {if (err) console.error(err)})
-                }, null, true);
+            const notifications = () => {
+                const query = {
+                    string: `SELECT u.Id, u.Username From User as u, Bid as b Where b.Auction_Id = ? AND u.Id = b.User_Id AND u.Id != (SELECT Id FROM User WHERE Username = ? AND Password = ?)`,
+                    escape: [auction_id, username, password]
+                }
+
+                this.query(query, res, (rows) => {
+                    const nots = rows.map( user => {
+                        return {
+                            User_Id: user.Id,
+                            Content: `${username} has outbed you on your watched auction with id: ${auction_id}`,
+                            Link: `/auction/${auction_id}`,
+                            Type: 'Auction'
+                        }
+                    })
+
+                    this.sendNotifications(nots, (res_obj) => {
+                        res.send(res_obj);
+    
+                        this.sql.commit(err => {if (err) console.error(err)})
+                    })
+                })
             }
     
-            return insertBid(updateAuction);
+            return insertBid( () => updateAuction(notifications) );
         })
     }
 

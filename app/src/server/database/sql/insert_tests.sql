@@ -85,7 +85,7 @@ VALUES  (5, "5.jpg", @max_auction_id + 1),
         (4, "4.jpg", @max_auction_id + 5),
         (1, "1.jpg", @max_auction_id + 6),
         (6, "6.jpg", @max_auction_id + 2),
-        (7, "7.gif", @max_auction_id + 4);
+        (7, "pill.jpeg", @max_auction_id + 4);
 
 
 -- Views --
