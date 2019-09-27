@@ -42,12 +42,14 @@ async function endAuction(auctions, index)
 function watchAuctions()
 {
     controller.auctions( function(payload) {
+    // console.log("TCL: payload", payload.data)
         if(payload.error)
         {
             console.error(payload.message);
             return;
         }
         console.log(`Pulling ${payload.data.length} Auctions.`);
+        
         if(payload.data.length === 0)
             setTimeout(() => {
                 watchAuctions();

@@ -41,13 +41,13 @@ INSERT INTO General_User VALUES (@dummy_user_id, 100.0, 100.0, 'Userus', 'Passwo
 -- Auctions --
 
 INSERT INTO Auction (Id, Seller_Id, Name, Currently, First_Bid, Buy_Price, Location, Latitude, Longitude, Started, Ends, Description)
-VALUES  (@max_auction_id + 1, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "A luxurious suit for the extraordinary gentleman."),
-        (@max_auction_id + 2, 1, "Modest Frock", 333.00, 100.00, 800.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-9-18 9:00:00", "An elegant frock for the graceful lady."),
-        (@max_auction_id + 3, 3, "Venereal Disease", 0.00, 30.00, 69.69, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-12-18 9:00:00", ";)"),
-        (@max_auction_id + 4, 3, "Natural Viagra", 23.00, 10.00, 55.00, "Olympus", NULL, NULL, "2019-01-11 9:00:00", "2019-10-18 9:00:00", "To make your partner say: 'By Jupiter's Cock!'"),
-        (@max_auction_id + 5, 5, "Your Mother", 6.12, 5.00, 12.00, "Elladistan", NULL, NULL, "2019-01-11 9:00:00", "2019-10-18 9:00:00", ""),
-        (@max_auction_id + 6, 4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", ""),
-        (@max_auction_id + 7, 1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", "2019-01-18 9:00:00", "");
+VALUES  (@max_auction_id + 1, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", DATE_ADD(now(), INTERVAL 1 MINUTE), "A luxurious suit for the extraordinary gentleman."),
+        (@max_auction_id + 2, 1, "Modest Frock", 333.00, 100.00, 800.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00",DATE_ADD(now(), INTERVAL 5 MINUTE), "An elegant frock for the graceful lady."),
+        (@max_auction_id + 3, 3, "Venereal Disease", 0.00, 30.00, 69.69, "Olympus", NULL, NULL, "2019-01-11 9:00:00", DATE_ADD(now(), INTERVAL 6 MINUTE), ";)"),
+        (@max_auction_id + 4, 3, "Natural Viagra", 23.00, 10.00, 55.00, "Olympus", NULL, NULL, "2019-01-11 9:00:00", DATE_ADD(now(), INTERVAL 1 MINUTE), "To make your partner say: 'By Jupiter's Cock!'"),
+        (@max_auction_id + 5, 5, "Your Mother", 6.12, 5.00, 12.00, "Elladistan", NULL, NULL, "2019-01-11 9:00:00", DATE_ADD(now(), INTERVAL 10 DAY), ""),
+        (@max_auction_id + 6, 4, "Child Tear - Flavoured Martini", 99.00, 45.00, 500.00, "Bastille inc", NULL, NULL, DATE_ADD(now(), INTERVAL 10 MINUTE), "2019-01-18 9:00:00", ""),
+        (@max_auction_id + 7, 1, "Noble Scepter", 5236.00, 1000.00, 10000.00, "Historical Emporium", NULL, NULL, "2019-01-11 9:00:00", DATE_ADD(now(), INTERVAL 20 MINUTE), "");
 
 
 -- Categories --
@@ -55,7 +55,7 @@ VALUES  (@max_auction_id + 1, 1, "Sumptuous Dandy's Outfit", 125.00, 100.00, 500
 INSERT INTO Category (Id, Name, Caption)
 VALUES (@category_1, "Health & Fitness",            "Your body is your temple. Respect it as you should."),
        (@category_2, "Clothing",                    "Be fashionable, be alluring."),
-       (@category_3, "Home",                        "Home sweet home.");
+       (@category_3, "Home",                        "Home sweet home."),
        (@category_4, "CDs & Vinyl",                 "Kick back and relax to the sound of music."),
        (@category_5, "Digital Music",               "All the newest tracks are here."),
        (@category_6, "Computer & Accessories",      "The best computers money can buy."),
