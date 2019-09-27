@@ -652,11 +652,11 @@ class DBController
 
     auctions(callback) {
         const query = {
-            string: `   SELECT  a.Id, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username) as User,
+            string: `   SELECT  a.Id, a.Name, JSON_OBJECT('Id', a.Seller_Id, 'Username', a.Username) as User,
                                 a.Started, a.Ends, b.Bids
                         FROM
                         (
-                            SELECT a.Id, a.Started, a.Ends, a.Seller_Id, u.Username
+                            SELECT a.Id, a.Name, a.Started, a.Ends, a.Seller_Id, u.Username, a.Ended
                             FROM Auction a,
                                  User u
                             WHERE a.Seller_Id = u.Id
@@ -664,12 +664,17 @@ class DBController
                         LEFT JOIN
                         (
                             SELECT  b.Auction_Id, JSON_ARRAYAGG(JSON_OBJECT('Id', b.Id, 'User', JSON_OBJECT('Id', b.User_Id, 'Username', u.Username), 'Amount', b.Amount)) as Bids
-                            FROM    Bid b,
-                                    User u
-                            WHERE b.Id
+                            FROM
+                                (
+                                    SELECT *
+                                    FROM Bid b
+                                    ORDER BY b.Amount DESC
+                                ) as b,
+                                User u
+                            WHERE b.User_Id = u.Id
                             GROUP BY b.Auction_Id
                         ) as b ON b.Auction_Id = a.Id
-                        WHERE a.Ends > NOW()
+                        WHERE a.Ended = FALSE
                         ORDER BY a.Ends ASC LIMIT 500`,
             escape: []
         }
@@ -691,6 +696,7 @@ class DBController
             {
                 rows[i].User = JSON.parse(rows[i].User);
                 rows[i].Bids = rows[i].Bids === null ? [] : JSON.parse(rows[i].Bids);
+                rows[i].Bids.sort((a,b) => (parseFloat(a.Amount) < parseFloat(b.Amount)))
             }
 
             callback({
@@ -701,18 +707,18 @@ class DBController
         });
     }
 
-    endAuction(auction_id, auction_name, seller_id, seller_name, winner, bids, callback)
+    endAuction(auction_id, auction_name, seller_id, seller_name, bids, callback)
     {
+        const winner = bids.length === 0 ? null : bids[0].User.Username; 
+
         const query = {
-            string: `UPDATE 
-                     (
-                        SELECT *
-                        FROM Auction
-                        WHERE Id = ?
-                     )
-                     SET Ended = TRUE`,
+            string: `UPDATE Auction
+                     SET Ended = TRUE
+                     WHERE Id = ?`,
             escape: [auction_id]
         }
+
+        const controller = this;
 
         this.sql.query(query.string, query.escape, function(err, rows) {
             if(err)
@@ -732,16 +738,16 @@ class DBController
                     Content: 
                                 (bid.User.Username === winner)
                                 ?
-                                `You are now the proud owner of "${bid.Auction_Name}". Congratulations!`
+                                `You are now the proud owner of "${auction_name}". Congratulations!`
                                 :
-                                `Your watched auction with name "${bid.Auction_Name}" has been bought out by user "${winner}".`
+                                `Your watched auction with name "${auction_name}" has been bought out by user "${winner}".`
                              ,
                     Link: 
                             (bid.User.Username === winner)
                             ?
                             `/user/${winner}/messages/new&to=${seller_name}&subject=${`I have won "${auction_name}"`}`
                             :
-                            `Your watched auction with name "${auction_name}" has been bought out by user "${winner}".`,
+                            `/auction/${auction_id}`,
                     Type: 'Auction'
                 }
             });
@@ -749,11 +755,11 @@ class DBController
             notifications.push({
                 User_Id: seller_id,
                 Content: `Your auction with name "${auction_name}" has ${bids.length === 0 ? `ended with no buyers.` : `been won by user "${winner}".`}`,
-                Link: `${bids.length === 0 ? `` : `/user/${seller_name}/messages/new&to=${winner}&subject=${`You have won "${auction_name}"`}`}`,
+                Link: `${bids.length === 0 ? `/auction/${auction_id}` : `/user/${seller_name}/messages/new&to=${winner}&subject=${`You have won "${auction_name}"`}`}`,
                 Type: 'Auction'
             });
-
-            this.sendNotifications(notifications, callback);
+            
+            controller.sendNotifications(notifications, callback);
 
         });
     }
@@ -789,7 +795,7 @@ class DBController
                                 ahc.Auction_Id = a.Id
                         GROUP BY c.Id
                         HAVING COUNT(distinct(a.Id)) > 1
-                        ORDER BY count(distinct(a.Id)) Desc Limit 5
+                        ORDER BY count(distinct(a.Id)) Desc Limit 1000
             `,
             escape: []
         }
@@ -998,12 +1004,12 @@ class DBController
             let notification = notifications[i];
 
             notification_query.string += `(?, ?, ?, 'Unread', ?, NOW())`;
-            notification_query.escape.concat([notification.User_Id, notification.Content, notification.Link, notification.Type]);
+            notification_query.escape = notification_query.escape.concat([notification.User_Id, notification.Content, notification.Link, notification.Type]);
 
             if(i !== notifications.length - 1)
                 notification_query.string += `, `
         }
-
+        //console.log(notification_query.escape)
         this.sql.query(notification_query.string, notification_query.escape, function(err, rows) {
 
             if(err)
